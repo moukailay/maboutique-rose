@@ -13,7 +13,7 @@ export default function LanguageSelector() {
   const { language, setLanguage } = useTranslation();
 
   const languages = [
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'fr', name: 'français', flag: '🇨🇦' },
     { code: 'en', name: 'English', flag: '🇬🇧' },
   ];
 

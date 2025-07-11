@@ -23,31 +23,18 @@ import NotFound from "@/pages/not-found";
 
 // Admin pages
 import AdminLogin from "@/pages/admin/Login";
-import AdminDashboard from "@/pages/admin/Dashboard";
-import AdminProducts from "@/pages/admin/Products";
-import AdminProductForm from "@/pages/admin/ProductForm";
-import AdminCategories from "@/pages/admin/Categories";
-import AdminOrders from "@/pages/admin/Orders";
-import AdminCustomers from "@/pages/admin/Customers";
-import AdminReviews from "@/pages/admin/Reviews";
-import AdminSettings from "@/pages/admin/Settings";
-import ChatMessages from "@/pages/admin/ChatMessages";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminProducts from "@/pages/admin/AdminProducts";
+import AddProduct from "@/pages/admin/AddProduct";
 
 function Router() {
   return (
     <Switch>
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />
-      <Route path="/admin/products/new" component={AdminProductForm} />
-      <Route path="/admin/products/:id/edit" component={AdminProductForm} />
-      <Route path="/admin/categories" component={AdminCategories} />
-      <Route path="/admin/orders" component={AdminOrders} />
-      <Route path="/admin/customers" component={AdminCustomers} />
-      <Route path="/admin/reviews" component={AdminReviews} />
-      <Route path="/admin/settings" component={AdminSettings} />
-      <Route path="/admin/chat" component={ChatMessages} />
+      <Route path="/admin/products/add" component={AddProduct} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />
