@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import LanguageSelector from '@/components/LanguageSelector';
+import ThemeSelector from '@/components/ThemeSelector';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Header() {
@@ -39,7 +40,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -57,7 +58,7 @@ export default function Header() {
                 className={`font-medium transition-colors ${
                   isActive(item.href)
                     ? 'text-rose-primary'
-                    : 'text-text-dark hover:text-rose-primary'
+                    : 'text-text-dark dark:text-text-light hover:text-rose-primary'
                 }`}
               >
                 {item.label}
@@ -71,7 +72,7 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="text-text-dark hover:text-rose-primary"
+              className="text-text-dark dark:text-text-light hover:text-rose-primary"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -80,7 +81,7 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={toggleCart}
-              className="text-text-dark hover:text-rose-primary relative"
+              className="text-text-dark dark:text-text-light hover:text-rose-primary relative"
             >
               <ShoppingCart className="h-5 w-5" />
               {getTotalItems() > 0 && (
@@ -91,13 +92,15 @@ export default function Header() {
             </Button>
 
             <LanguageSelector />
+            
+            <ThemeSelector />
 
             <AuthDropdown />
 
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-text-dark hover:text-rose-primary"
+              className="md:hidden text-text-dark dark:text-text-light hover:text-rose-primary"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -108,7 +111,7 @@ export default function Header() {
 
       {/* Search Dropdown */}
       {isSearchOpen && (
-        <div className="bg-white border-t border-gray-100 px-4 py-3">
+        <div className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 px-4 py-3">
           <div className="max-w-7xl mx-auto">
             <form onSubmit={handleSearch} className="relative">
               <Input

@@ -34,11 +34,12 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 ### Frontend Structure
 - **Pages**: Home, Products, Product Detail, About, Contact, Cart, Checkout, Login, Register
 - **Admin Pages**: Login, Dashboard, Products, Categories, Orders, Customers, Reviews, Settings
-- **Components**: Header (sticky navigation with AuthDropdown and LanguageSelector), Footer, ProductCard, CartSidebar
+- **Components**: Header (sticky navigation with AuthDropdown, LanguageSelector, and ThemeSelector), Footer, ProductCard, CartSidebar
 - **Auth Components**: AuthProvider, AuthDropdown, Login/Register forms
 - **Translation Components**: TranslationProvider, LanguageSelector, useTranslation hook
+- **Theme Components**: ThemeProvider, ThemeSelector, useTheme hook
 - **UI Components**: Complete shadcn/ui component library integration
-- **Theming**: CSS custom properties with rose/pink color palette for ROSE-D'ÉDEN branding
+- **Theming**: CSS custom properties with rose/pink color palette for ROSE-D'ÉDEN branding, full dark/light theme support
 
 ### Backend Structure
 - **Routes**: Authentication (login/register/verify), Product management, categories, orders, reviews, contact forms, newsletter
@@ -88,6 +89,15 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 - Updated Header, Home, Products, and AuthDropdown components to use translations
 - Language preference persisted in localStorage
 - Ready for extension to additional languages
+
+### Dark/Light Theme System (January 2025)
+- Created comprehensive theme switching system with dark/light mode support
+- Added useTheme hook with ThemeProvider context
+- Implemented ThemeSelector component with sun/moon icons
+- Added CSS variables for dark theme variants in index.css
+- Updated Header, Home, and Products pages with dark mode classes
+- Theme preference persisted in localStorage with system preference detection
+- Integrated theme translations in both French and English
 
 ## External Dependencies
 

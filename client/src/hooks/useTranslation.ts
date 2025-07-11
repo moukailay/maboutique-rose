@@ -103,6 +103,11 @@ export const translations = {
     'common.sort': 'Trier',
     'common.price': 'Prix',
     'common.name': 'Nom',
+    
+    // Themes
+    'theme.light': 'Thème clair',
+    'theme.dark': 'Thème sombre',
+    'theme.toggle': 'Basculer le thème',
     'common.email': 'Email',
     'common.phone': 'Téléphone',
     'common.address': 'Adresse',
@@ -195,6 +200,11 @@ export const translations = {
     'common.sort': 'Sort',
     'common.price': 'Price',
     'common.name': 'Name',
+    
+    // Themes
+    'theme.light': 'Light theme',
+    'theme.dark': 'Dark theme',
+    'theme.toggle': 'Toggle theme',
     'common.email': 'Email',
     'common.phone': 'Phone',
     'common.address': 'Address',

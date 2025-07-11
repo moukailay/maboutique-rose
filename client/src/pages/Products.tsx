@@ -55,13 +55,13 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-text-dark mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-text-dark dark:text-text-light mb-4">
             {t('products.title')}
           </h1>
-          <p className="text-lg text-text-medium">
+          <p className="text-lg text-text-medium dark:text-text-medium">
             {t('home.featured.subtitle')}
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function Products() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-text-medium text-lg">
+            <p className="text-text-medium dark:text-text-medium text-lg">
               {searchQuery || categoryFilter 
                 ? t('products.empty')
                 : t('products.loading')}

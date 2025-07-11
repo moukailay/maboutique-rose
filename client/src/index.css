@@ -24,13 +24,14 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
   
-  /* Rose color palette */
+  /* Rose color palette - Light Theme */
   --rose-primary: hsl(330, 81%, 60%);
   --rose-light: hsl(330, 81%, 70%);
   --rose-dark: hsl(330, 81%, 45%);
   --rose-accent: hsl(330, 30%, 85%);
   --text-dark: hsl(220, 13%, 18%);
   --text-medium: hsl(0, 0%, 40%);
+  --text-light: hsl(0, 0%, 98%);
 }
 
 .dark {
@@ -44,7 +45,7 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(330, 81%, 60%);
+  --primary: hsl(330, 81%, 65%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);
@@ -54,6 +55,15 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  
+  /* Rose color palette - Dark Theme */
+  --rose-primary: hsl(330, 81%, 65%);
+  --rose-light: hsl(330, 81%, 75%);
+  --rose-dark: hsl(330, 81%, 50%);
+  --rose-accent: hsl(330, 30%, 20%);
+  --text-dark: hsl(0, 0%, 98%);
+  --text-medium: hsl(240, 5%, 64.9%);
+  --text-light: hsl(220, 13%, 18%);
 }
 
 @layer base {

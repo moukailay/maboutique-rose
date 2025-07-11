@@ -16,7 +16,7 @@ export default function Home() {
   const featuredProducts = products?.slice(0, 4) || [];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-center text-white overflow-hidden">
         <div
@@ -50,13 +50,13 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-dark mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-text-dark dark:text-text-light mb-4">
               {t('home.featured.title')}
             </h2>
-            <p className="text-lg text-text-medium max-w-2xl mx-auto">
+            <p className="text-lg text-text-medium dark:text-text-medium max-w-2xl mx-auto">
               {t('home.featured.subtitle')}
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
             <div className="mb-8 lg:mb-0">
@@ -103,25 +103,25 @@ export default function Home() {
               />
             </div>
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-dark mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-text-dark dark:text-text-light mb-6">
                 {t('home.about.title')}
               </h2>
-              <p className="text-lg text-text-medium mb-6">
+              <p className="text-lg text-text-medium dark:text-text-medium mb-6">
                 {t('home.about.text')}
               </p>
               
               <div className="space-y-4 mb-8">
                 <div className="flex items-center">
                   <Leaf className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">{t('home.about.eco')}</span>
+                  <span className="text-text-dark dark:text-text-light font-medium">{t('home.about.eco')}</span>
                 </div>
                 <div className="flex items-center">
                   <Tag className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">{t('home.about.quality')}</span>
+                  <span className="text-text-dark dark:text-text-light font-medium">{t('home.about.quality')}</span>
                 </div>
                 <div className="flex items-center">
                   <Handshake className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">{t('home.about.social')}</span>
+                  <span className="text-text-dark dark:text-text-light font-medium">{t('home.about.social')}</span>
                 </div>
               </div>
               
