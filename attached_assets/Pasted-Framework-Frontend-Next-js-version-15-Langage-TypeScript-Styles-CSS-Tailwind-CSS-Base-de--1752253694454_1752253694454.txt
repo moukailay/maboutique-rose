@@ -1,0 +1,221 @@
+Framework Frontend : Next.js (version 15)
+
+Langage : TypeScript
+
+Styles CSS : Tailwind CSS
+
+Base de données : PostgreSQL
+
+Cahier des charges détaillé du site e-commerce pour produits naturels
+Structure générale du site :
+Page d’accueil (Home)
+
+Page des produits (Catalogue)
+
+Page de détail produit
+
+Page À propos
+
+Page Contact
+
+Page Panier
+
+Page Paiement
+
+1. HEADER (En-tête du site)
+Le header doit être sticky (reste en haut en scrollant).
+
+Logo (à gauche)
+Logo cliquable, redirigeant vers la page d'accueil.
+
+Menu principal (centré)
+
+Accueil
+
+Produits
+
+À propos
+
+Contact
+
+Icônes interactives (à droite)
+
+Icône recherche (déploie une barre de recherche au clic)
+
+Icône panier (affiche nombre d'articles dans le panier, redirige vers le panier)
+
+Icône compte utilisateur (connexion/inscription)
+
+2. HERO SECTION (Section principale d’accueil)
+Cette section doit occuper tout l'écran initial (viewport height).
+
+Image de fond immersive :
+
+Photo professionnelle d’un paysage naturel (forêt, plantes, nature).
+
+Sombre ou légèrement sombre, pour contraste avec le texte.
+
+Texte accrocheur :
+
+Grand titre en blanc : « Redécouvrez la Nature »
+
+Sous-titre : « Votre source de produits naturels authentiques et responsables. »
+
+Bouton d’appel à l'action (CTA) :
+
+Texte : « Découvrir nos produits »
+
+Redirige vers la page catalogue.
+
+3. SECTION PRÉSENTATION DES PRODUITS (Catalogue sur la page d'accueil)
+Présentation en grille responsive des produits phares.
+
+Titre de section : « Nos produits naturels vedettes »
+
+Disposition :
+
+3 à 4 colonnes (responsive en mobile : 1 à 2 colonnes)
+
+Chaque carte produit inclut :
+
+Image du produit
+
+Nom du produit
+
+Prix (clair, visible)
+
+Bouton : « Voir produit » ou « Ajouter au panier »
+
+Pagination simple ou bouton « Voir tous les produits ».
+
+4. PAGE DE DÉTAIL D’UN PRODUIT
+Affichage détaillé après clic sur un produit :
+
+Image principale grande et zoomable.
+
+Galerie d'images secondaires (max 4).
+
+Titre produit, prix, disponibilité en stock.
+
+Description détaillée du produit.
+
+Bouton clair : « Ajouter au panier ».
+
+Avis clients (notes, commentaires clients sous forme de liste).
+
+5. SECTION À PROPOS (brève introduction en accueil, lien vers page dédiée)
+Texte court présentant les valeurs de la marque :
+
+Engagement écologique
+
+Origine et qualité des produits
+
+Responsabilité sociale
+
+Bouton redirigeant vers la page complète « À propos ».
+
+6. FORMULAIRE DE CONTACT (Page dédiée « Contact »)
+Formulaire clair, simple et efficace :
+
+Champs requis :
+
+Nom complet
+
+Adresse email
+
+Sujet (liste déroulante : Demande générale, Question produit, Problème commande)
+
+Message (zone texte multi-lignes)
+
+Validation côté client (TypeScript) et serveur.
+
+Bouton : « Envoyer message »
+
+Affiché à côté du formulaire, informations utiles :
+
+Adresse physique
+
+Téléphone
+
+Email de contact
+
+7. SECTION PANIER & CHECKOUT (Paiement)
+Panier :
+Liste claire des produits ajoutés (image, nom, quantité modifiable, prix, total).
+
+Option de suppression facile d’un produit.
+
+Calcul automatique du total et des frais éventuels (livraison, taxes).
+
+Bouton clair : « Procéder au paiement ».
+
+Paiement sécurisé :
+Formulaire sécurisé de paiement (Stripe ou PayPal).
+
+Formulaire de livraison (adresse complète, numéro de téléphone).
+
+Validation claire et simple des données de paiement.
+
+Message clair de confirmation après commande.
+
+8. FOOTER (bas de page)
+Organisé en colonnes avec les sections suivantes :
+
+À propos
+
+Lien vers la page À propos
+
+Lien vers la page Contact
+
+Navigation rapide
+
+Accueil
+
+Produits
+
+Mon compte
+
+Politique de confidentialité
+
+Conditions générales de vente
+
+Contact
+
+Adresse email
+
+Numéro de téléphone
+
+Adresse physique
+
+Réseaux sociaux
+
+Icônes Facebook, Instagram, LinkedIn, Twitter (ou autre selon pertinence)
+
+Inscription à la newsletter
+
+Champ unique : « Entrez votre email »
+
+Bouton : « S’inscrire »
+
+9. TECHNOLOGIES & INFRASTRUCTURE
+Frontend :
+
+Framework : Next.js (App Router)
+
+Langage : TypeScript
+
+CSS : Tailwind CSS (classes utilitaires uniquement)
+
+Backend/API :
+
+Gestion des routes Next.js avec route handlers pour les requêtes API
+
+Validation stricte avec Zod (optionnel mais recommandé)
+
+ORM Prisma (connexion à PostgreSQL)
+
+Base de données :
+
+PostgreSQL (utilisation directe ou via Prisma ORM)
+
+Schéma clair (Produits, Catégories, Utilisateurs, Commandes, Paiements, Avis)
