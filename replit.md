@@ -34,10 +34,11 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 ### Frontend Structure
 - **Pages**: Home, Products, Product Detail, About, Contact, Cart, Checkout, Login, Register
 - **Admin Pages**: Login, Dashboard, Products, Categories, Orders, Customers, Reviews, Settings
-- **Components**: Header (sticky navigation with AuthDropdown, LanguageSelector, and ThemeSelector), Footer, ProductCard, CartSidebar
+- **Components**: Header (sticky navigation with AuthDropdown, LanguageSelector, and ThemeSelector), Footer, ProductCard, CartSidebar, ChatWidget
 - **Auth Components**: AuthProvider, AuthDropdown, Login/Register forms
 - **Translation Components**: TranslationProvider, LanguageSelector, useTranslation hook
 - **Theme Components**: ThemeProvider, ThemeSelector, useTheme hook
+- **Chat Components**: ChatWidget with Quebec French interface and intelligent responses
 - **UI Components**: Complete shadcn/ui component library integration
 - **Theming**: CSS custom properties with rose/pink color palette for ROSE-D'ÉDEN branding, full dark/light theme support
 
@@ -98,6 +99,15 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 - Updated Header, Home, and Products pages with dark mode classes
 - Theme preference persisted in localStorage with system preference detection
 - Integrated theme translations in both French and English
+
+### Live Chat System (January 2025)
+- Created custom live chat widget with Quebec French interface
+- Intelligent auto-responses based on message content (pricing, shipping, products, orders)
+- Professional chat design with avatars and timestamps
+- Contextual responses specifically for Quebec market
+- Fully responsive design with floating chat button
+- Online status indicator and professional Quebec customer service approach
+- Integrated with existing translation system for French/English support
 
 ## External Dependencies
 
