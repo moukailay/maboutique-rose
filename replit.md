@@ -109,6 +109,16 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 - Online status indicator and professional Quebec customer service approach
 - Integrated with existing translation system for French/English support
 
+### Database Integration (January 2025)
+- Migrated from in-memory storage to PostgreSQL database using Neon Database
+- Added complete database schema with relations using Drizzle ORM
+- Implemented DatabaseStorage class replacing MemStorage for all data operations
+- Added proper bcrypt password hashing for secure authentication
+- Created automatic database initialization with sample data (categories, products, admin user)
+- Updated all authentication routes to use bcrypt for password comparison
+- Maintained all existing functionality while adding persistent data storage
+- Database schema includes: users, categories, products, orders, order_items, reviews, contacts, newsletters, chat_messages
+
 ## External Dependencies
 
 ### Frontend Dependencies

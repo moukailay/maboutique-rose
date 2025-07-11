@@ -7,6 +7,7 @@ import {
   reviews,
   contacts,
   newsletters,
+  chatMessages,
   type User,
   type InsertUser,
   type Product,
@@ -26,6 +27,9 @@ import {
   type ChatMessage,
   type InsertChatMessage,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, like, ilike } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export interface IStorage {
   // Users
@@ -82,69 +86,43 @@ export interface IStorage {
   }): Promise<User>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private categories: Map<number, Category> = new Map();
-  private products: Map<number, Product> = new Map();
-  private orders: Map<number, Order> = new Map();
-  private orderItems: Map<number, OrderItem> = new Map();
-  private reviews: Map<number, Review> = new Map();
-  private contacts: Map<number, Contact> = new Map();
-  private newsletters: Map<number, Newsletter> = new Map();
-  private chatMessages: Map<number, ChatMessage> = new Map();
-
-  private currentUserId = 1;
-  private currentCategoryId = 1;
-  private currentProductId = 1;
-  private currentOrderId = 1;
-  private currentOrderItemId = 1;
-  private currentReviewId = 1;
-  private currentContactId = 1;
-  private currentNewsletterId = 1;
-  private currentChatMessageId = 1;
-
-  constructor() {
-    this.initializeData();
-  }
-
-  private initializeData() {
+export class DatabaseStorage implements IStorage {
+  async initializeData() {
     // Initialize categories
     const categoriesData = [
       {
-        id: 1,
         name: "Miel & Apiculture",
         description: "Miel artisanal et produits de la ruche",
         slug: "miel-apiculture",
       },
       {
-        id: 2,
         name: "Huiles Essentielles",
         description: "Huiles essentielles pures et biologiques",
         slug: "huiles-essentielles",
       },
       {
-        id: 3,
         name: "Tisanes & Infusions",
         description: "Tisanes aux plantes naturelles",
         slug: "tisanes-infusions",
       },
       {
-        id: 4,
         name: "Cosmétiques Naturels",
         description: "Soins naturels pour le corps",
         slug: "cosmetiques-naturels",
       },
     ];
 
-    categoriesData.forEach((cat) => {
-      this.categories.set(cat.id, cat);
-      this.currentCategoryId = Math.max(this.currentCategoryId, cat.id + 1);
-    });
+    // Check if categories exist, if not, create them
+    const existingCategories = await this.getCategories();
+    if (existingCategories.length === 0) {
+      for (const cat of categoriesData) {
+        await this.createCategory(cat);
+      }
+    }
 
     // Initialize products
     const productsData = [
       {
-        id: 1,
         name: "Miel Bio Artisanal",
         description:
           "Miel de fleurs sauvages récolté localement par nos apiculteurs partenaires. Un goût authentique et des bienfaits naturels préservés.",
@@ -158,10 +136,8 @@ export class MemStorage implements IStorage {
         categoryId: 1,
         stock: 50,
         isActive: true,
-        createdAt: new Date(),
       },
       {
-        id: 2,
         name: "Huiles Essentielles Bio",
         description:
           "Coffret de 6 huiles essentielles pures : lavande, eucalyptus, menthe, citron, tea tree et romarin. Idéal pour l'aromathérapie.",
@@ -170,106 +146,83 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
           "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          "https://images.unsplash.com/photo-1594736797933-d0601ba2fe65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 2,
-        stock: 30,
-        isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        id: 3,
-        name: "Tisanes Bio",
-        description:
-          "Collection de 12 tisanes aux plantes : camomille, verveine, tilleul, menthe, thym et bien d'autres. Parfaites pour la détente.",
-        price: "47.99",
-        image:
-          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        images: [
-          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        ],
-        categoryId: 3,
         stock: 25,
         isActive: true,
-        createdAt: new Date(),
       },
       {
-        id: 4,
-        name: "Cosmétiques Naturels",
+        name: "Tisane Détox Bio",
         description:
-          "Soins visage aux ingrédients naturels : crème hydratante, sérum anti-âge, gommage doux et masque purifiant.",
-        price: "67.99",
+          "Mélange de plantes biologiques pour une détoxification naturelle. Contient du pissenlit, de la bardane et du thé vert.",
+        price: "24.99",
         image:
-          "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
-          "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          "https://images.unsplash.com/photo-1597318020386-ab2dcda8e8c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        ],
+        categoryId: 3,
+        stock: 100,
+        isActive: true,
+      },
+      {
+        name: "Crème Hydratante Bio",
+        description:
+          "Crème hydratante aux ingrédients naturels biologiques. Idéale pour tous types de peau, enrichie en beurre de karité.",
+        price: "45.99",
+        image:
+          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        images: [
+          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          "https://images.unsplash.com/photo-1594736797933-d0601ba2fe65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 4,
-        stock: 15,
+        stock: 30,
         isActive: true,
-        createdAt: new Date(),
       },
     ];
 
-    productsData.forEach((prod) => {
-      this.products.set(prod.id, prod);
-      this.currentProductId = Math.max(this.currentProductId, prod.id + 1);
-    });
+    // Check if products exist, if not, create them
+    const existingProducts = await this.getProducts();
+    if (existingProducts.length === 0) {
+      for (const prod of productsData) {
+        await this.createProduct(prod);
+      }
+    }
 
-    // Initialize admin user
-    const adminUser = {
-      id: 1,
-      username: "admin@rose-d-eden.fr",
-      email: "admin@rose-d-eden.fr",
-      password: "admin123",
-      firstName: "Admin",
-      lastName: "Rose d'Eden",
-      phone: null,
-      address: null,
-      city: null,
-      postalCode: null,
-      country: null,
-      role: "admin",
-      createdAt: new Date(),
-    };
-    
-    this.users.set(1, adminUser);
-    this.currentUserId = 2;
+    // Create admin user if it doesn't exist
+    const adminUser = await this.getUserByEmail("admin@rose-d-eden.fr");
+    if (!adminUser) {
+      await this.createUserWithAuth({
+        firstName: "Admin",
+        lastName: "User",
+        email: "admin@rose-d-eden.fr",
+        password: "admin123",
+        role: "admin",
+      });
+    }
   }
 
-  // Users
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find((user) => user.email === email);
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      ...insertUser,
-      id,
-      role: insertUser.role || 'user',
-      createdAt: new Date(),
-      address: insertUser.address || null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      phone: insertUser.phone || null,
-      city: insertUser.city || null,
-      postalCode: insertUser.postalCode || null,
-      country: insertUser.country || null,
-    };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
@@ -280,224 +233,128 @@ export class MemStorage implements IStorage {
     password: string;
     role?: 'user' | 'admin';
   }): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      id,
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    
+    const [user] = await db.insert(users).values({
       username: userData.email,
       email: userData.email,
-      password: userData.password,
+      password: hashedPassword,
       firstName: userData.firstName,
       lastName: userData.lastName,
-      phone: null,
-      address: null,
-      city: null,
-      postalCode: null,
-      country: null,
       role: userData.role || 'user',
-      createdAt: new Date(),
-    };
+    }).returning();
     
-    this.users.set(id, user);
     return user;
   }
 
-  // Categories
+  // Category methods
   async getCategories(): Promise<Category[]> {
-    return Array.from(this.categories.values());
+    return await db.select().from(categories);
   }
 
   async getCategory(id: number): Promise<Category | undefined> {
-    return this.categories.get(id);
+    const [category] = await db.select().from(categories).where(eq(categories.id, id));
+    return category || undefined;
   }
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
-    const id = this.currentCategoryId++;
-    const category: Category = {
-      ...insertCategory,
-      id,
-      description: insertCategory.description || null,
-    };
-    this.categories.set(id, category);
+    const [category] = await db.insert(categories).values(insertCategory).returning();
     return category;
   }
 
-  // Products
+  // Product methods
   async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values()).filter((p) => p.isActive);
+    return await db.select().from(products);
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
-    const product = this.products.get(id);
-    return product?.isActive ? product : undefined;
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product || undefined;
   }
 
   async getProductsByCategory(categoryId: number): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(
-      (p) => p.categoryId === categoryId && p.isActive,
-    );
+    return await db.select().from(products).where(eq(products.categoryId, categoryId));
   }
 
   async searchProducts(query: string): Promise<Product[]> {
-    const lowercaseQuery = query.toLowerCase();
-    return Array.from(this.products.values()).filter(
-      (p) =>
-        p.isActive &&
-        (p.name.toLowerCase().includes(lowercaseQuery) ||
-          p.description?.toLowerCase().includes(lowercaseQuery)),
-    );
+    return await db.select().from(products).where(ilike(products.name, `%${query}%`));
   }
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
-    const id = this.currentProductId++;
-    const product: Product = {
-      ...insertProduct,
-      id,
-      createdAt: new Date(),
-      description: insertProduct.description || null,
-      images: insertProduct.images || null,
-      categoryId: insertProduct.categoryId || null,
-      stock: insertProduct.stock || 0,
-      isActive:
-        insertProduct.isActive !== undefined ? insertProduct.isActive : true,
-    };
-    this.products.set(id, product);
+    const [product] = await db.insert(products).values(insertProduct).returning();
     return product;
   }
 
-  // Orders
+  // Order methods
   async getOrders(): Promise<Order[]> {
-    return Array.from(this.orders.values());
+    return await db.select().from(orders);
   }
 
   async getOrder(id: number): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order || undefined;
   }
 
   async getOrdersByUser(userId: number): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter((o) => o.userId === userId);
+    return await db.select().from(orders).where(eq(orders.userId, userId));
   }
 
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const id = this.currentOrderId++;
-    const order: Order = {
-      ...insertOrder,
-      id,
-      createdAt: new Date(),
-      status: insertOrder.status || "pending",
-      userId: insertOrder.userId || null,
-      shippingAddress: insertOrder.shippingAddress || null,
-      paymentMethod: insertOrder.paymentMethod || null,
-    };
-    this.orders.set(id, order);
+    const [order] = await db.insert(orders).values(insertOrder).returning();
     return order;
   }
 
-  async updateOrderStatus(
-    id: number,
-    status: string,
-  ): Promise<Order | undefined> {
-    const order = this.orders.get(id);
-    if (order) {
-      order.status = status;
-      this.orders.set(id, order);
-      return order;
-    }
-    return undefined;
+  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
+    const [order] = await db.update(orders).set({ status }).where(eq(orders.id, id)).returning();
+    return order || undefined;
   }
 
-  // Order Items
+  // Order Item methods
   async getOrderItems(orderId: number): Promise<OrderItem[]> {
-    return Array.from(this.orderItems.values()).filter(
-      (item) => item.orderId === orderId,
-    );
+    return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   }
 
   async createOrderItem(insertOrderItem: InsertOrderItem): Promise<OrderItem> {
-    const id = this.currentOrderItemId++;
-    const orderItem: OrderItem = {
-      ...insertOrderItem,
-      id,
-      productId: insertOrderItem.productId || null,
-      orderId: insertOrderItem.orderId || null,
-    };
-    this.orderItems.set(id, orderItem);
+    const [orderItem] = await db.insert(orderItems).values(insertOrderItem).returning();
     return orderItem;
   }
 
-  // Reviews
+  // Review methods
   async getReviews(productId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values()).filter(
-      (r) => r.productId === productId,
-    );
+    return await db.select().from(reviews).where(eq(reviews.productId, productId));
   }
 
   async createReview(insertReview: InsertReview): Promise<Review> {
-    const id = this.currentReviewId++;
-    const review: Review = {
-      ...insertReview,
-      id,
-      createdAt: new Date(),
-      productId: insertReview.productId || null,
-      userId: insertReview.userId || null,
-      comment: insertReview.comment || null,
-    };
-    this.reviews.set(id, review);
+    const [review] = await db.insert(reviews).values(insertReview).returning();
     return review;
   }
 
-  // Contacts
+  // Contact methods
   async createContact(insertContact: InsertContact): Promise<Contact> {
-    const id = this.currentContactId++;
-    const contact: Contact = { ...insertContact, id, createdAt: new Date() };
-    this.contacts.set(id, contact);
+    const [contact] = await db.insert(contacts).values(insertContact).returning();
     return contact;
   }
 
-  // Newsletter
-  async createNewsletter(
-    insertNewsletter: InsertNewsletter,
-  ): Promise<Newsletter> {
-    const id = this.currentNewsletterId++;
-    const newsletter: Newsletter = {
-      ...insertNewsletter,
-      id,
-      createdAt: new Date(),
-    };
-    this.newsletters.set(id, newsletter);
+  // Newsletter methods
+  async createNewsletter(insertNewsletter: InsertNewsletter): Promise<Newsletter> {
+    const [newsletter] = await db.insert(newsletters).values(insertNewsletter).returning();
     return newsletter;
   }
 
-  // Chat Messages
+  // Chat Message methods
   async getChatMessages(): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessages.values()).sort(
-      (a, b) => b.createdAt!.getTime() - a.createdAt!.getTime()
-    );
+    return await db.select().from(chatMessages);
   }
 
   async createChatMessage(insertChatMessage: InsertChatMessage): Promise<ChatMessage> {
-    const id = this.currentChatMessageId++;
-    const chatMessage: ChatMessage = {
-      id,
-      message: insertChatMessage.message,
-      userAgent: insertChatMessage.userAgent || null,
-      url: insertChatMessage.url || null,
-      ipAddress: insertChatMessage.ipAddress || null,
-      isRead: insertChatMessage.isRead || false,
-      createdAt: new Date(),
-    };
-    this.chatMessages.set(id, chatMessage);
+    const [chatMessage] = await db.insert(chatMessages).values(insertChatMessage).returning();
     return chatMessage;
   }
 
   async markChatMessageAsRead(id: number): Promise<ChatMessage | undefined> {
-    const message = this.chatMessages.get(id);
-    if (message) {
-      const updatedMessage = { ...message, isRead: true };
-      this.chatMessages.set(id, updatedMessage);
-      return updatedMessage;
-    }
-    return undefined;
+    const [chatMessage] = await db.update(chatMessages).set({ isRead: true }).where(eq(chatMessages.id, id)).returning();
+    return chatMessage || undefined;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

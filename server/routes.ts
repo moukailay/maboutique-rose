@@ -3,15 +3,19 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize database data
+  await storage.initializeData();
+  
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
       
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) {
+      if (!user || !await bcrypt.compare(password, user.password)) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
@@ -38,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email, password } = req.body;
       
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password || user.role !== 'admin') {
+      if (!user || !await bcrypt.compare(password, user.password) || user.role !== 'admin') {
         return res.status(401).json({ message: "Access denied" });
       }
       
