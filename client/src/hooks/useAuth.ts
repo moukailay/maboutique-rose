@@ -58,9 +58,10 @@ export function useAuthState() {
   const login = async (email: string, password: string, isAdmin = false) => {
     try {
       const endpoint = isAdmin ? '/api/auth/admin/login' : '/api/auth/login';
-      const response = await apiRequest(endpoint, {
+      const response = await apiRequest({
+        url: endpoint,
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        body: { email, password }
       });
 
       const { token, user: userData } = response;
@@ -91,9 +92,10 @@ export function useAuthState() {
 
   const register = async (userData: RegisterData) => {
     try {
-      const response = await apiRequest('/api/auth/register', {
+      const response = await apiRequest({
+        url: '/api/auth/register',
         method: 'POST',
-        body: JSON.stringify(userData)
+        body: userData
       });
 
       const { token, user: newUser } = response;
