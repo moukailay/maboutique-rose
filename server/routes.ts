@@ -5,6 +5,125 @@ import { insertContactSchema, insertNewsletterSchema, insertReviewSchema } from 
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      // In a real app, generate a JWT token
+      const token = `fake-jwt-token-${user.id}`;
+      
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  app.post("/api/auth/admin/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password || user.role !== 'admin') {
+        return res.status(401).json({ message: "Access denied" });
+      }
+      
+      // In a real app, generate a JWT token
+      const token = `fake-jwt-token-${user.id}`;
+      
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { firstName, lastName, email, password } = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+      
+      // Create new user
+      const user = await storage.createUserWithAuth({
+        firstName,
+        lastName,
+        email,
+        password,
+        role: 'user'
+      });
+      
+      // In a real app, generate a JWT token
+      const token = `fake-jwt-token-${user.id}`;
+      
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  app.get("/api/auth/verify", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      
+      if (!token || !token.startsWith('fake-jwt-token-')) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      
+      const userId = parseInt(token.replace('fake-jwt-token-', ''));
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
   // Products
   app.get("/api/products", async (req, res) => {
     try {

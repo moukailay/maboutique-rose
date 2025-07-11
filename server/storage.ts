@@ -64,6 +64,15 @@ export interface IStorage {
 
   // Newsletter
   createNewsletter(newsletter: InsertNewsletter): Promise<Newsletter>;
+
+  // Auth
+  createUserWithAuth(userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role?: 'user' | 'admin';
+  }): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
@@ -199,6 +208,26 @@ export class MemStorage implements IStorage {
       this.products.set(prod.id, prod);
       this.currentProductId = Math.max(this.currentProductId, prod.id + 1);
     });
+
+    // Initialize admin user
+    const adminUser = {
+      id: 1,
+      username: "admin@rose-d-eden.fr",
+      email: "admin@rose-d-eden.fr",
+      password: "admin123",
+      firstName: "Admin",
+      lastName: "Rose d'Eden",
+      phone: null,
+      address: null,
+      city: null,
+      postalCode: null,
+      country: null,
+      role: "admin",
+      createdAt: new Date(),
+    };
+    
+    this.users.set(1, adminUser);
+    this.currentUserId = 2;
   }
 
   // Users
@@ -221,6 +250,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
+      role: insertUser.role || 'user',
       createdAt: new Date(),
       address: insertUser.address || null,
       firstName: insertUser.firstName || null,
@@ -230,6 +260,34 @@ export class MemStorage implements IStorage {
       postalCode: insertUser.postalCode || null,
       country: insertUser.country || null,
     };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async createUserWithAuth(userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role?: 'user' | 'admin';
+  }): Promise<User> {
+    const id = this.currentUserId++;
+    const user: User = {
+      id,
+      username: userData.email,
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      phone: null,
+      address: null,
+      city: null,
+      postalCode: null,
+      country: null,
+      role: userData.role || 'user',
+      createdAt: new Date(),
+    };
+    
     this.users.set(id, user);
     return user;
   }

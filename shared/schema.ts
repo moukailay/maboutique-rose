@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   city: text("city"),
   postalCode: text("postal_code"),
   country: text("country"),
+  role: text("role").notNull().default("user"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -2,11 +2,14 @@
 
 ## Overview
 
-This is a modern e-commerce web application specialized in natural products, built with a React frontend and Express.js backend. The application features a clean, responsive design with a focus on natural aesthetics and user experience.
+This is a modern e-commerce web application specialized in natural products called "ROSE-D'ÉDEN", built with a React frontend and Express.js backend. The application features a complete authentication system for both customers and administrators, with a clean, responsive design focused on natural aesthetics and user experience. The app uses JWT-based authentication with dropdown login in the header and separate customer/admin login pages.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preference: Pink color scheme with "ROSE-D'ÉDEN" branding throughout the site.
+Authentication requirement: JWT-based authentication with dropdown in header and separate customer/admin pages.
+Language: French interface and content.
 
 ## System Architecture
 
@@ -28,15 +31,18 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Frontend Structure
-- **Pages**: Home, Products, Product Detail, About, Contact, Cart, Checkout
-- **Components**: Header (sticky navigation), Footer, ProductCard, CartSidebar
+- **Pages**: Home, Products, Product Detail, About, Contact, Cart, Checkout, Login, Register
+- **Admin Pages**: Login, Dashboard, Products, Categories, Orders, Customers, Reviews, Settings
+- **Components**: Header (sticky navigation with AuthDropdown), Footer, ProductCard, CartSidebar
+- **Auth Components**: AuthProvider, AuthDropdown, Login/Register forms
 - **UI Components**: Complete shadcn/ui component library integration
-- **Theming**: CSS custom properties with natural color palette (forest green, earth tones)
+- **Theming**: CSS custom properties with rose/pink color palette for ROSE-D'ÉDEN branding
 
 ### Backend Structure
-- **Routes**: Product management, categories, orders, reviews, contact forms, newsletter
+- **Routes**: Authentication (login/register/verify), Product management, categories, orders, reviews, contact forms, newsletter
 - **Storage**: Interface-based storage system with in-memory implementation
-- **Database Schema**: Users, products, categories, orders, order items, reviews, contacts, newsletters
+- **Database Schema**: Users (with role field), products, categories, orders, order items, reviews, contacts, newsletters
+- **Authentication**: JWT-based authentication with role-based access control
 
 ### Database Schema
 ```sql
@@ -52,11 +58,25 @@ Preferred communication style: Simple, everyday language.
 
 ## Data Flow
 
-1. **Product Browsing**: Users browse products through category filtering and search
-2. **Cart Management**: Client-side cart state with persistent storage
-3. **Order Processing**: Form-based checkout with order creation
-4. **Content Management**: Contact forms and newsletter subscriptions
-5. **Review System**: Product reviews with rating system
+1. **Authentication**: JWT-based login/register with role-based access control
+2. **Product Browsing**: Users browse products through category filtering and search
+3. **Cart Management**: Client-side cart state with persistent storage
+4. **Order Processing**: Form-based checkout with order creation
+5. **Content Management**: Contact forms and newsletter subscriptions
+6. **Review System**: Product reviews with rating system
+7. **Admin Management**: Complete admin interface for managing products, orders, users, and settings
+
+## Recent Changes (January 2025)
+
+### Authentication System Implementation
+- Added JWT-based authentication with separate customer and admin login systems
+- Created AuthProvider context for global authentication state management
+- Implemented AuthDropdown component in header with login/logout functionality
+- Added separate Login and Register pages for customers
+- Updated backend with authentication routes (/api/auth/login, /api/auth/register, /api/auth/verify)
+- Added role-based access control (user/admin roles)
+- Created default admin user (admin@rose-d-eden.fr / admin123)
+- Implemented complete admin interface with all management capabilities
 
 ## External Dependencies
 

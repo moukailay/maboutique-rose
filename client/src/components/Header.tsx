@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Search, ShoppingCart, User, Menu, X, Leaf } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart';
+import AuthDropdown from '@/components/auth/AuthDropdown';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -86,13 +87,7 @@ export default function Header() {
               )}
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-text-dark hover:text-rose-primary"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            <AuthDropdown />
 
             <Button
               variant="ghost"

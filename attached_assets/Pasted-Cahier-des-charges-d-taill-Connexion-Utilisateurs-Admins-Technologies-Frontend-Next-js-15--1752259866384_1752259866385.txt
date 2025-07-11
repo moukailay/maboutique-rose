@@ -1,0 +1,154 @@
+Cahier des charges détaillé – Connexion Utilisateurs & Admins
+Technologies :
+
+Frontend : Next.js 15, TypeScript, Tailwind CSS
+
+Backend/API : Next.js Route Handlers, Prisma ORM
+
+Base de données : PostgreSQL
+
+Authentification : JWT (JSON Web Token)
+
+📌 Contexte général :
+L’icône « Utilisateur » placée en haut à droite dans le header du site permet à la fois aux clients et aux administrateurs de se connecter ou de créer un compte.
+
+Lorsque l’utilisateur clique sur cette icône, une petite fenêtre contextuelle (dropdown) apparaît, présentant deux choix clairement séparés :
+
+Connexion Client
+
+Connexion Administrateur
+
+1. Interface et gestion du clic sur l’icône utilisateur (dans le header) :
+Au clic sur l’icône utilisateur dans le header (en haut à droite) :
+
+Dropdown clair et simple avec :
+
+Bouton « Client »
+
+Bouton « Admin »
+
+Style recommandé (avec Tailwind CSS) :
+
+Fond blanc (bg-white), coins arrondis (rounded-lg), ombre légère (shadow-md)
+
+Boutons avec texte clair :
+
+Client (text-gray-700 hover:text-green-500)
+
+Admin (text-gray-700 hover:text-pink-600)
+
+2. Processus de connexion détaillé côté CLIENT :
+🎯 En tant que Client, je clique sur « Client » :
+Redirection vers la page : /login
+(formulaire de connexion standard côté client)
+
+Formulaire de connexion Client :
+
+Champs requis :
+
+Email
+
+Mot de passe
+
+Bouton : « Se connecter »
+
+Lien rapide : « Pas encore inscrit ? Créez votre compte »
+
+Validation côté frontend :
+
+Vérification rapide de la validité des champs (format email correct, mot de passe rempli).
+
+Gestion du succès :
+
+Redirection automatique vers la page d’accueil avec un message discret : « Bienvenue [nom du client] »
+
+Gestion des erreurs :
+
+Message clair en rouge : « Email ou mot de passe incorrect »
+
+🎯 En tant que Client, si je clique sur « Créer votre compte » :
+Redirection vers /inscription :
+
+Formulaire d’inscription Client :
+
+Champs requis :
+
+Prénom
+
+Nom
+
+Email
+
+Mot de passe (8 caractères minimum, avec au moins 1 majuscule, 1 minuscule, 1 chiffre)
+
+Bouton : « Créer mon compte »
+
+Gestion du succès :
+
+Redirection vers page d’accueil, client connecté automatiquement.
+
+Message de bienvenue clair.
+
+Gestion des erreurs :
+
+Message précis indiquant la cause (email existant, mot de passe faible, etc.)
+
+🎯 État connecté du client :
+Lorsqu’un client est connecté, son profil est actif :
+
+Préférences personnelles sauvegardées (panier, historique de commande, avis déposés).
+
+Toutes ses activités (historique d'achat, avis, favoris) sont sauvegardées en base de données (PostgreSQL via Prisma).
+
+Icône utilisateur indique l'état connecté (par exemple une petite coche verte ✅).
+
+3. Processus de connexion détaillé côté ADMIN :
+🎯 En tant qu’Administrateur, je clique sur « Admin » :
+Redirection immédiate vers : /admin/login
+
+Formulaire de connexion Admin :
+
+Champs requis :
+
+Email administrateur
+
+Mot de passe administrateur
+
+Bouton : « Se connecter à l’interface Admin »
+
+Validation stricte côté serveur :
+
+Vérification de l’existence du compte administrateur.
+
+Vérification des permissions (rôle admin).
+
+Gestion du succès :
+
+Redirection directe vers /admin/dashboard
+
+Message discret confirmant la connexion.
+
+Gestion des erreurs :
+
+Message clair en rouge : « Accès refusé. Email ou mot de passe incorrect »
+
+4. État connecté de l’Administrateur :
+En étant connecté en tant qu’admin :
+
+Accès complet à l’interface administrateur.
+
+Session sécurisée par JWT avec expiration automatique après une certaine période (ex : 24h).
+
+Possibilité de déconnexion simple via la sidebar dans l’interface admin.
+
+L’administrateur n’a jamais accès aux espaces personnels des clients.
+
+5. Sécurité et permissions :
+Authentification JWT (JSON Web Token) pour sécuriser les sessions.
+
+Routes API sécurisées, protégées par rôle (client ou admin).
+
+Vérification stricte des permissions côté serveur.
+
+Aucune possibilité pour un utilisateur d’accéder à l’espace admin sans permissions spécifiques côté backend.
+
