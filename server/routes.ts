@@ -218,6 +218,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat Messages endpoints
+  app.post('/api/chat/messages', async (req, res) => {
+    try {
+      const { message, userAgent, url } = req.body;
+      
+      const chatMessage = await storage.createChatMessage({
+        message,
+        userAgent,
+        url,
+        ipAddress: req.ip,
+        isRead: false,
+      });
+      
+      res.json(chatMessage);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/chat/messages', async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/chat/messages/:id/read', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const message = await storage.markChatMessageAsRead(id);
+      
+      if (!message) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+      
+      res.json(message);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

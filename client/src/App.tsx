@@ -31,6 +31,7 @@ import AdminOrders from "@/pages/admin/Orders";
 import AdminCustomers from "@/pages/admin/Customers";
 import AdminReviews from "@/pages/admin/Reviews";
 import AdminSettings from "@/pages/admin/Settings";
+import ChatMessages from "@/pages/admin/ChatMessages";
 
 function Router() {
   return (
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/admin/customers" component={AdminCustomers} />
       <Route path="/admin/reviews" component={AdminReviews} />
       <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/admin/chat" component={ChatMessages} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />

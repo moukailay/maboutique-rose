@@ -23,6 +23,8 @@ import {
   type InsertContact,
   type Newsletter,
   type InsertNewsletter,
+  type ChatMessage,
+  type InsertChatMessage,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -65,6 +67,11 @@ export interface IStorage {
   // Newsletter
   createNewsletter(newsletter: InsertNewsletter): Promise<Newsletter>;
 
+  // Chat Messages
+  getChatMessages(): Promise<ChatMessage[]>;
+  createChatMessage(chatMessage: InsertChatMessage): Promise<ChatMessage>;
+  markChatMessageAsRead(id: number): Promise<ChatMessage | undefined>;
+
   // Auth
   createUserWithAuth(userData: {
     firstName: string;
@@ -84,6 +91,7 @@ export class MemStorage implements IStorage {
   private reviews: Map<number, Review> = new Map();
   private contacts: Map<number, Contact> = new Map();
   private newsletters: Map<number, Newsletter> = new Map();
+  private chatMessages: Map<number, ChatMessage> = new Map();
 
   private currentUserId = 1;
   private currentCategoryId = 1;
@@ -93,6 +101,7 @@ export class MemStorage implements IStorage {
   private currentReviewId = 1;
   private currentContactId = 1;
   private currentNewsletterId = 1;
+  private currentChatMessageId = 1;
 
   constructor() {
     this.initializeData();
@@ -456,6 +465,38 @@ export class MemStorage implements IStorage {
     };
     this.newsletters.set(id, newsletter);
     return newsletter;
+  }
+
+  // Chat Messages
+  async getChatMessages(): Promise<ChatMessage[]> {
+    return Array.from(this.chatMessages.values()).sort(
+      (a, b) => b.createdAt!.getTime() - a.createdAt!.getTime()
+    );
+  }
+
+  async createChatMessage(insertChatMessage: InsertChatMessage): Promise<ChatMessage> {
+    const id = this.currentChatMessageId++;
+    const chatMessage: ChatMessage = {
+      id,
+      message: insertChatMessage.message,
+      userAgent: insertChatMessage.userAgent || null,
+      url: insertChatMessage.url || null,
+      ipAddress: insertChatMessage.ipAddress || null,
+      isRead: insertChatMessage.isRead || false,
+      createdAt: new Date(),
+    };
+    this.chatMessages.set(id, chatMessage);
+    return chatMessage;
+  }
+
+  async markChatMessageAsRead(id: number): Promise<ChatMessage | undefined> {
+    const message = this.chatMessages.get(id);
+    if (message) {
+      const updatedMessage = { ...message, isRead: true };
+      this.chatMessages.set(id, updatedMessage);
+      return updatedMessage;
+    }
+    return undefined;
   }
 }
 

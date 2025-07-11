@@ -20,6 +20,7 @@ export default function ChatWidget() {
   const [isOnline, setIsOnline] = useState(true);
   const [messageCounter, setMessageCounter] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const { t, language } = useTranslation();
 
   // Auto-scroll vers le bas
@@ -30,6 +31,23 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Gestionnaire de clic extérieur pour fermer le chat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatRef.current && !chatRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   // Messages d'accueil automatiques avec séquence
   useEffect(() => {
@@ -58,7 +76,7 @@ export default function ChatWidget() {
     }
   }, [t, messageCounter, messages.length]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
     const messageToSend = newMessage.trim();
@@ -76,6 +94,24 @@ export default function ChatWidget() {
     setMessageCounter(prev => prev + 1);
     setNewMessage('');
     setIsTyping(true);
+
+    // Sauvegarder le message dans la base de données
+    try {
+      await fetch('/api/chat/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageToSend,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        }),
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du message:', error);
+    }
 
     // Réponses automatiques intelligentes en français
     setTimeout(() => {
@@ -118,28 +154,37 @@ export default function ChatWidget() {
       <div className="fixed bottom-6 right-6 z-50">
         <div className="relative">
           <Button
-            onClick={() => setIsOpen(true)}
+            onClick={() => setIsOpen(!isOpen)}
             className="h-16 w-16 rounded-full bg-rose-primary hover:bg-rose-light shadow-lg transition-all duration-300 hover:scale-110 group"
             size="icon"
           >
-            <MessageCircle className="h-7 w-7 text-white" />
-            {isOnline && (
+            {isOpen ? (
+              <X className="h-7 w-7 text-white" />
+            ) : (
+              <MessageCircle className="h-7 w-7 text-white" />
+            )}
+            {isOnline && !isOpen && (
               <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
             )}
           </Button>
           
           {/* Tooltip d'aide */}
-          <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="bg-gray-800 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap">
-              {t('chat.help_tooltip')}
+          {!isOpen && (
+            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="bg-gray-800 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap">
+                {t('chat.help_tooltip')}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Fenêtre de chat avec design québécois */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 h-[500px] animate-in slide-in-from-bottom-5 fade-in-0 duration-300">
+        <div 
+          ref={chatRef}
+          className="fixed bottom-24 right-6 z-50 w-80 h-[500px] animate-in slide-in-from-bottom-5 fade-in-0 duration-300"
+        >
           <Card className="h-full flex flex-col shadow-xl border-2 border-rose-primary/20 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-rose-primary to-rose-dark text-white p-4">
               <div className="flex items-center justify-between">

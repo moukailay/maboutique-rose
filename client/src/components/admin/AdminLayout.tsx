@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -34,6 +35,17 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Récupérer le nombre de messages non lus
+  const { data: unreadMessages = 0 } = useQuery({
+    queryKey: ['unread-chat-messages'],
+    queryFn: async () => {
+      const response = await fetch('/api/chat/messages');
+      const messages = await response.json();
+      return messages.filter((m: any) => !m.isRead).length;
+    },
+    refetchInterval: 30000, // Rafraîchir toutes les 30 secondes
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -89,6 +101,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       active: location === '/admin/reviews'
     },
     { 
+      icon: MessageSquare, 
+      label: 'Messages Chat', 
+      href: '/admin/chat',
+      active: location === '/admin/chat',
+      badge: unreadMessages > 0 ? unreadMessages : undefined
+    },
+    { 
       icon: BarChart3, 
       label: 'Statistiques', 
       href: '/admin/stats',
@@ -127,6 +146,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 >
                   <item.icon className="mr-2 h-4 w-4" />
                   {item.label}
+                  {item.badge && (
+                    <Badge variant="destructive" className="ml-auto text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Button>
                 
                 {item.subItems && item.active && (
