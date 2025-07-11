@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, User, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,44 +18,62 @@ export default function ChatWidget() {
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const [messageCounter, setMessageCounter] = useState(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { t, language } = useTranslation();
+
+  // Auto-scroll vers le bas
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Messages d'accueil automatiques avec séquence
   useEffect(() => {
-    const welcomeMessages: Message[] = [
-      {
-        id: 'welcome-1',
+    if (messages.length === 0) {
+      const welcomeMessage1: Message = {
+        id: `welcome-${messageCounter}`,
         text: t('chat.welcome'),
         sender: 'support',
         timestamp: new Date()
-      },
-      {
-        id: 'welcome-2',
-        text: t('chat.welcome_options'),
-        sender: 'support',
-        timestamp: new Date(Date.now() + 1000)
-      }
-    ];
-    
-    setMessages([welcomeMessages[0]]);
-    
-    // Ajouter le second message après un délai
-    setTimeout(() => {
-      setMessages(prev => [...prev, welcomeMessages[1]]);
-    }, 1500);
-  }, [t]);
+      };
+      
+      setMessages([welcomeMessage1]);
+      setMessageCounter(prev => prev + 1);
+      
+      // Ajouter le second message après un délai
+      setTimeout(() => {
+        const welcomeMessage2: Message = {
+          id: `welcome-${messageCounter + 1}`,
+          text: t('chat.welcome_options'),
+          sender: 'support',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, welcomeMessage2]);
+        setMessageCounter(prev => prev + 1);
+      }, 1500);
+    }
+  }, [t, messageCounter, messages.length]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
+    const messageToSend = newMessage.trim();
+    const currentCounter = messageCounter;
+    
     const userMessage: Message = {
-      id: Date.now().toString(),
-      text: newMessage,
+      id: `user-${currentCounter}`,
+      text: messageToSend,
       sender: 'user',
       timestamp: new Date()
     };
 
+    // Ajouter le message utilisateur
     setMessages(prev => [...prev, userMessage]);
+    setMessageCounter(prev => prev + 1);
     setNewMessage('');
     setIsTyping(true);
 
@@ -64,7 +82,7 @@ export default function ChatWidget() {
       let responseText = t('chat.auto_response');
       
       // Réponses contextuelles selon le message
-      const userText = newMessage.toLowerCase();
+      const userText = messageToSend.toLowerCase();
       if (userText.includes('prix') || userText.includes('coût') || userText.includes('tarif')) {
         responseText = t('chat.response_pricing');
       } else if (userText.includes('livraison') || userText.includes('expédition')) {
@@ -76,14 +94,16 @@ export default function ChatWidget() {
       }
       
       const autoResponse: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `support-${currentCounter + 1}`,
         text: responseText,
         sender: 'support',
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, autoResponse]);
+      setMessageCounter(prev => prev + 1);
       setIsTyping(false);
-    }, Math.random() * 2000 + 1000); // Délai variable pour plus de réalisme
+    }, Math.random() * 1500 + 1000); // Délai variable pour plus de réalisme
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -200,6 +220,8 @@ export default function ChatWidget() {
                     </div>
                   </div>
                 )}
+                
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Zone de saisie améliorée */}
