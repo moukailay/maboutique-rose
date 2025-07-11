@@ -1,0 +1,151 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Search, ShoppingCart, User, Menu, X, Leaf } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useCart } from '@/lib/cart';
+
+export default function Header() {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [location, setLocation] = useLocation();
+  const { toggleCart, getTotalItems } = useCart();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setLocation(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
+  const navItems = [
+    { href: '/', label: 'Accueil' },
+    { href: '/products', label: 'Produits' },
+    { href: '/about', label: 'À propos' },
+    { href: '/contact', label: 'Contact' },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === '/' && location === '/') return true;
+    if (href !== '/' && location.startsWith(href)) return true;
+    return false;
+  };
+
+  return (
+    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Leaf className="h-8 w-8 text-forest-green" />
+            <span className="text-2xl font-bold text-forest-green">Natura</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'text-forest-green'
+                    : 'text-text-dark hover:text-forest-green'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right Icons */}
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="text-text-dark hover:text-forest-green"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCart}
+              className="text-text-dark hover:text-forest-green relative"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-2 -right-2 bg-forest-green text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-text-dark hover:text-forest-green"
+            >
+              <User className="h-5 w-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-text-dark hover:text-forest-green"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Search Dropdown */}
+      {isSearchOpen && (
+        <div className="bg-white border-t border-gray-100 px-4 py-3">
+          <div className="max-w-7xl mx-auto">
+            <form onSubmit={handleSearch} className="relative">
+              <Input
+                type="text"
+                placeholder="Rechercher des produits..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2"
+                autoFocus
+              />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="px-4 py-2 space-y-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  isActive(item.href)
+                    ? 'text-forest-green bg-gray-50'
+                    : 'text-text-dark hover:text-forest-green hover:bg-gray-50'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}

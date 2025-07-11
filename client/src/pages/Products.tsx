@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import ProductCard from '@/components/ProductCard';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import type { Product, Category } from '@shared/schema';
+
+export default function Products() {
+  const [location] = useLocation();
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const searchQuery = urlParams.get('search') || '';
+  const categoryFilter = urlParams.get('category') || '';
+  
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  const { data: products, isLoading: productsLoading } = useQuery<Product[]>({
+    queryKey: ['/api/products', { search: searchQuery, category: categoryFilter }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (categoryFilter) params.append('category', categoryFilter);
+      
+      const response = await fetch(`/api/products?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
+    },
+  });
+
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ['/api/categories'],
+  });
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (localSearch) params.append('search', localSearch);
+    if (categoryFilter) params.append('category', categoryFilter);
+    
+    window.history.pushState({}, '', `/products?${params}`);
+    window.location.reload();
+  };
+
+  const handleCategoryFilter = (categoryId: string) => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.append('search', searchQuery);
+    if (categoryId) params.append('category', categoryId);
+    
+    window.history.pushState({}, '', `/products?${params}`);
+    window.location.reload();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-text-dark mb-4">
+            Nos Produits Naturels
+          </h1>
+          <p className="text-lg text-text-medium">
+            Découvrez notre gamme complète de produits naturels authentiques et responsables.
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4">
+          <form onSubmit={handleSearch} className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Rechercher des produits..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          </form>
+          
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              variant={categoryFilter === '' ? 'default' : 'outline'}
+              onClick={() => handleCategoryFilter('')}
+              className={categoryFilter === '' ? 'bg-forest-green hover:bg-forest-light' : ''}
+            >
+              Tous
+            </Button>
+            {categories?.map((category) => (
+              <Button
+                key={category.id}
+                variant={categoryFilter === category.id.toString() ? 'default' : 'outline'}
+                onClick={() => handleCategoryFilter(category.id.toString())}
+                className={categoryFilter === category.id.toString() ? 'bg-forest-green hover:bg-forest-light' : ''}
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        {productsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {[...Array(8)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
+                <CardContent className="p-6">
+                  <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : products && products.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-text-medium text-lg">
+              {searchQuery || categoryFilter 
+                ? 'Aucun produit trouvé pour cette recherche.' 
+                : 'Aucun produit disponible pour le moment.'}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
