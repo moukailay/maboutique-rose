@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Search, ShoppingCart, Menu, X, Leaf } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart';
@@ -8,6 +8,7 @@ import AuthDropdown from '@/components/auth/AuthDropdown';
 import LanguageSelector from '@/components/LanguageSelector';
 import ThemeSelector from '@/components/ThemeSelector';
 import { useTranslation } from '@/hooks/useTranslation';
+import logoImage from '@assets/image_1752269345378.png';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -44,9 +45,12 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Leaf className="h-8 w-8 text-rose-primary" />
-            <span className="text-2xl font-bold text-rose-primary">ROSE-D'ÉDEN</span>
+          <Link href="/" className="flex items-center">
+            <img 
+              src={logoImage} 
+              alt="Rose D'É" 
+              className="h-10 w-auto sm:h-12 md:h-14 lg:h-16 object-contain transition-all duration-200 hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -130,7 +134,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100">
+        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
           <div className="px-4 py-2 space-y-1">
             {navItems.map((item) => (
               <Link
@@ -138,8 +142,8 @@ export default function Header() {
                 href={item.href}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   isActive(item.href)
-                    ? 'text-rose-primary bg-gray-50'
-                    : 'text-text-dark hover:text-rose-primary hover:bg-gray-50'
+                    ? 'text-rose-primary bg-gray-50 dark:bg-gray-700'
+                    : 'text-text-dark dark:text-text-light hover:text-rose-primary hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
