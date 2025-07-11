@@ -1,0 +1,207 @@
+Objectif principal :
+L’administrateur doit pouvoir gérer efficacement les produits, commandes, utilisateurs, catégories, et avoir une vision claire sur les performances globales de la boutique.
+
+1. Authentification Admin
+En tant qu’Admin, je me connecte :
+Page dédiée accessible via /admin/login.
+
+Formulaire simple :
+
+Email
+
+Mot de passe
+
+Validation stricte avec messages d’erreur clairs en cas d’échec.
+
+Redirection automatique vers l’interface admin en cas de succès (/admin/dashboard).
+
+2. Structure de l’interface Administrateur
+Structure globale après connexion :
+Sidebar (menu latéral fixe à gauche)
+
+Zone principale (droite) dynamique selon sélection dans la sidebar
+
+Navbar (en haut, horizontale)
+
+3. Sidebar (menu latéral gauche)
+Menu fixe avec les liens suivants :
+
+Dashboard (Tableau de bord)
+
+Produits
+
+Tous les produits
+
+Ajouter un produit
+
+Catégories
+
+Commandes
+
+Clients
+
+Avis clients
+
+Statistiques
+
+Paramètres
+
+Déconnexion
+
+4. Navbar (haut de l’écran)
+Éléments visibles en permanence :
+
+Barre de recherche rapide (pour rechercher produits, commandes, clients)
+
+Icône Notifications (alertes sur commandes, stock bas, nouveaux avis)
+
+Avatar/nom admin connecté (menu déroulant permettant la déconnexion ou profil admin)
+
+5. Détails des sections principales :
+A. DASHBOARD (Tableau de bord principal)
+Vue d’ensemble rapide sous forme de cartes :
+
+Total ventes du jour/semaine/mois
+
+Nombre de commandes en attente
+
+Produits en rupture de stock
+
+Nouveaux clients inscrits
+
+Graphiques simples (courbes, barres) :
+
+Evolution des ventes sur le dernier mois
+
+Produits les plus vendus (top 5)
+
+B. PRODUITS
+→ Tous les produits :
+Liste claire (tableau) avec :
+
+Image miniature produit
+
+Nom produit
+
+Catégorie
+
+Prix
+
+Stock
+
+Statut (publié/non publié)
+
+Actions : Modifier, Supprimer rapidement, Activer/Désactiver
+
+Pagination rapide et efficace.
+
+Bouton rapide : « Ajouter nouveau produit ».
+
+→ Ajouter un produit :
+Formulaire détaillé avec :
+
+Nom du produit
+
+Description (éditeur texte enrichi markdown)
+
+Prix
+
+Prix promotionnel (optionnel)
+
+Images produit (upload multiple)
+
+Catégorie (sélection)
+
+Stock initial
+
+Bouton clair : « Sauvegarder » et « Sauvegarder & publier ».
+
+→ Catégories :
+Gestion simple des catégories de produits :
+
+Liste des catégories existantes
+
+Ajout, modification, suppression rapide
+
+C. COMMANDES
+Liste claire et efficace des commandes :
+
+Numéro commande unique
+
+Nom du client
+
+Date commande
+
+Statut commande (en attente, payé, expédié, annulé)
+
+Total montant commande
+
+Bouton « Voir détails » pour chaque commande.
+
+Sur clic « détails commande » :
+
+Informations client complètes (adresse, email, téléphone)
+
+Liste détaillée produits commandés
+
+Option pour changer statut commande (en attente → payé → expédié, etc.)
+
+Bouton d'impression rapide de la facture (format PDF)
+
+D. CLIENTS (Gestion des utilisateurs)
+Liste claire des utilisateurs inscrits sur le site :
+
+Nom
+
+Email
+
+Date d’inscription
+
+Nombre de commandes passées
+
+Montant total dépensé
+
+Statut (Actif, Bloqué)
+
+Actions rapides :
+
+Consulter profil client détaillé (historique des commandes)
+
+Option blocage/déblocage utilisateur
+
+E. AVIS CLIENTS
+Gestion simple des avis publiés par les utilisateurs :
+
+Liste des avis récents (Nom du client, Produit, Note, Commentaire)
+
+Possibilité de valider, rejeter ou supprimer un avis
+
+Recherche par produit, date ou client
+
+F. STATISTIQUES
+Page complète d’analyse des données e-commerce (performance) :
+
+Ventes globales (filtrables par jour/semaine/mois/année)
+
+Produits les plus populaires (top ventes)
+
+Clients les plus fidèles (top clients)
+
+Graphiques dynamiques avec Recharts pour visualiser clairement les données
+
+G. PARAMÈTRES
+Gestion complète des paramètres du site :
+
+Coordonnées générales (adresse, téléphone, email affichés sur le site)
+
+Gestion des moyens de paiement (Stripe, PayPal, etc.)
+
+Gestion des frais de livraison (prix fixe, gratuits, par zones géographiques)
+
+Configuration des taxes (TVA, taxes locales)
+
+H. DÉCONNEXION
+Bouton clair en sidebar pour se déconnecter.
+
+Redirection automatique vers la page de login admin après déconnexion.
+
