@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Product, Category } from '@shared/schema';
 
 export default function Products() {
@@ -15,6 +16,7 @@ export default function Products() {
   const categoryFilter = urlParams.get('category') || '';
   
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const { t } = useTranslation();
 
   const { data: products, isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ['/api/products', { search: searchQuery, category: categoryFilter }],
@@ -57,10 +59,10 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-text-dark mb-4">
-            Nos Produits Naturels
+            {t('products.title')}
           </h1>
           <p className="text-lg text-text-medium">
-            Découvrez notre gamme complète de produits naturels authentiques et responsables.
+            {t('home.featured.subtitle')}
           </p>
         </div>
 
@@ -69,7 +71,7 @@ export default function Products() {
           <form onSubmit={handleSearch} className="flex-1 relative">
             <Input
               type="text"
-              placeholder="Rechercher des produits..."
+              placeholder={t('products.search')}
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               className="pl-10"
@@ -83,7 +85,7 @@ export default function Products() {
               onClick={() => handleCategoryFilter('')}
               className={categoryFilter === '' ? 'bg-rose-primary hover:bg-rose-light' : ''}
             >
-              Tous
+              {t('products.filter.all')}
             </Button>
             {categories?.map((category) => (
               <Button
@@ -122,8 +124,8 @@ export default function Products() {
           <div className="text-center py-12">
             <p className="text-text-medium text-lg">
               {searchQuery || categoryFilter 
-                ? 'Aucun produit trouvé pour cette recherche.' 
-                : 'Aucun produit disponible pour le moment.'}
+                ? t('products.empty')
+                : t('products.loading')}
             </p>
           </div>
         )}

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart';
 import AuthDropdown from '@/components/auth/AuthDropdown';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -12,6 +14,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useLocation();
   const { toggleCart, getTotalItems } = useCart();
+  const { t } = useTranslation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +26,10 @@ export default function Header() {
   };
 
   const navItems = [
-    { href: '/', label: 'Accueil' },
-    { href: '/products', label: 'Produits' },
-    { href: '/about', label: 'À propos' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/', label: t('nav.home') },
+    { href: '/products', label: t('nav.products') },
+    { href: '/about', label: t('nav.about') },
+    { href: '/contact', label: t('nav.contact') },
   ];
 
   const isActive = (href: string) => {
@@ -87,6 +90,8 @@ export default function Header() {
               )}
             </Button>
 
+            <LanguageSelector />
+
             <AuthDropdown />
 
             <Button
@@ -108,7 +113,7 @@ export default function Header() {
             <form onSubmit={handleSearch} className="relative">
               <Input
                 type="text"
-                placeholder="Rechercher des produits..."
+                placeholder={t('products.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2"

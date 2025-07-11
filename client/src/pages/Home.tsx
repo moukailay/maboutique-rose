@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductCard from '@/components/ProductCard';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Product } from '@shared/schema';
 
 export default function Home() {
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ['/api/products'],
   });
+  const { t } = useTranslation();
 
   const featuredProducts = products?.slice(0, 4) || [];
 
@@ -27,14 +29,14 @@ export default function Home() {
         
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Bienvenue chez ROSE-D'ÉDEN
+            {t('home.hero.title')}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Votre source de produits naturels authentiques et responsables.
+            {t('home.hero.subtitle')}
           </p>
           <Link href="/products">
             <Button size="lg" className="bg-rose-primary hover:bg-rose-light text-white px-8 py-4 text-lg">
-              Découvrir nos produits
+              {t('home.hero.cta')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -52,10 +54,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-text-dark mb-4">
-              Nos produits naturels vedettes
+              {t('home.featured.title')}
             </h2>
             <p className="text-lg text-text-medium max-w-2xl mx-auto">
-              Découvrez notre sélection de produits naturels soigneusement choisis pour leur qualité et leur authenticité.
+              {t('home.featured.subtitle')}
             </p>
           </div>
           
@@ -81,7 +83,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link href="/products">
               <Button variant="outline" size="lg" className="border-rose-primary text-rose-primary hover:bg-rose-primary hover:text-white">
-                Voir tous les produits
+                {t('home.featured.cta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -102,31 +104,30 @@ export default function Home() {
             </div>
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-text-dark mb-6">
-                Notre engagement pour la nature
+                {t('home.about.title')}
               </h2>
               <p className="text-lg text-text-medium mb-6">
-                Depuis plus de 10 ans, nous nous engageons à vous offrir des produits naturels d'exception, 
-                sélectionnés avec soin auprès de producteurs locaux et responsables.
+                {t('home.about.text')}
               </p>
               
               <div className="space-y-4 mb-8">
                 <div className="flex items-center">
                   <Leaf className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">Engagement écologique et durable</span>
+                  <span className="text-text-dark font-medium">{t('home.about.eco')}</span>
                 </div>
                 <div className="flex items-center">
                   <Tag className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">Origine et qualité garanties</span>
+                  <span className="text-text-dark font-medium">{t('home.about.quality')}</span>
                 </div>
                 <div className="flex items-center">
                   <Handshake className="text-rose-primary mr-3 h-5 w-5" />
-                  <span className="text-text-dark font-medium">Responsabilité sociale</span>
+                  <span className="text-text-dark font-medium">{t('home.about.social')}</span>
                 </div>
               </div>
               
               <Link href="/about">
                 <Button className="bg-rose-primary hover:bg-rose-light">
-                  En savoir plus
+                  {t('home.about.cta')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>

@@ -10,9 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, UserCheck, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AuthDropdown() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useTranslation();
 
   if (isAuthenticated && user) {
     return (
@@ -25,7 +27,7 @@ export default function AuthDropdown() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <div className="px-2 py-1.5 text-sm text-gray-700">
-            <div className="font-medium">Bienvenue</div>
+            <div className="font-medium">{t('nav.profile')}</div>
             <div className="text-gray-500">{user.firstName} {user.lastName}</div>
           </div>
           <DropdownMenuSeparator />
@@ -33,21 +35,21 @@ export default function AuthDropdown() {
             <DropdownMenuItem asChild>
               <Link href="/admin/dashboard">
                 <Settings className="mr-2 h-4 w-4" />
-                Interface Admin
+                {t('nav.admin')}
               </Link>
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem asChild>
               <Link href="/profile">
                 <User className="mr-2 h-4 w-4" />
-                Mon Profil
+                {t('nav.profile')}
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} className="text-red-600">
             <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
+            {t('nav.logout')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -65,13 +67,13 @@ export default function AuthDropdown() {
         <DropdownMenuItem asChild>
           <Link href="/login" className="text-gray-700 hover:text-green-500">
             <User className="mr-2 h-4 w-4" />
-            Connexion Client
+            {t('nav.login')}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/admin/login" className="text-gray-700 hover:text-rose-primary">
             <Settings className="mr-2 h-4 w-4" />
-            Connexion Admin
+            {t('nav.admin')}
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

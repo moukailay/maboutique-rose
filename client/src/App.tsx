@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { TranslationProvider } from "@/components/TranslationProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
@@ -62,19 +63,21 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Router />
-            </main>
-            <Footer />
-            <CartSidebar />
-          </div>
-          <Toaster />
-        </TooltipProvider>
-      </AuthProvider>
+      <TranslationProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                <Router />
+              </main>
+              <Footer />
+              <CartSidebar />
+            </div>
+            <Toaster />
+          </TooltipProvider>
+        </AuthProvider>
+      </TranslationProvider>
     </QueryClientProvider>
   );
 }

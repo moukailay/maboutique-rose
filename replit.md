@@ -9,7 +9,8 @@ This is a modern e-commerce web application specialized in natural products call
 Preferred communication style: Simple, everyday language.
 Design preference: Pink color scheme with "ROSE-D'ÉDEN" branding throughout the site.
 Authentication requirement: JWT-based authentication with dropdown in header and separate customer/admin pages.
-Language: French interface and content.
+Language: Multi-language support (French/English) with language selector in header.
+Currency: All prices displayed in Canadian Dollars (CAD).
 
 ## System Architecture
 
@@ -33,8 +34,9 @@ Language: French interface and content.
 ### Frontend Structure
 - **Pages**: Home, Products, Product Detail, About, Contact, Cart, Checkout, Login, Register
 - **Admin Pages**: Login, Dashboard, Products, Categories, Orders, Customers, Reviews, Settings
-- **Components**: Header (sticky navigation with AuthDropdown), Footer, ProductCard, CartSidebar
+- **Components**: Header (sticky navigation with AuthDropdown and LanguageSelector), Footer, ProductCard, CartSidebar
 - **Auth Components**: AuthProvider, AuthDropdown, Login/Register forms
+- **Translation Components**: TranslationProvider, LanguageSelector, useTranslation hook
 - **UI Components**: Complete shadcn/ui component library integration
 - **Theming**: CSS custom properties with rose/pink color palette for ROSE-D'ÉDEN branding
 
@@ -77,6 +79,15 @@ Language: French interface and content.
 - Added role-based access control (user/admin roles)
 - Created default admin user (admin@rose-d-eden.fr / admin123)
 - Implemented complete admin interface with all management capabilities
+
+### Multi-Language Translation System (January 2025)
+- Created comprehensive translation system with French/English support
+- Added useTranslation hook with TranslationProvider context
+- Implemented LanguageSelector component with dropdown menu
+- Added translation keys for all major UI elements (navigation, home page, products, auth, admin)
+- Updated Header, Home, Products, and AuthDropdown components to use translations
+- Language preference persisted in localStorage
+- Ready for extension to additional languages
 
 ## External Dependencies
 
