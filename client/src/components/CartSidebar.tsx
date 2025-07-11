@@ -37,7 +37,7 @@ export default function CartSidebar() {
             <div className="text-center py-8">
               <p className="text-text-medium">Votre panier est vide</p>
               <Link href="/products">
-                <Button className="mt-4 bg-forest-green hover:bg-forest-light">
+                <Button className="mt-4 bg-rose-primary hover:bg-rose-light">
                   Découvrir nos produits
                 </Button>
               </Link>
@@ -93,13 +93,13 @@ export default function CartSidebar() {
           <div className="p-6 border-t border-gray-200">
             <div className="flex justify-between items-center mb-4">
               <span className="text-lg font-semibold text-text-dark">Total:</span>
-              <span className="text-lg font-bold text-forest-green">
+              <span className="text-lg font-bold text-rose-primary">
                 {getTotalPrice().toFixed(2)} €
               </span>
             </div>
             <Link href="/checkout">
               <Button
-                className="w-full bg-forest-green hover:bg-forest-light"
+                className="w-full bg-rose-primary hover:bg-rose-light"
                 onClick={toggleCart}
               >
                 Procéder au paiement

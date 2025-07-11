@@ -20,7 +20,7 @@ export default function Cart() {
               Découvrez nos produits naturels et ajoutez-les à votre panier.
             </p>
             <Link href="/products">
-              <Button className="bg-forest-green hover:bg-forest-light">
+              <Button className="bg-rose-primary hover:bg-rose-light">
                 Découvrir nos produits
               </Button>
             </Link>
@@ -58,7 +58,7 @@ export default function Cart() {
                       <h3 className="font-semibold text-text-dark text-lg">
                         {item.name}
                       </h3>
-                      <p className="text-forest-green font-bold text-lg">
+                      <p className="text-rose-primary font-bold text-lg">
                         {item.price} €
                       </p>
                     </div>
@@ -119,12 +119,12 @@ export default function Cart() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-text-medium">Livraison</span>
-                    <span className="font-medium text-forest-green">Gratuite</span>
+                    <span className="font-medium text-rose-primary">Gratuite</span>
                   </div>
                   <div className="border-t pt-2">
                     <div className="flex justify-between">
                       <span className="text-lg font-semibold text-text-dark">Total</span>
-                      <span className="text-lg font-bold text-forest-green">
+                      <span className="text-lg font-bold text-rose-primary">
                         {getTotalPrice().toFixed(2)} €
                       </span>
                     </div>
@@ -133,7 +133,7 @@ export default function Cart() {
 
                 <div className="space-y-3">
                   <Link href="/checkout">
-                    <Button className="w-full bg-forest-green hover:bg-forest-light">
+                    <Button className="w-full bg-rose-primary hover:bg-rose-light">
                       Procéder au paiement
                     </Button>
                   </Link>

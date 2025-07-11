@@ -27,13 +27,13 @@ export default function Home() {
         
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Redécouvrez la Nature
+            Bienvenue chez ROSE-D'ÉDEN
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
             Votre source de produits naturels authentiques et responsables.
           </p>
           <Link href="/products">
-            <Button size="lg" className="bg-forest-green hover:bg-forest-light text-white px-8 py-4 text-lg">
+            <Button size="lg" className="bg-rose-primary hover:bg-rose-light text-white px-8 py-4 text-lg">
               Découvrir nos produits
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -80,7 +80,7 @@ export default function Home() {
           
           <div className="text-center mt-12">
             <Link href="/products">
-              <Button variant="outline" size="lg" className="border-forest-green text-forest-green hover:bg-forest-green hover:text-white">
+              <Button variant="outline" size="lg" className="border-rose-primary text-rose-primary hover:bg-rose-primary hover:text-white">
                 Voir tous les produits
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -111,21 +111,21 @@ export default function Home() {
               
               <div className="space-y-4 mb-8">
                 <div className="flex items-center">
-                  <Leaf className="text-forest-green mr-3 h-5 w-5" />
+                  <Leaf className="text-rose-primary mr-3 h-5 w-5" />
                   <span className="text-text-dark font-medium">Engagement écologique et durable</span>
                 </div>
                 <div className="flex items-center">
-                  <Tag className="text-forest-green mr-3 h-5 w-5" />
+                  <Tag className="text-rose-primary mr-3 h-5 w-5" />
                   <span className="text-text-dark font-medium">Origine et qualité garanties</span>
                 </div>
                 <div className="flex items-center">
-                  <Handshake className="text-forest-green mr-3 h-5 w-5" />
+                  <Handshake className="text-rose-primary mr-3 h-5 w-5" />
                   <span className="text-text-dark font-medium">Responsabilité sociale</span>
                 </div>
               </div>
               
               <Link href="/about">
-                <Button className="bg-forest-green hover:bg-forest-light">
+                <Button className="bg-rose-primary hover:bg-rose-light">
                   En savoir plus
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>

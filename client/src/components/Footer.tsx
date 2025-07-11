@@ -41,8 +41,8 @@ export default function Footer() {
           {/* About Column */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Leaf className="h-6 w-6 text-forest-green" />
-              <span className="text-xl font-bold">Natura</span>
+              <Leaf className="h-6 w-6 text-rose-primary" />
+              <span className="text-xl font-bold">ROSE-D'ÉDEN</span>
             </div>
             <p className="text-gray-300 mb-4">
               Votre source de produits naturels authentiques et responsables depuis plus de 10 ans.
@@ -86,12 +86,12 @@ export default function Footer() {
                 placeholder="Votre email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-gray-700 text-white border-gray-600 focus:border-forest-green"
+                className="bg-gray-700 text-white border-gray-600 focus:border-rose-primary"
                 required
               />
               <Button
                 type="submit"
-                className="w-full bg-forest-green hover:bg-forest-light"
+                className="w-full bg-rose-primary hover:bg-rose-light"
                 disabled={isSubscribing}
               >
                 {isSubscribing ? 'En cours...' : "S'inscrire"}
@@ -125,7 +125,7 @@ export default function Footer() {
 
         {/* Footer Bottom */}
         <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Natura. Tous droits réservés.</p>
+          <p>&copy; 2024 ROSE-D'ÉDEN. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

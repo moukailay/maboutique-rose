@@ -81,7 +81,7 @@ export default function Products() {
             <Button
               variant={categoryFilter === '' ? 'default' : 'outline'}
               onClick={() => handleCategoryFilter('')}
-              className={categoryFilter === '' ? 'bg-forest-green hover:bg-forest-light' : ''}
+              className={categoryFilter === '' ? 'bg-rose-primary hover:bg-rose-light' : ''}
             >
               Tous
             </Button>
@@ -90,7 +90,7 @@ export default function Products() {
                 key={category.id}
                 variant={categoryFilter === category.id.toString() ? 'default' : 'outline'}
                 onClick={() => handleCategoryFilter(category.id.toString())}
-                className={categoryFilter === category.id.toString() ? 'bg-forest-green hover:bg-forest-light' : ''}
+                className={categoryFilter === category.id.toString() ? 'bg-rose-primary hover:bg-rose-light' : ''}
               >
                 {category.name}
               </Button>

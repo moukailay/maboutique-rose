@@ -40,8 +40,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Leaf className="h-8 w-8 text-forest-green" />
-            <span className="text-2xl font-bold text-forest-green">Natura</span>
+            <Leaf className="h-8 w-8 text-rose-primary" />
+            <span className="text-2xl font-bold text-rose-primary">ROSE-D'ÉDEN</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -52,8 +52,8 @@ export default function Header() {
                 href={item.href}
                 className={`font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'text-forest-green'
-                    : 'text-text-dark hover:text-forest-green'
+                    ? 'text-rose-primary'
+                    : 'text-text-dark hover:text-rose-primary'
                 }`}
               >
                 {item.label}
@@ -67,7 +67,7 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="text-text-dark hover:text-forest-green"
+              className="text-text-dark hover:text-rose-primary"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -76,11 +76,11 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={toggleCart}
-              className="text-text-dark hover:text-forest-green relative"
+              className="text-text-dark hover:text-rose-primary relative"
             >
               <ShoppingCart className="h-5 w-5" />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-2 -right-2 bg-forest-green text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-rose-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {getTotalItems()}
                 </span>
               )}
@@ -89,7 +89,7 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-text-dark hover:text-forest-green"
+              className="text-text-dark hover:text-rose-primary"
             >
               <User className="h-5 w-5" />
             </Button>
@@ -97,7 +97,7 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-text-dark hover:text-forest-green"
+              className="md:hidden text-text-dark hover:text-rose-primary"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -135,8 +135,8 @@ export default function Header() {
                 href={item.href}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   isActive(item.href)
-                    ? 'text-forest-green bg-gray-50'
-                    : 'text-text-dark hover:text-forest-green hover:bg-gray-50'
+                    ? 'text-rose-primary bg-gray-50'
+                    : 'text-text-dark hover:text-rose-primary hover:bg-gray-50'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >

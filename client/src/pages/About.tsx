@@ -8,7 +8,7 @@ export default function About() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-text-dark mb-6">
-            À propos de Natura
+            À propos de ROSE-D'ÉDEN
           </h1>
           <p className="text-xl text-text-medium max-w-3xl mx-auto">
             Depuis plus de 10 ans, nous nous engageons à vous offrir des produits naturels d'exception, 
@@ -30,7 +30,7 @@ export default function About() {
               Notre Mission
             </h2>
             <p className="text-lg text-text-medium mb-6">
-              Chez Natura, nous croyons que la nature nous offre tout ce dont nous avons besoin pour 
+              Chez ROSE-D'ÉDEN, nous croyons que la nature nous offre tout ce dont nous avons besoin pour 
               prendre soin de nous-mêmes et de notre environnement. Notre mission est de vous connecter 
               avec les meilleurs produits naturels, authentiques et responsables.
             </p>
@@ -49,7 +49,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="text-center">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-forest-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-rose-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Leaf className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
@@ -64,7 +64,7 @@ export default function About() {
 
             <Card className="text-center">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-forest-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-rose-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Tag className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
@@ -79,7 +79,7 @@ export default function About() {
 
             <Card className="text-center">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-forest-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-rose-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Handshake className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
@@ -102,7 +102,7 @@ export default function About() {
             </h2>
             <p className="text-lg text-text-medium mb-6">
               Fondée en 2014 par une équipe passionnée de nature et de bien-être, 
-              Natura a commencé comme une petite boutique locale spécialisée dans 
+              ROSE-D'ÉDEN a commencé comme une petite boutique locale spécialisée dans 
               les produits naturels.
             </p>
             <p className="text-lg text-text-medium mb-6">

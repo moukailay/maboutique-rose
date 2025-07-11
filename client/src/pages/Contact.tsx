@@ -128,7 +128,7 @@ export default function Contact() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-forest-green hover:bg-forest-light"
+                  className="w-full bg-rose-primary hover:bg-rose-light"
                 >
                   {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
                 </Button>
@@ -146,7 +146,7 @@ export default function Contact() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-forest-green rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-rose-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <MapPin className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -156,7 +156,7 @@ export default function Contact() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-forest-green rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-rose-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Phone className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -166,12 +166,12 @@ export default function Contact() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-forest-green rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-rose-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Mail className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <h3 className="font-medium text-text-dark">Email</h3>
-                    <p className="text-text-medium">contact@natura.fr</p>
+                    <p className="text-text-medium">contact@rose-d-eden.fr</p>
                   </div>
                 </div>
               </CardContent>

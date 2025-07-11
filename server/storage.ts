@@ -1,8 +1,28 @@
-import { 
-  users, products, categories, orders, orderItems, reviews, contacts, newsletters,
-  type User, type InsertUser, type Product, type InsertProduct, type Category, type InsertCategory,
-  type Order, type InsertOrder, type OrderItem, type InsertOrderItem, type Review, type InsertReview,
-  type Contact, type InsertContact, type Newsletter, type InsertNewsletter
+import {
+  users,
+  products,
+  categories,
+  orders,
+  orderItems,
+  reviews,
+  contacts,
+  newsletters,
+  type User,
+  type InsertUser,
+  type Product,
+  type InsertProduct,
+  type Category,
+  type InsertCategory,
+  type Order,
+  type InsertOrder,
+  type OrderItem,
+  type InsertOrderItem,
+  type Review,
+  type InsertReview,
+  type Contact,
+  type InsertContact,
+  type Newsletter,
+  type InsertNewsletter,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -72,13 +92,33 @@ export class MemStorage implements IStorage {
   private initializeData() {
     // Initialize categories
     const categoriesData = [
-      { id: 1, name: "Miel & Apiculture", description: "Miel artisanal et produits de la ruche", slug: "miel-apiculture" },
-      { id: 2, name: "Huiles Essentielles", description: "Huiles essentielles pures et biologiques", slug: "huiles-essentielles" },
-      { id: 3, name: "Tisanes & Infusions", description: "Tisanes aux plantes naturelles", slug: "tisanes-infusions" },
-      { id: 4, name: "Cosmétiques Naturels", description: "Soins naturels pour le corps", slug: "cosmetiques-naturels" },
+      {
+        id: 1,
+        name: "Miel & Apiculture",
+        description: "Miel artisanal et produits de la ruche",
+        slug: "miel-apiculture",
+      },
+      {
+        id: 2,
+        name: "Huiles Essentielles",
+        description: "Huiles essentielles pures et biologiques",
+        slug: "huiles-essentielles",
+      },
+      {
+        id: 3,
+        name: "Tisanes & Infusions",
+        description: "Tisanes aux plantes naturelles",
+        slug: "tisanes-infusions",
+      },
+      {
+        id: 4,
+        name: "Cosmétiques Naturels",
+        description: "Soins naturels pour le corps",
+        slug: "cosmetiques-naturels",
+      },
     ];
 
-    categoriesData.forEach(cat => {
+    categoriesData.forEach((cat) => {
       this.categories.set(cat.id, cat);
       this.currentCategoryId = Math.max(this.currentCategoryId, cat.id + 1);
     });
@@ -88,66 +128,74 @@ export class MemStorage implements IStorage {
       {
         id: 1,
         name: "Miel Bio Artisanal",
-        description: "Miel de fleurs sauvages récolté localement par nos apiculteurs partenaires. Un goût authentique et des bienfaits naturels préservés.",
+        description:
+          "Miel de fleurs sauvages récolté localement par nos apiculteurs partenaires. Un goût authentique et des bienfaits naturels préservés.",
         price: "24.99",
-        image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        image:
+          "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
           "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 1,
         stock: 50,
         isActive: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 2,
         name: "Huiles Essentielles Bio",
-        description: "Coffret de 6 huiles essentielles pures : lavande, eucalyptus, menthe, citron, tea tree et romarin. Idéal pour l'aromathérapie.",
+        description:
+          "Coffret de 6 huiles essentielles pures : lavande, eucalyptus, menthe, citron, tea tree et romarin. Idéal pour l'aromathérapie.",
         price: "89.99",
-        image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        image:
+          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
           "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 2,
         stock: 30,
         isActive: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 3,
         name: "Tisanes Bio",
-        description: "Collection de 12 tisanes aux plantes : camomille, verveine, tilleul, menthe, thym et bien d'autres. Parfaites pour la détente.",
+        description:
+          "Collection de 12 tisanes aux plantes : camomille, verveine, tilleul, menthe, thym et bien d'autres. Parfaites pour la détente.",
         price: "34.99",
-        image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        image:
+          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
           "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 3,
         stock: 25,
         isActive: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 4,
         name: "Cosmétiques Naturels",
-        description: "Soins visage aux ingrédients naturels : crème hydratante, sérum anti-âge, gommage doux et masque purifiant.",
+        description:
+          "Soins visage aux ingrédients naturels : crème hydratante, sérum anti-âge, gommage doux et masque purifiant.",
         price: "49.99",
-        image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        image:
+          "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
           "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         ],
         categoryId: 4,
         stock: 15,
         isActive: true,
-        createdAt: new Date()
-      }
+        createdAt: new Date(),
+      },
     ];
 
-    productsData.forEach(prod => {
+    productsData.forEach((prod) => {
       this.products.set(prod.id, prod);
       this.currentProductId = Math.max(this.currentProductId, prod.id + 1);
     });
@@ -159,18 +207,20 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
+    );
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    return Array.from(this.users.values()).find((user) => user.email === email);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id, 
+    const user: User = {
+      ...insertUser,
+      id,
       createdAt: new Date(),
       address: insertUser.address || null,
       firstName: insertUser.firstName || null,
@@ -178,7 +228,7 @@ export class MemStorage implements IStorage {
       phone: insertUser.phone || null,
       city: insertUser.city || null,
       postalCode: insertUser.postalCode || null,
-      country: insertUser.country || null
+      country: insertUser.country || null,
     };
     this.users.set(id, user);
     return user;
@@ -195,10 +245,10 @@ export class MemStorage implements IStorage {
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = this.currentCategoryId++;
-    const category: Category = { 
-      ...insertCategory, 
+    const category: Category = {
+      ...insertCategory,
       id,
-      description: insertCategory.description || null
+      description: insertCategory.description || null,
     };
     this.categories.set(id, category);
     return category;
@@ -206,7 +256,7 @@ export class MemStorage implements IStorage {
 
   // Products
   async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(p => p.isActive);
+    return Array.from(this.products.values()).filter((p) => p.isActive);
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
@@ -215,30 +265,33 @@ export class MemStorage implements IStorage {
   }
 
   async getProductsByCategory(categoryId: number): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(p => p.categoryId === categoryId && p.isActive);
+    return Array.from(this.products.values()).filter(
+      (p) => p.categoryId === categoryId && p.isActive,
+    );
   }
 
   async searchProducts(query: string): Promise<Product[]> {
     const lowercaseQuery = query.toLowerCase();
-    return Array.from(this.products.values()).filter(p => 
-      p.isActive && (
-        p.name.toLowerCase().includes(lowercaseQuery) ||
-        p.description?.toLowerCase().includes(lowercaseQuery)
-      )
+    return Array.from(this.products.values()).filter(
+      (p) =>
+        p.isActive &&
+        (p.name.toLowerCase().includes(lowercaseQuery) ||
+          p.description?.toLowerCase().includes(lowercaseQuery)),
     );
   }
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
-    const product: Product = { 
-      ...insertProduct, 
-      id, 
+    const product: Product = {
+      ...insertProduct,
+      id,
       createdAt: new Date(),
       description: insertProduct.description || null,
       images: insertProduct.images || null,
       categoryId: insertProduct.categoryId || null,
       stock: insertProduct.stock || 0,
-      isActive: insertProduct.isActive !== undefined ? insertProduct.isActive : true
+      isActive:
+        insertProduct.isActive !== undefined ? insertProduct.isActive : true,
     };
     this.products.set(id, product);
     return product;
@@ -254,25 +307,28 @@ export class MemStorage implements IStorage {
   }
 
   async getOrdersByUser(userId: number): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter(o => o.userId === userId);
+    return Array.from(this.orders.values()).filter((o) => o.userId === userId);
   }
 
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
     const id = this.currentOrderId++;
-    const order: Order = { 
-      ...insertOrder, 
-      id, 
+    const order: Order = {
+      ...insertOrder,
+      id,
       createdAt: new Date(),
       status: insertOrder.status || "pending",
       userId: insertOrder.userId || null,
       shippingAddress: insertOrder.shippingAddress || null,
-      paymentMethod: insertOrder.paymentMethod || null
+      paymentMethod: insertOrder.paymentMethod || null,
     };
     this.orders.set(id, order);
     return order;
   }
 
-  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
+  async updateOrderStatus(
+    id: number,
+    status: string,
+  ): Promise<Order | undefined> {
     const order = this.orders.get(id);
     if (order) {
       order.status = status;
@@ -284,16 +340,18 @@ export class MemStorage implements IStorage {
 
   // Order Items
   async getOrderItems(orderId: number): Promise<OrderItem[]> {
-    return Array.from(this.orderItems.values()).filter(item => item.orderId === orderId);
+    return Array.from(this.orderItems.values()).filter(
+      (item) => item.orderId === orderId,
+    );
   }
 
   async createOrderItem(insertOrderItem: InsertOrderItem): Promise<OrderItem> {
     const id = this.currentOrderItemId++;
-    const orderItem: OrderItem = { 
-      ...insertOrderItem, 
+    const orderItem: OrderItem = {
+      ...insertOrderItem,
       id,
       productId: insertOrderItem.productId || null,
-      orderId: insertOrderItem.orderId || null
+      orderId: insertOrderItem.orderId || null,
     };
     this.orderItems.set(id, orderItem);
     return orderItem;
@@ -301,18 +359,20 @@ export class MemStorage implements IStorage {
 
   // Reviews
   async getReviews(productId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values()).filter(r => r.productId === productId);
+    return Array.from(this.reviews.values()).filter(
+      (r) => r.productId === productId,
+    );
   }
 
   async createReview(insertReview: InsertReview): Promise<Review> {
     const id = this.currentReviewId++;
-    const review: Review = { 
-      ...insertReview, 
-      id, 
+    const review: Review = {
+      ...insertReview,
+      id,
       createdAt: new Date(),
       productId: insertReview.productId || null,
       userId: insertReview.userId || null,
-      comment: insertReview.comment || null
+      comment: insertReview.comment || null,
     };
     this.reviews.set(id, review);
     return review;
@@ -327,9 +387,15 @@ export class MemStorage implements IStorage {
   }
 
   // Newsletter
-  async createNewsletter(insertNewsletter: InsertNewsletter): Promise<Newsletter> {
+  async createNewsletter(
+    insertNewsletter: InsertNewsletter,
+  ): Promise<Newsletter> {
     const id = this.currentNewsletterId++;
-    const newsletter: Newsletter = { ...insertNewsletter, id, createdAt: new Date() };
+    const newsletter: Newsletter = {
+      ...insertNewsletter,
+      id,
+      createdAt: new Date(),
+    };
     this.newsletters.set(id, newsletter);
     return newsletter;
   }

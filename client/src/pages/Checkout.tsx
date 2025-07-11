@@ -66,7 +66,7 @@ export default function Checkout() {
               Ajoutez des produits à votre panier pour procéder au paiement.
             </p>
             <Link href="/products">
-              <Button className="bg-forest-green hover:bg-forest-light">
+              <Button className="bg-rose-primary hover:bg-rose-light">
                 Découvrir nos produits
               </Button>
             </Link>
@@ -81,7 +81,7 @@ export default function Checkout() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-16">
-            <CheckCircle className="h-24 w-24 text-forest-green mx-auto mb-6" />
+            <CheckCircle className="h-24 w-24 text-rose-primary mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-text-dark mb-4">
               Commande confirmée !
             </h1>
@@ -90,7 +90,7 @@ export default function Checkout() {
             </p>
             <div className="space-y-4">
               <Link href="/products">
-                <Button className="bg-forest-green hover:bg-forest-light mr-4">
+                <Button className="bg-rose-primary hover:bg-rose-light mr-4">
                   Continuer mes achats
                 </Button>
               </Link>
@@ -300,18 +300,18 @@ export default function Checkout() {
                     </div>
                     <div className="flex justify-between">
                       <span>Livraison</span>
-                      <span className="text-forest-green">Gratuite</span>
+                      <span className="text-rose-primary">Gratuite</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total</span>
-                      <span className="text-forest-green">{getTotalPrice().toFixed(2)} €</span>
+                      <span className="text-rose-primary">{getTotalPrice().toFixed(2)} €</span>
                     </div>
                   </div>
                   
                   <Button
                     type="submit"
                     disabled={isProcessing}
-                    className="w-full bg-forest-green hover:bg-forest-light"
+                    className="w-full bg-rose-primary hover:bg-rose-light"
                   >
                     {isProcessing ? 'Traitement...' : 'Finaliser la commande'}
                   </Button>

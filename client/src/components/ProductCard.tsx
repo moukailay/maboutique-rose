@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
       <CardContent className="p-6">
         <Link href={`/products/${product.id}`}>
-          <h3 className="text-lg font-semibold text-text-dark mb-2 hover:text-forest-green transition-colors cursor-pointer">
+          <h3 className="text-lg font-semibold text-text-dark mb-2 hover:text-rose-primary transition-colors cursor-pointer">
             {product.name}
           </h3>
         </Link>
@@ -45,12 +45,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.description}
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-forest-green">
+          <span className="text-xl font-bold text-rose-primary">
             {product.price} €
           </span>
           <Button
             onClick={handleAddToCart}
-            className="bg-forest-green hover:bg-forest-light text-white"
+            className="bg-rose-primary hover:bg-rose-light text-white"
           >
             Ajouter
           </Button>

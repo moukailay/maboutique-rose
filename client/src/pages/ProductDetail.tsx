@@ -79,7 +79,7 @@ export default function ProductDetail() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-text-dark mb-4">Produit non trouvé</h1>
           <Link href="/products">
-            <Button className="bg-forest-green hover:bg-forest-light">
+            <Button className="bg-rose-primary hover:bg-rose-light">
               Retour aux produits
             </Button>
           </Link>
@@ -121,7 +121,7 @@ export default function ProductDetail() {
                     key={index}
                     onClick={() => setSelectedImage(index)}
                     className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                      selectedImage === index ? 'border-forest-green' : 'border-gray-200'
+                      selectedImage === index ? 'border-rose-primary' : 'border-gray-200'
                     }`}
                   >
                     <img
@@ -154,7 +154,7 @@ export default function ProductDetail() {
                   ({reviews?.length || 0} avis)
                 </span>
               </div>
-              <p className="text-3xl font-bold text-forest-green mb-4">{product.price} €</p>
+              <p className="text-3xl font-bold text-rose-primary mb-4">{product.price} €</p>
               
               <div className="flex items-center space-x-2 mb-4">
                 <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>
@@ -194,7 +194,7 @@ export default function ProductDetail() {
               <Button
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
-                className="w-full bg-forest-green hover:bg-forest-light"
+                className="w-full bg-rose-primary hover:bg-rose-light"
                 size="lg"
               >
                 Ajouter au panier
