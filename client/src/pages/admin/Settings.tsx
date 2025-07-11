@@ -321,7 +321,7 @@ export default function AdminSettings() {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="freeShippingThreshold">Seuil de livraison gratuite (€)</Label>
+                    <Label htmlFor="freeShippingThreshold">Seuil de livraison gratuite (CAD)</Label>
                     <Input
                       id="freeShippingThreshold"
                       type="number"
@@ -330,7 +330,7 @@ export default function AdminSettings() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="standardShippingCost">Coût livraison standard (€)</Label>
+                    <Label htmlFor="standardShippingCost">Coût livraison standard (CAD)</Label>
                     <Input
                       id="standardShippingCost"
                       type="number"
@@ -343,7 +343,7 @@ export default function AdminSettings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="expressShippingCost">Coût livraison express (€)</Label>
+                    <Label htmlFor="expressShippingCost">Coût livraison express (CAD)</Label>
                     <Input
                       id="expressShippingCost"
                       type="number"
@@ -353,7 +353,7 @@ export default function AdminSettings() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="internationalShippingCost">Coût livraison internationale (€)</Label>
+                    <Label htmlFor="internationalShippingCost">Coût livraison internationale (CAD)</Label>
                     <Input
                       id="internationalShippingCost"
                       type="number"

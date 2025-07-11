@@ -266,7 +266,7 @@ export default function AdminOrders() {
                           <div className="text-text-dark">{order.itemsCount} article{order.itemsCount !== 1 ? 's' : ''}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-text-dark">{order.total.toFixed(2)} €</div>
+                          <div className="font-medium text-text-dark">{order.total.toFixed(2)} CAD</div>
                         </TableCell>
                         <TableCell>
                           <Badge className={statusConfig.color}>

@@ -139,7 +139,7 @@ export class MemStorage implements IStorage {
         name: "Miel Bio Artisanal",
         description:
           "Miel de fleurs sauvages récolté localement par nos apiculteurs partenaires. Un goût authentique et des bienfaits naturels préservés.",
-        price: "24.99",
+        price: "34.99",
         image:
           "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
@@ -156,7 +156,7 @@ export class MemStorage implements IStorage {
         name: "Huiles Essentielles Bio",
         description:
           "Coffret de 6 huiles essentielles pures : lavande, eucalyptus, menthe, citron, tea tree et romarin. Idéal pour l'aromathérapie.",
-        price: "89.99",
+        price: "119.99",
         image:
           "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
@@ -173,7 +173,7 @@ export class MemStorage implements IStorage {
         name: "Tisanes Bio",
         description:
           "Collection de 12 tisanes aux plantes : camomille, verveine, tilleul, menthe, thym et bien d'autres. Parfaites pour la détente.",
-        price: "34.99",
+        price: "47.99",
         image:
           "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [
@@ -190,7 +190,7 @@ export class MemStorage implements IStorage {
         name: "Cosmétiques Naturels",
         description:
           "Soins visage aux ingrédients naturels : crème hydratante, sérum anti-âge, gommage doux et masque purifiant.",
-        price: "49.99",
+        price: "67.99",
         image:
           "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         images: [

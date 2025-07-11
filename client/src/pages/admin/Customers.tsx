@@ -246,7 +246,7 @@ export default function AdminCustomers() {
                         <TableCell>
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 text-gray-400 mr-1" />
-                            <span className="font-medium text-text-dark">{customer.totalSpent.toFixed(2)} €</span>
+                            <span className="font-medium text-text-dark">{customer.totalSpent.toFixed(2)} CAD</span>
                           </div>
                         </TableCell>
                         <TableCell>

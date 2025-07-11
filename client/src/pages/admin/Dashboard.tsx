@@ -89,7 +89,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-text-dark">
-                {dashboardStats.todayRevenue.toFixed(2)} €
+                {dashboardStats.todayRevenue.toFixed(2)} CAD
               </div>
               <p className="text-xs text-text-medium">
                 +12% par rapport à hier
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-text-dark">
-                {dashboardStats.weeklyRevenue.toFixed(2)} €
+                {dashboardStats.weeklyRevenue.toFixed(2)} CAD
               </div>
               <p className="text-sm text-text-medium">
                 +18% par rapport à la semaine dernière
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-text-dark">
-                {dashboardStats.monthlyRevenue.toFixed(2)} €
+                {dashboardStats.monthlyRevenue.toFixed(2)} CAD
               </div>
               <p className="text-sm text-text-medium">
                 +25% par rapport au mois dernier
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
                       <p className="text-sm text-text-medium">{order.customer}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-text-dark">{order.amount.toFixed(2)} €</p>
+                      <p className="font-medium text-text-dark">{order.amount.toFixed(2)} CAD</p>
                       <Badge className={getStatusColor(order.status)}>
                         {getStatusText(order.status)}
                       </Badge>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-text-dark">{product.revenue.toFixed(2)} €</p>
+                      <p className="font-medium text-text-dark">{product.revenue.toFixed(2)} CAD</p>
                     </div>
                   </div>
                 ))}

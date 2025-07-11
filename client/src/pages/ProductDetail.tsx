@@ -154,7 +154,7 @@ export default function ProductDetail() {
                   ({reviews?.length || 0} avis)
                 </span>
               </div>
-              <p className="text-3xl font-bold text-rose-primary mb-4">{product.price} €</p>
+              <p className="text-3xl font-bold text-rose-primary mb-4">{product.price} CAD</p>
               
               <div className="flex items-center space-x-2 mb-4">
                 <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>

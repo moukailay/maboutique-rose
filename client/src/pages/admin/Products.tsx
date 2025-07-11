@@ -181,7 +181,7 @@ export default function AdminProducts() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="font-medium text-text-dark">{product.price} €</span>
+                          <span className="font-medium text-text-dark">{product.price} CAD</span>
                         </TableCell>
                         <TableCell>
                           <div>

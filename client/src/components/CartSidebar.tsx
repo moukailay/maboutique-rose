@@ -53,7 +53,7 @@ export default function CartSidebar() {
                   />
                   <div className="flex-1">
                     <h3 className="font-medium text-text-dark">{item.name}</h3>
-                    <p className="text-sm text-text-medium">{item.price} €</p>
+                    <p className="text-sm text-text-medium">{item.price} CAD</p>
                     <div className="flex items-center mt-2">
                       <Button
                         variant="ghost"
@@ -94,7 +94,7 @@ export default function CartSidebar() {
             <div className="flex justify-between items-center mb-4">
               <span className="text-lg font-semibold text-text-dark">Total:</span>
               <span className="text-lg font-bold text-rose-primary">
-                {getTotalPrice().toFixed(2)} €
+                {getTotalPrice().toFixed(2)} CAD
               </span>
             </div>
             <Link href="/checkout">

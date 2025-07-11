@@ -59,7 +59,7 @@ export default function Cart() {
                         {item.name}
                       </h3>
                       <p className="text-rose-primary font-bold text-lg">
-                        {item.price} €
+                        {item.price} CAD
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -85,7 +85,7 @@ export default function Cart() {
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-text-dark text-lg">
-                        {(parseFloat(item.price) * item.quantity).toFixed(2)} €
+                        {(parseFloat(item.price) * item.quantity).toFixed(2)} CAD
                       </p>
                       <Button
                         variant="ghost"
@@ -115,7 +115,7 @@ export default function Cart() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-text-medium">Sous-total</span>
-                    <span className="font-medium">{getTotalPrice().toFixed(2)} €</span>
+                    <span className="font-medium">{getTotalPrice().toFixed(2)} CAD</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-text-medium">Livraison</span>
@@ -125,7 +125,7 @@ export default function Cart() {
                     <div className="flex justify-between">
                       <span className="text-lg font-semibold text-text-dark">Total</span>
                       <span className="text-lg font-bold text-rose-primary">
-                        {getTotalPrice().toFixed(2)} €
+                        {getTotalPrice().toFixed(2)} CAD
                       </span>
                     </div>
                   </div>
