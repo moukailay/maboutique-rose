@@ -108,6 +108,14 @@ export const translations = {
     'theme.light': 'Thème clair',
     'theme.dark': 'Thème sombre',
     'theme.toggle': 'Basculer le thème',
+    
+    // Chat
+    'chat.title': 'Assistance Client',
+    'chat.subtitle': 'Nous sommes là pour vous aider',
+    'chat.welcome': 'Bonjour 👋 Comment pouvons-nous vous aider avec nos produits naturels ?',
+    'chat.placeholder': 'Tapez votre message...',
+    'chat.send': 'Envoyer',
+    'chat.auto_response': 'Merci pour votre message ! Un membre de notre équipe vous répondra rapidement.',
     'common.email': 'Email',
     'common.phone': 'Téléphone',
     'common.address': 'Adresse',
@@ -205,6 +213,14 @@ export const translations = {
     'theme.light': 'Light theme',
     'theme.dark': 'Dark theme',
     'theme.toggle': 'Toggle theme',
+    
+    // Chat
+    'chat.title': 'Customer Support',
+    'chat.subtitle': 'We\'re here to help you',
+    'chat.welcome': 'Hello 👋 How can we help you with our natural products?',
+    'chat.placeholder': 'Type your message...',
+    'chat.send': 'Send',
+    'chat.auto_response': 'Thank you for your message! A member of our team will respond quickly.',
     'common.email': 'Email',
     'common.phone': 'Phone',
     'common.address': 'Address',

@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
+import ChatWidget from "@/components/ChatWidget";
 import Home from "@/pages/Home";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
@@ -75,6 +76,7 @@ function App() {
                 </main>
                 <Footer />
                 <CartSidebar />
+                <ChatWidget />
               </div>
               <Toaster />
             </TooltipProvider>
