@@ -182,6 +182,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/products/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      console.log("Updating product with ID:", id, "data:", {
+        name: req.body.name,
+        price: req.body.price,
+        categoryId: req.body.categoryId,
+        stock: req.body.stock,
+        imageLength: req.body.image?.length || 0
+      });
+      
+      const productData = insertProductSchema.parse(req.body);
+      const product = await storage.updateProduct(id, productData);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid product data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating product", error: error.message });
+    }
+  });
+
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {

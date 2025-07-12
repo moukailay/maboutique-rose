@@ -26,6 +26,7 @@ import AdminLogin from "@/pages/admin/Login";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AddProduct from "@/pages/admin/AddProduct";
+import EditProduct from "@/pages/admin/EditProduct";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/products/add" component={AddProduct} />
+      <Route path="/admin/products/:id/edit" component={EditProduct} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />

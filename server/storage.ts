@@ -49,6 +49,7 @@ export interface IStorage {
   getProductsByCategory(categoryId: number): Promise<Product[]>;
   searchProducts(query: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: number, product: InsertProduct): Promise<Product | undefined>;
 
   // Orders
   getOrders(): Promise<Order[]>;
@@ -288,6 +289,22 @@ export class DatabaseStorage implements IStorage {
       return product;
     } catch (error) {
       console.error("Database error when creating product:", error);
+      throw error;
+    }
+  }
+
+  async updateProduct(id: number, updateData: InsertProduct): Promise<Product | undefined> {
+    try {
+      console.log("Updating product with ID:", id, "data:", updateData);
+      const [product] = await db
+        .update(products)
+        .set(updateData)
+        .where(eq(products.id, id))
+        .returning();
+      console.log("Product updated successfully:", product);
+      return product || undefined;
+    } catch (error) {
+      console.error("Database error when updating product:", error);
       throw error;
     }
   }
