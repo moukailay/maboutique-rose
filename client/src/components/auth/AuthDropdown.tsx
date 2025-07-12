@@ -33,7 +33,7 @@ export default function AuthDropdown() {
           <DropdownMenuSeparator />
           {user.role === 'admin' ? (
             <DropdownMenuItem asChild>
-              <Link href="/admin/dashboard">
+              <Link href="/admin">
                 <Settings className="mr-2 h-4 w-4" />
                 {t('nav.admin')}
               </Link>
