@@ -134,25 +134,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { category, search } = req.query;
       let products;
       
+      console.log('Products API called with params:', { category, search });
+      
       if (search) {
+        console.log('Searching for products with query:', search);
         products = await storage.searchProducts(search as string);
       } else if (category) {
+        console.log('Filtering by category:', category);
         // Check if category is a slug or ID
         const categoryData = isNaN(Number(category)) 
           ? await storage.getCategoryBySlug(category as string)
           : await storage.getCategory(Number(category));
         
+        console.log('Category data found:', categoryData);
+        
         if (categoryData) {
           products = await storage.getProductsByCategory(categoryData.id);
+          console.log('Products found for category:', products.length);
         } else {
+          console.log('Category not found, returning all products');
           products = await storage.getProducts();
         }
       } else {
+        console.log('No filters, returning all products');
         products = await storage.getProducts();
       }
       
+      console.log('Final products count:', products.length);
       res.json(products);
     } catch (error) {
+      console.error('Error in products API:', error);
       res.status(500).json({ message: "Error fetching products" });
     }
   });
