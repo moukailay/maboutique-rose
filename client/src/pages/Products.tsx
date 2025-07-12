@@ -19,7 +19,7 @@ export default function Products() {
   const { t } = useTranslation();
 
   const { data: products, isLoading: productsLoading } = useQuery<Product[]>({
-    queryKey: ['/api/products', { search: searchQuery, category: categoryFilter }],
+    queryKey: ['/api/products', searchQuery, categoryFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
@@ -48,7 +48,7 @@ export default function Products() {
   const handleCategoryFilter = (categoryId: string) => {
     const params = new URLSearchParams();
     if (searchQuery) params.append('search', searchQuery);
-    if (categoryId) params.append('category', categoryId);
+    if (categoryId !== 'all') params.append('category', categoryId);
     
     window.history.pushState({}, '', `/products?${params}`);
     window.location.reload();
@@ -59,10 +59,16 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-text-dark dark:text-text-light mb-4">
-            {t('products.title')}
+            {categoryFilter ? 
+              `${categories?.find(c => c.id.toString() === categoryFilter)?.name || 'Catégorie'} - ${t('products.title')}` : 
+              t('products.title')
+            }
           </h1>
           <p className="text-lg text-text-medium dark:text-text-medium">
-            {t('home.featured.subtitle')}
+            {categoryFilter ? 
+              `Découvrez nos produits dans la catégorie ${categories?.find(c => c.id.toString() === categoryFilter)?.name || 'sélectionnée'}` : 
+              t('home.featured.subtitle')
+            }
           </p>
         </div>
 

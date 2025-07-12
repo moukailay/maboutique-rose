@@ -14,11 +14,14 @@ import { Link, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useState, useRef } from "react";
 import { 
   Package, 
   Upload,
   ArrowLeft,
-  Save
+  Save,
+  X,
+  ImageIcon
 } from "lucide-react";
 
 interface Category {
@@ -37,7 +40,7 @@ const productSchema = z.object({
     },
     "Le prix doit être un nombre valide"
   ),
-  image: z.string().url("L'URL de l'image doit être valide"),
+  image: z.string().min(1, "Une image est requise"),
   categoryId: z.string().min(1, "La catégorie est requise"),
   stock: z.string().min(1, "Le stock est requis").refine(
     (val) => {
@@ -55,6 +58,8 @@ export default function AddProduct() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
@@ -71,6 +76,50 @@ export default function AddProduct() {
       stock: "0",
     },
   });
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un fichier image.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erreur",
+        description: "L'image ne peut pas dépasser 5 MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        setSelectedImages([result]);
+        form.setValue('image', result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+    if (newImages.length === 0) {
+      form.setValue('image', '');
+    } else {
+      form.setValue('image', newImages[0]);
+    }
+  };
 
   const createProductMutation = useMutation({
     mutationFn: async (data: ProductFormData) => {
@@ -287,39 +336,72 @@ export default function AddProduct() {
                     <FormItem>
                       <FormLabel>Image du produit</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://exemple.com/image.jpg"
-                          {...field}
-                        />
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="flex items-center gap-2"
+                            >
+                              <Upload className="h-4 w-4" />
+                              Téléverser une image
+                            </Button>
+                            <Input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                          </div>
+                          
+                          {selectedImages.length > 0 && (
+                            <div className="space-y-2">
+                              <Label>Aperçu de l'image</Label>
+                              <div className="flex gap-4 flex-wrap">
+                                {selectedImages.map((image, index) => (
+                                  <div key={index} className="relative">
+                                    <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                                      <img
+                                        src={image}
+                                        alt={`Aperçu ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="sm"
+                                      className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                                      onClick={() => removeImage(index)}
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {selectedImages.length === 0 && (
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                              <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                              <p className="text-gray-500 mb-2">Aucune image sélectionnée</p>
+                              <p className="text-sm text-gray-400">
+                                Cliquez sur "Téléverser une image" pour ajouter une photo
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormDescription>
-                        URL de l'image du produit (format JPG, PNG ou WebP)
+                        Formats acceptés : JPG, PNG, WebP (max 5 MB)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                {/* Preview */}
-                {form.watch('image') && (
-                  <div className="space-y-2">
-                    <Label>Aperçu de l'image</Label>
-                    <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
-                      <img
-                        src={form.watch('image')}
-                        alt="Aperçu"
-                        className="w-full h-full object-cover"
-                        onError={() => {
-                          toast({
-                            title: "Erreur d'image",
-                            description: "Impossible de charger l'image. Vérifiez l'URL.",
-                            variant: "destructive",
-                          });
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
 
                 <div className="flex justify-end gap-4 pt-6">
                   <Button asChild variant="outline" type="button">
