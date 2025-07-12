@@ -11,11 +11,14 @@ import type { Product, Category } from '@shared/schema';
 
 export default function Products() {
   const [location] = useLocation();
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  
+  // Get URL parameters from window.location instead of wouter location
+  const urlParams = new URLSearchParams(window.location.search);
   const searchQuery = urlParams.get('search') || '';
   const categoryFilter = urlParams.get('category') || '';
   
   console.log('Current location:', location);
+  console.log('Window location search:', window.location.search);
   console.log('Category filter from URL:', categoryFilter);
   
   const [localSearch, setLocalSearch] = useState(searchQuery);
