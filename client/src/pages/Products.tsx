@@ -15,6 +15,9 @@ export default function Products() {
   const searchQuery = urlParams.get('search') || '';
   const categoryFilter = urlParams.get('category') || '';
   
+  console.log('Current location:', location);
+  console.log('Category filter from URL:', categoryFilter);
+  
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const { t } = useTranslation();
 
@@ -25,10 +28,20 @@ export default function Products() {
       if (searchQuery) params.append('search', searchQuery);
       if (categoryFilter) params.append('category', categoryFilter);
       
-      const response = await fetch(`/api/products?${params}`);
+      const url = `/api/products${params.toString() ? '?' + params.toString() : ''}`;
+      console.log('Fetching products from:', url);
+      
+      const response = await fetch(url, {
+        credentials: 'include'
+      });
+      
       if (!response.ok) throw new Error('Failed to fetch products');
-      return response.json();
+      const data = await response.json();
+      console.log('Received products:', data.length, 'for category:', categoryFilter || 'all');
+      return data;
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const { data: categories } = useQuery<Category[]>({
@@ -85,25 +98,34 @@ export default function Products() {
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           </form>
           
-          <div className="flex gap-2 flex-wrap">
+          {categoryFilter ? (
             <Button
-              variant={categoryFilter === '' ? 'default' : 'outline'}
-              onClick={() => handleCategoryFilter('')}
-              className={categoryFilter === '' ? 'bg-rose-primary hover:bg-rose-light' : ''}
+              onClick={() => window.location.href = '/categories'}
+              className="bg-rose-primary hover:bg-rose-light text-white"
             >
-              {t('products.filter.all')}
+              ← Retour aux catégories
             </Button>
-            {categories?.map((category) => (
+          ) : (
+            <div className="flex gap-2 flex-wrap">
               <Button
-                key={category.id}
-                variant={categoryFilter === category.id.toString() ? 'default' : 'outline'}
-                onClick={() => handleCategoryFilter(category.id.toString())}
-                className={categoryFilter === category.id.toString() ? 'bg-rose-primary hover:bg-rose-light' : ''}
+                variant={categoryFilter === '' ? 'default' : 'outline'}
+                onClick={() => handleCategoryFilter('')}
+                className={categoryFilter === '' ? 'bg-rose-primary hover:bg-rose-light' : ''}
               >
-                {category.name}
+                {t('products.filter.all')}
               </Button>
-            ))}
-          </div>
+              {categories?.map((category) => (
+                <Button
+                  key={category.id}
+                  variant={categoryFilter === category.id.toString() ? 'default' : 'outline'}
+                  onClick={() => handleCategoryFilter(category.id.toString())}
+                  className={categoryFilter === category.id.toString() ? 'bg-rose-primary hover:bg-rose-light' : ''}
+                >
+                  {category.name}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Products Grid */}
