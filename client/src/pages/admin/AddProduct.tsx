@@ -91,10 +91,10 @@ export default function AddProduct() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       toast({
         title: "Erreur",
-        description: "L'image ne peut pas dépasser 5 MB.",
+        description: "L'image ne peut pas dépasser 2 MB.",
         variant: "destructive",
       });
       return;
@@ -104,8 +104,38 @@ export default function AddProduct() {
     reader.onload = (e) => {
       const result = e.target?.result as string;
       if (result) {
-        setSelectedImages([result]);
-        form.setValue('image', result);
+        // Compression d'image simple
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Redimensionner l'image si elle est trop grande
+          const maxWidth = 800;
+          const maxHeight = 600;
+          let { width, height } = img;
+          
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            } else {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            setSelectedImages([compressedDataUrl]);
+            form.setValue('image', compressedDataUrl);
+          }
+        };
+        img.src = result;
       }
     };
     reader.readAsDataURL(file);
@@ -396,7 +426,7 @@ export default function AddProduct() {
                         </div>
                       </FormControl>
                       <FormDescription>
-                        Formats acceptés : JPG, PNG, WebP (max 5 MB)
+                        Formats acceptés : JPG, PNG, WebP (max 2 MB) - Les images sont automatiquement optimisées
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
