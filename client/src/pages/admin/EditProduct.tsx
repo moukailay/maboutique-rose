@@ -191,8 +191,9 @@ export default function EditProduct() {
       };
       
       console.log("Updating product with data:", productData);
-      const response = await apiRequest('PUT', `/api/products/${id}`, productData);
-      return response;
+      const response = await apiRequest(`/api/products/${id}`, { method: 'PUT', data: productData });
+      const result = await response.json();
+      return result;
     },
     onSuccess: (data) => {
       toast({

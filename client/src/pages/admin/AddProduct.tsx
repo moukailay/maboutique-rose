@@ -172,8 +172,9 @@ export default function AddProduct() {
       };
       
       console.log("Sending product data:", productData);
-      const response = await apiRequest('POST', '/api/products', productData);
-      return response;
+      const response = await apiRequest('/api/products', { method: 'POST', data: productData });
+      const result = await response.json();
+      return result;
     },
     onSuccess: (data) => {
       toast({
