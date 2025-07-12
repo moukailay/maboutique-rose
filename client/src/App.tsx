@@ -12,6 +12,7 @@ import CartSidebar from "@/components/CartSidebar";
 import ChatWidget from "@/components/ChatWidget";
 import Home from "@/pages/Home";
 import Products from "@/pages/Products";
+import Categories from "@/pages/Categories";
 import ProductDetail from "@/pages/ProductDetail";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
@@ -41,6 +42,7 @@ function Router() {
       {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/products" component={Products} />
+      <Route path="/categories" component={Categories} />
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />

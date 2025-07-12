@@ -80,7 +80,7 @@ export default function CategoryDrawer({ isOpen, onClose }: CategoryDrawerProps)
   };
 
   const handleAllProductsClick = () => {
-    setLocation('/products');
+    setLocation('/categories');
     onClose();
   };
 
@@ -157,7 +157,7 @@ export default function CategoryDrawer({ isOpen, onClose }: CategoryDrawerProps)
                 <ShoppingBag className="w-5 h-5 text-rose-600 dark:text-rose-400" />
               </div>
               <span className="text-lg font-medium text-gray-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400">
-                {t('all_products')}
+                Toutes les catégories
               </span>
             </div>
           </button>
