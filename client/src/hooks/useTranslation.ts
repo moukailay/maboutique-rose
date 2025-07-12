@@ -58,6 +58,10 @@ export const translations = {
     'products.empty': 'Aucun produit trouvé',
     'products.add_to_cart': 'Ajouter au panier',
 
+    // Categories
+    'categories': 'Catégories',
+    'all_products': 'Tous les produits',
+
     // Cart
     'cart.title': 'Mon Panier',
     'cart.empty': 'Votre panier est vide',
@@ -170,6 +174,10 @@ export const translations = {
     'products.loading': 'Loading products...',
     'products.empty': 'No products found',
     'products.add_to_cart': 'Add to cart',
+
+    // Categories
+    'categories': 'Categories',
+    'all_products': 'All products',
 
     // Cart
     'cart.title': 'My Cart',

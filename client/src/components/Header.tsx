@@ -7,13 +7,14 @@ import { useCart } from '@/lib/cart';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import LanguageSelector from '@/components/LanguageSelector';
 import ThemeSelector from '@/components/ThemeSelector';
-import CategoryNavigation from '@/components/CategoryNavigation';
+import CategoryDrawer from '@/components/CategoryDrawer';
 import { useTranslation } from '@/hooks/useTranslation';
 import logoImage from '@assets/image_1752269345378.png';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useLocation();
   const { toggleCart, getTotalItems } = useCart();
@@ -45,14 +46,24 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <img 
-              src={logoImage} 
-              alt="Rose D'É" 
-              className="h-10 w-auto sm:h-12 md:h-14 lg:h-16 object-contain transition-all duration-200 hover:scale-105"
-            />
-          </Link>
+          {/* Menu Button & Logo */}
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCategoryDrawerOpen(true)}
+              className="text-text-dark dark:text-text-light hover:text-rose-primary"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <Link href="/" className="flex items-center">
+              <img 
+                src={logoImage} 
+                alt="Rose D'É" 
+                className="h-10 w-auto sm:h-12 md:h-14 lg:h-16 object-contain transition-all duration-200 hover:scale-105"
+              />
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
@@ -155,8 +166,11 @@ export default function Header() {
         </div>
       )}
       
-      {/* Category Navigation */}
-      <CategoryNavigation />
+      {/* Category Drawer */}
+      <CategoryDrawer 
+        isOpen={isCategoryDrawerOpen} 
+        onClose={() => setIsCategoryDrawerOpen(false)} 
+      />
     </header>
   );
 }
