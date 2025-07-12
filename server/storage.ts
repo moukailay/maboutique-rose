@@ -50,6 +50,7 @@ export interface IStorage {
   searchProducts(query: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: InsertProduct): Promise<Product | undefined>;
+  deleteProduct(id: number): Promise<boolean>;
 
   // Orders
   getOrders(): Promise<Order[]>;
@@ -305,6 +306,21 @@ export class DatabaseStorage implements IStorage {
       return product || undefined;
     } catch (error) {
       console.error("Database error when updating product:", error);
+      throw error;
+    }
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    try {
+      console.log("Deleting product with ID:", id);
+      const result = await db
+        .delete(products)
+        .where(eq(products.id, id))
+        .returning();
+      console.log("Product deleted successfully:", result.length > 0);
+      return result.length > 0;
+    } catch (error) {
+      console.error("Database error when deleting product:", error);
       throw error;
     }
   }

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Package, 
   Plus,
@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: number;
@@ -31,10 +33,40 @@ export default function AdminProducts() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ['/api/products'],
   });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId: number) => {
+      return await apiRequest(`/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({
+        title: "Succès",
+        description: "Le produit a été supprimé avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur s'est produite lors de la suppression.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteProduct = (productId: number, productName: string) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le produit "${productName}" ? Cette action est irréversible.`)) {
+      deleteProductMutation.mutate(productId);
+    }
+  };
 
   if (!user || user.role !== 'admin') {
     return (
@@ -150,7 +182,12 @@ export default function AdminProducts() {
                       Modifier
                     </Link>
                   </Button>
-                  <Button variant="destructive" size="sm">
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => handleDeleteProduct(product.id, product.name)}
+                    disabled={deleteProductMutation.isPending}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
