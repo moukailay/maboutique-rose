@@ -58,9 +58,26 @@ export function useAuthState() {
   const login = async (email: string, password: string, isAdmin = false) => {
     try {
       const endpoint = isAdmin ? '/api/auth/admin/login' : '/api/auth/login';
-      const response = await apiRequest('POST', endpoint, { email, password });
-      const responseData = await response.json();
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
+      if (!response.ok) {
+        let errorMessage = "Email ou mot de passe incorrect.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, keep default message
+        }
+        throw new Error(errorMessage);
+      }
+
+      const responseData = await response.json();
       const { token, user: userData } = responseData;
       
       localStorage.setItem('authToken', token);
@@ -80,7 +97,7 @@ export function useAuthState() {
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: "Email ou mot de passe incorrect.",
+        description: error instanceof Error ? error.message : "Email ou mot de passe incorrect.",
         variant: "destructive",
       });
       throw error;
@@ -89,9 +106,26 @@ export function useAuthState() {
 
   const register = async (userData: RegisterData) => {
     try {
-      const response = await apiRequest('POST', '/api/auth/register', userData);
-      const responseData = await response.json();
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
+      if (!response.ok) {
+        let errorMessage = "Une erreur est survenue lors de la création du compte.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, keep default message
+        }
+        throw new Error(errorMessage);
+      }
+
+      const responseData = await response.json();
       const { token, user: newUser } = responseData;
       
       localStorage.setItem('authToken', token);
@@ -106,7 +140,7 @@ export function useAuthState() {
     } catch (error) {
       toast({
         title: "Erreur lors de l'inscription",
-        description: "Veuillez vérifier vos informations.",
+        description: error instanceof Error ? error.message : "Veuillez vérifier vos informations.",
         variant: "destructive",
       });
       throw error;
