@@ -8,13 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/lib/cart';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import { useAuthState } from '@/hooks/useAuth';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const { user } = useAuthState();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [orderId, setOrderId] = useState<string>('');
   const [formData, setFormData] = useState({
     // Shipping
     firstName: '',
@@ -41,17 +45,51 @@ export default function Checkout() {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Create order data
+      const orderData = {
+        userId: user?.id || null,
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        customerEmail: formData.email,
+        phone: formData.phone,
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country
+        },
+        items: items.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: parseFloat(item.price)
+        })),
+        totalAmount: getTotalPrice(),
+        status: 'pending'
+      };
 
-    setIsProcessing(false);
-    setOrderComplete(true);
-    clearCart();
-    
-    toast({
-      title: "Commande confirmée !",
-      description: "Votre commande a été passée avec succès.",
-    });
+      // Save order to database
+      const response = await apiRequest('POST', '/api/orders', orderData);
+      const createdOrder = await response.json();
+
+      setOrderId(createdOrder.id);
+      setOrderComplete(true);
+      clearCart();
+      
+      toast({
+        title: "Commande confirmée !",
+        description: `Votre commande #${createdOrder.id} a été passée avec succès.`,
+      });
+
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création de votre commande.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (items.length === 0 && !orderComplete) {
@@ -86,7 +124,7 @@ export default function Checkout() {
               Commande confirmée !
             </h1>
             <p className="text-lg text-text-medium mb-8">
-              Votre commande a été passée avec succès. Vous recevrez un email de confirmation dans quelques minutes.
+              Votre commande #{orderId} a été passée avec succès. Vous recevrez un email de confirmation dans quelques minutes.
             </p>
             <div className="space-y-4">
               <Link href="/products">

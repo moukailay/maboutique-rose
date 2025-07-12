@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -23,34 +24,74 @@ import {
   XCircle,
   Clock
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
 
 interface Order {
-  id: string;
+  id: number;
   customerName: string;
   customerEmail: string;
-  date: string;
+  phone?: string;
+  total: string;
   status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
-  total: number;
-  itemsCount: number;
+  shippingAddress?: string;
+  paymentMethod?: string;
+  createdAt: string;
+  items?: OrderItem[];
+}
+
+interface OrderItem {
+  id: number;
+  productId: number;
+  quantity: number;
+  price: string;
+  product?: {
+    name: string;
+    image: string;
+  };
 }
 
 export default function AdminOrders() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Mock data - in real app, this would come from API
-  const orders: Order[] = [
-    { id: '#2024-001', customerName: 'Marie Dubois', customerEmail: 'marie.dubois@email.com', date: '2024-01-15', status: 'pending', total: 125.50, itemsCount: 3 },
-    { id: '#2024-002', customerName: 'Jean Martin', customerEmail: 'jean.martin@email.com', date: '2024-01-14', status: 'paid', total: 89.90, itemsCount: 2 },
-    { id: '#2024-003', customerName: 'Sophie Chen', customerEmail: 'sophie.chen@email.com', date: '2024-01-13', status: 'shipped', total: 245.00, itemsCount: 5 },
-    { id: '#2024-004', customerName: 'Pierre Blanc', customerEmail: 'pierre.blanc@email.com', date: '2024-01-12', status: 'delivered', total: 67.30, itemsCount: 1 },
-    { id: '#2024-005', customerName: 'Claire Lopez', customerEmail: 'claire.lopez@email.com', date: '2024-01-11', status: 'cancelled', total: 156.75, itemsCount: 4 }
-  ];
+  // Fetch orders from API
+  const { data: orders = [], isLoading, error } = useQuery({
+    queryKey: ['/api/orders'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/orders');
+      return response.json();
+    }
+  });
+
+  // Update order status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: number; status: string }) => {
+      const response = await apiRequest('PUT', `/api/orders/${orderId}/status`, { status });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
+      toast({
+        title: "Statut mis à jour",
+        description: "Le statut de la commande a été modifié avec succès.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut de la commande.",
+        variant: "destructive",
+      });
+    }
+  });
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = order.id.toString().includes(searchQuery.toLowerCase()) ||
                          order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          order.customerEmail.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
@@ -98,18 +139,19 @@ export default function AdminOrders() {
     }
   };
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    // In real app, this would call API to update order status
-    console.log('Update order status:', orderId, newStatus);
+  const handleStatusChange = (orderId: number, newStatus: string) => {
+    updateStatusMutation.mutate({ orderId, status: newStatus });
   };
 
-  const handleViewOrder = (orderId: string) => {
+  const handleViewOrder = (orderId: number) => {
     setLocation(`/admin/orders/${orderId}`);
   };
 
-  const handlePrintInvoice = (orderId: string) => {
-    // In real app, this would generate and print PDF invoice
-    console.log('Print invoice for order:', orderId);
+  const handlePrintInvoice = (orderId: number) => {
+    toast({
+      title: "Fonction à venir",
+      description: "L'impression de facture sera bientôt disponible.",
+    });
   };
 
   const getStatusCounts = () => {
@@ -124,6 +166,33 @@ export default function AdminOrders() {
   };
 
   const statusCounts = getStatusCounts();
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="text-center py-8">
+            <p className="text-text-medium">Erreur lors du chargement des commandes</p>
+            <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -249,7 +318,7 @@ export default function AdminOrders() {
                     return (
                       <TableRow key={order.id}>
                         <TableCell>
-                          <div className="font-medium text-text-dark">{order.id}</div>
+                          <div className="font-medium text-text-dark">#{order.id}</div>
                         </TableCell>
                         <TableCell>
                           <div>
@@ -259,14 +328,14 @@ export default function AdminOrders() {
                         </TableCell>
                         <TableCell>
                           <div className="text-text-dark">
-                            {new Date(order.date).toLocaleDateString('fr-FR')}
+                            {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-text-dark">{order.itemsCount} article{order.itemsCount !== 1 ? 's' : ''}</div>
+                          <div className="text-text-dark">-</div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-text-dark">{order.total.toFixed(2)} CAD</div>
+                          <div className="font-medium text-text-dark">{parseFloat(order.total).toFixed(2)} CAD</div>
                         </TableCell>
                         <TableCell>
                           <Badge className={statusConfig.color}>

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
@@ -303,6 +303,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email", errors: error.errors });
       }
       res.status(500).json({ message: "Error subscribing to newsletter" });
+    }
+  });
+
+  // Orders
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const { userId, customerName, customerEmail, phone, shippingAddress, items, totalAmount, status } = req.body;
+      
+      // Create order
+      const orderData = {
+        userId,
+        customerName,
+        customerEmail,
+        phone,
+        total: totalAmount.toString(),
+        status: status || 'pending',
+        shippingAddress: JSON.stringify(shippingAddress),
+        paymentMethod: 'card'
+      };
+      
+      const order = await storage.createOrder(orderData);
+      
+      // Create order items
+      for (const item of items) {
+        await storage.createOrderItem({
+          orderId: order.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price.toString()
+        });
+      }
+      
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ message: "Error creating order", error: error.message });
+    }
+  });
+
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching orders" });
+    }
+  });
+
+  app.get("/api/orders/:id", async (req, res) => {
+    try {
+      const orderId = Number(req.params.id);
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const orderItems = await storage.getOrderItems(orderId);
+      res.json({ ...order, items: orderItems });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching order" });
+    }
+  });
+
+  app.put("/api/orders/:id/status", async (req, res) => {
+    try {
+      const orderId = Number(req.params.id);
+      const { status } = req.body;
+      
+      const updatedOrder = await storage.updateOrderStatus(orderId, status);
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      res.json(updatedOrder);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating order status" });
     }
   });
 

@@ -28,6 +28,8 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AddProduct from "@/pages/admin/AddProduct";
 import EditProduct from "@/pages/admin/EditProduct";
+import AdminOrders from "@/pages/admin/Orders";
+import OrderDetail from "@/pages/admin/OrderDetail";
 
 function Router() {
   return (
@@ -38,6 +40,8 @@ function Router() {
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/products/add" component={AddProduct} />
       <Route path="/admin/products/:id/edit" component={EditProduct} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/orders/:id" component={OrderDetail} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />

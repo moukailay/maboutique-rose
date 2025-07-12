@@ -9,6 +9,7 @@ import {
   TrendingUp, 
   AlertTriangle 
 } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
 
 interface DashboardStats {
@@ -23,25 +24,54 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  // Simulate dashboard data - in real app, this would come from API
+  // Fetch real orders data
+  const { data: orders = [] } = useQuery({
+    queryKey: ['/api/orders'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/orders');
+      return response.json();
+    }
+  });
+
+  // Fetch real products data
+  const { data: products = [] } = useQuery({
+    queryKey: ['/api/products'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/products');
+      return response.json();
+    }
+  });
+
+  // Calculate real stats from actual data
   const dashboardStats: DashboardStats = {
-    todayRevenue: 1250.50,
-    weeklyRevenue: 8750.25,
-    monthlyRevenue: 34500.00,
-    pendingOrders: 12,
-    lowStockProducts: 5,
-    newCustomers: 8,
-    totalProducts: 156,
-    totalOrders: 342
+    todayRevenue: orders.filter(o => {
+      const today = new Date().toDateString();
+      return new Date(o.createdAt).toDateString() === today;
+    }).reduce((sum, order) => sum + parseFloat(order.total), 0),
+    weeklyRevenue: orders.filter(o => {
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      return new Date(o.createdAt) > weekAgo;
+    }).reduce((sum, order) => sum + parseFloat(order.total), 0),
+    monthlyRevenue: orders.filter(o => {
+      const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      return new Date(o.createdAt) > monthAgo;
+    }).reduce((sum, order) => sum + parseFloat(order.total), 0),
+    pendingOrders: orders.filter(o => o.status === 'pending').length,
+    lowStockProducts: products.filter(p => p.stock < 10).length,
+    newCustomers: orders.filter(o => {
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      return new Date(o.createdAt) > weekAgo;
+    }).length,
+    totalProducts: products.length,
+    totalOrders: orders.length
   };
 
-  const recentOrders = [
-    { id: '#2024-001', customer: 'Marie Dubois', amount: 125.50, status: 'pending' },
-    { id: '#2024-002', customer: 'Jean Martin', amount: 89.90, status: 'paid' },
-    { id: '#2024-003', customer: 'Sophie Chen', amount: 245.00, status: 'shipped' },
-    { id: '#2024-004', customer: 'Pierre Blanc', amount: 67.30, status: 'pending' },
-    { id: '#2024-005', customer: 'Claire Lopez', amount: 156.75, status: 'paid' }
-  ];
+  const recentOrders = orders.slice(0, 5).map(order => ({
+    id: `#${order.id}`,
+    customer: order.customerName,
+    amount: parseFloat(order.total),
+    status: order.status
+  }));
 
   const topProducts = [
     { name: 'Miel Bio Artisanal', sales: 45, revenue: 1350.00 },
