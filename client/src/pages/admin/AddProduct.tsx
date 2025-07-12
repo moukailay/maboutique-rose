@@ -83,11 +83,8 @@ export default function AddProduct() {
         stock: parseInt(data.stock),
       };
       
-      return await apiRequest({
-        url: '/api/products',
-        method: 'POST',
-        body: productData,
-      });
+      const response = await apiRequest('POST', '/api/products', productData);
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({

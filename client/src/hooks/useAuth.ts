@@ -58,13 +58,10 @@ export function useAuthState() {
   const login = async (email: string, password: string, isAdmin = false) => {
     try {
       const endpoint = isAdmin ? '/api/auth/admin/login' : '/api/auth/login';
-      const response = await apiRequest({
-        url: endpoint,
-        method: 'POST',
-        body: { email, password }
-      });
+      const response = await apiRequest('POST', endpoint, { email, password });
+      const responseData = await response.json();
 
-      const { token, user: userData } = response;
+      const { token, user: userData } = responseData;
       
       localStorage.setItem('authToken', token);
       setUser(userData);
@@ -92,13 +89,10 @@ export function useAuthState() {
 
   const register = async (userData: RegisterData) => {
     try {
-      const response = await apiRequest({
-        url: '/api/auth/register',
-        method: 'POST',
-        body: userData
-      });
+      const response = await apiRequest('POST', '/api/auth/register', userData);
+      const responseData = await response.json();
 
-      const { token, user: newUser } = response;
+      const { token, user: newUser } = responseData;
       
       localStorage.setItem('authToken', token);
       setUser(newUser);
