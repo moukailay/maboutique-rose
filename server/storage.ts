@@ -28,7 +28,7 @@ import {
   type InsertChatMessage,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, like, ilike } from "drizzle-orm";
+import { eq, and, like, ilike } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -295,7 +295,7 @@ export class DatabaseStorage implements IStorage {
 
   // Product methods
   async getProducts(): Promise<Product[]> {
-    return await db.select().from(products);
+    return await db.select().from(products).where(eq(products.isActive, true));
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
@@ -304,11 +304,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProductsByCategory(categoryId: number): Promise<Product[]> {
-    return await db.select().from(products).where(eq(products.categoryId, categoryId));
+    return await db.select().from(products).where(and(eq(products.categoryId, categoryId), eq(products.isActive, true)));
   }
 
   async searchProducts(query: string): Promise<Product[]> {
-    return await db.select().from(products).where(ilike(products.name, `%${query}%`));
+    return await db.select().from(products).where(and(ilike(products.name, `%${query}%`), eq(products.isActive, true)));
   }
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {

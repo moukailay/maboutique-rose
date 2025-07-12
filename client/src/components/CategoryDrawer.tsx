@@ -74,8 +74,8 @@ export default function CategoryDrawer({ isOpen, onClose }: CategoryDrawerProps)
     );
   };
 
-  const handleCategoryClick = (slug: string) => {
-    setLocation(`/products?category=${slug}`);
+  const handleCategoryClick = (categoryId: number) => {
+    setLocation(`/products?category=${categoryId}`);
     onClose();
   };
 
@@ -169,7 +169,7 @@ export default function CategoryDrawer({ isOpen, onClose }: CategoryDrawerProps)
                 {/* Catégorie principale */}
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => handleCategoryClick(category.slug)}
+                    onClick={() => handleCategoryClick(category.id)}
                     className="flex-1 text-left p-3 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors group"
                   >
                     <div className="flex items-center space-x-3">
@@ -209,7 +209,7 @@ export default function CategoryDrawer({ isOpen, onClose }: CategoryDrawerProps)
                     {category.children.map((subCategory) => (
                       <button
                         key={subCategory.id}
-                        onClick={() => handleCategoryClick(subCategory.slug)}
+                        onClick={() => handleCategoryClick(subCategory.id)}
                         className="w-full text-left p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors group"
                       >
                         <div className="flex items-center space-x-2">
