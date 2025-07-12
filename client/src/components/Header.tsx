@@ -7,6 +7,7 @@ import { useCart } from '@/lib/cart';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import LanguageSelector from '@/components/LanguageSelector';
 import ThemeSelector from '@/components/ThemeSelector';
+import CategoryNavigation from '@/components/CategoryNavigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import logoImage from '@assets/image_1752269345378.png';
 
@@ -153,6 +154,9 @@ export default function Header() {
           </div>
         </div>
       )}
+      
+      {/* Category Navigation */}
+      <CategoryNavigation />
     </header>
   );
 }

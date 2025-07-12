@@ -137,7 +137,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (search) {
         products = await storage.searchProducts(search as string);
       } else if (category) {
-        products = await storage.getProductsByCategory(Number(category));
+        // Check if category is a slug or ID
+        const categoryData = isNaN(Number(category)) 
+          ? await storage.getCategoryBySlug(category as string)
+          : await storage.getCategory(Number(category));
+        
+        if (categoryData) {
+          products = await storage.getProductsByCategory(categoryData.id);
+        } else {
+          products = await storage.getProducts();
+        }
       } else {
         products = await storage.getProducts();
       }

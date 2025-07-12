@@ -41,6 +41,7 @@ export interface IStorage {
   // Categories
   getCategories(): Promise<Category[]>;
   getCategory(id: number): Promise<Category | undefined>;
+  getCategoryBySlug(slug: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
 
   // Products
@@ -92,107 +93,130 @@ export class DatabaseStorage implements IStorage {
   async initializeData() {
     // Initialize categories
     const categoriesData = [
+      // Catégories principales
       {
-        name: "Miel & Apiculture",
-        description: "Miel artisanal et produits de la ruche",
-        slug: "miel-apiculture",
+        name: "TISANES",
+        description: "Tisanes biologiques et infusions naturelles",
+        slug: "tisanes",
+        parentId: null,
+        sortOrder: 1,
       },
       {
-        name: "Huiles Essentielles",
-        description: "Huiles essentielles pures et biologiques",
-        slug: "huiles-essentielles",
+        name: "FEMMES",
+        description: "Produits dédiés aux femmes",
+        slug: "femmes",
+        parentId: null,
+        sortOrder: 2,
       },
       {
-        name: "Tisanes & Infusions",
-        description: "Tisanes aux plantes naturelles",
-        slug: "tisanes-infusions",
+        name: "ROSE-D'ÉDEN",
+        description: "Produits signature Rose-d'Éden",
+        slug: "rose-d-eden",
+        parentId: null,
+        sortOrder: 3,
       },
       {
-        name: "Cosmétiques Naturels",
-        description: "Soins naturels pour le corps",
-        slug: "cosmetiques-naturels",
+        name: "HOMMES",
+        description: "Produits dédiés aux hommes",
+        slug: "hommes",
+        parentId: null,
+        sortOrder: 4,
+      },
+      {
+        name: "PRODUITS AMINCISSANTS",
+        description: "Produits pour la perte de poids et la minceur",
+        slug: "produits-amincissants",
+        parentId: null,
+        sortOrder: 5,
+      },
+      {
+        name: "HUILES ET BEURRES",
+        description: "Huiles essentielles et beurres naturels",
+        slug: "huiles-et-beurres",
+        parentId: null,
+        sortOrder: 6,
+      },
+      {
+        name: "AUTRES PRODUITS",
+        description: "Autres produits naturels",
+        slug: "autres-produits",
+        parentId: null,
+        sortOrder: 7,
+      },
+      {
+        name: "LINGERIE ROSE-D'ÉDEN",
+        description: "Lingerie signature Rose-d'Éden",
+        slug: "lingerie-rose-d-eden",
+        parentId: null,
+        sortOrder: 8,
+      },
+      {
+        name: "ROSE-D'ÉDEN DÉO / PARFUMS",
+        description: "Déodorants et parfums Rose-d'Éden",
+        slug: "rose-d-eden-deo-parfums",
+        parentId: null,
+        sortOrder: 9,
+      },
+      {
+        name: "ACCESSOIRES",
+        description: "Accessoires et objets utiles",
+        slug: "accessoires",
+        parentId: null,
+        sortOrder: 10,
+      },
+      {
+        name: "SOLDE",
+        description: "Produits en promotion",
+        slug: "solde",
+        parentId: null,
+        sortOrder: 11,
       },
     ];
 
     // Check if categories exist, if not, create them
     const existingCategories = await this.getCategories();
     if (existingCategories.length === 0) {
+      // Create main categories first
+      const createdCategories = [];
       for (const cat of categoriesData) {
-        await this.createCategory(cat);
+        const created = await this.createCategory(cat);
+        createdCategories.push(created);
+      }
+      
+      // Create subcategories for FEMMES
+      const femmesCategory = createdCategories.find(c => c.name === "FEMMES");
+      if (femmesCategory) {
+        const femmeSubcategories = [
+          {
+            name: "Produits Intimes",
+            description: "Produits d'hygiène intime féminine",
+            slug: "produits-intimes",
+            parentId: femmesCategory.id,
+            sortOrder: 1,
+          },
+          {
+            name: "Secrets de femmes",
+            description: "Produits spécialement conçus pour les femmes",
+            slug: "secrets-de-femmes",
+            parentId: femmesCategory.id,
+            sortOrder: 2,
+          },
+          {
+            name: "Produits de corps",
+            description: "Soins et produits pour le corps",
+            slug: "produits-de-corps",
+            parentId: femmesCategory.id,
+            sortOrder: 3,
+          },
+        ];
+        
+        for (const subcat of femmeSubcategories) {
+          await this.createCategory(subcat);
+        }
       }
     }
 
-    // Initialize products
-    const productsData = [
-      {
-        name: "Miel Bio Artisanal",
-        description:
-          "Miel de fleurs sauvages récolté localement par nos apiculteurs partenaires. Un goût authentique et des bienfaits naturels préservés.",
-        price: "34.99",
-        image:
-          "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        images: [
-          "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        ],
-        categoryId: 1,
-        stock: 50,
-        isActive: true,
-      },
-      {
-        name: "Huiles Essentielles Bio",
-        description:
-          "Coffret de 6 huiles essentielles pures : lavande, eucalyptus, menthe, citron, tea tree et romarin. Idéal pour l'aromathérapie.",
-        price: "119.99",
-        image:
-          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        images: [
-          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1594736797933-d0601ba2fe65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        ],
-        categoryId: 2,
-        stock: 25,
-        isActive: true,
-      },
-      {
-        name: "Tisane Détox Bio",
-        description:
-          "Mélange de plantes biologiques pour une détoxification naturelle. Contient du pissenlit, de la bardane et du thé vert.",
-        price: "24.99",
-        image:
-          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        images: [
-          "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1597318020386-ab2dcda8e8c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        ],
-        categoryId: 3,
-        stock: 100,
-        isActive: true,
-      },
-      {
-        name: "Crème Hydratante Bio",
-        description:
-          "Crème hydratante aux ingrédients naturels biologiques. Idéale pour tous types de peau, enrichie en beurre de karité.",
-        price: "45.99",
-        image:
-          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        images: [
-          "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1594736797933-d0601ba2fe65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        ],
-        categoryId: 4,
-        stock: 30,
-        isActive: true,
-      },
-    ];
-
-    // Check if products exist, if not, create them
-    const existingProducts = await this.getProducts();
-    if (existingProducts.length === 0) {
-      for (const prod of productsData) {
-        await this.createProduct(prod);
-      }
-    }
+    // Products will be created via admin interface later
 
     // Create admin user if it doesn't exist
     const adminUser = await this.getUserByEmail("admin@rose-d-eden.fr");
@@ -256,6 +280,11 @@ export class DatabaseStorage implements IStorage {
 
   async getCategory(id: number): Promise<Category | undefined> {
     const [category] = await db.select().from(categories).where(eq(categories.id, id));
+    return category || undefined;
+  }
+
+  async getCategoryBySlug(slug: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.slug, slug));
     return category || undefined;
   }
 
