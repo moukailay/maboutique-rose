@@ -91,10 +91,10 @@ export default function AddProduct() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Erreur",
-        description: "L'image ne peut pas dépasser 2 MB.",
+        description: "L'image ne peut pas dépasser 5 MB.",
         variant: "destructive",
       });
       return;
@@ -153,17 +153,27 @@ export default function AddProduct() {
 
   const createProductMutation = useMutation({
     mutationFn: async (data: ProductFormData) => {
+      // Clean and format the price
+      const cleanPrice = data.price.replace(/[^\d.-]/g, '');
+      const numericPrice = parseFloat(cleanPrice);
+      
+      if (isNaN(numericPrice) || numericPrice <= 0) {
+        throw new Error("Le prix doit être un nombre valide supérieur à 0");
+      }
+      
       const productData = {
         name: data.name,
         description: data.description,
-        price: data.price,
+        price: numericPrice.toString(),
         image: data.image,
         categoryId: parseInt(data.categoryId),
         stock: parseInt(data.stock),
+        isActive: true,
       };
       
+      console.log("Sending product data:", productData);
       const response = await apiRequest('POST', '/api/products', productData);
-      return await response.json();
+      return response;
     },
     onSuccess: (data) => {
       toast({
@@ -174,6 +184,7 @@ export default function AddProduct() {
       setLocation('/admin/products');
     },
     onError: (error: any) => {
+      console.error("Error creating product:", error);
       toast({
         title: "Erreur lors de la création",
         description: error.message || "Une erreur s'est produite lors de la création du produit.",
@@ -426,7 +437,7 @@ export default function AddProduct() {
                         </div>
                       </FormControl>
                       <FormDescription>
-                        Formats acceptés : JPG, PNG, WebP (max 2 MB) - Les images sont automatiquement optimisées
+                        Formats acceptés : JPG, PNG, WebP (max 5 MB) - Les images sont automatiquement optimisées
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
