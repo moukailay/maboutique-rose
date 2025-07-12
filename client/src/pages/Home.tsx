@@ -6,7 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Product } from '@shared/schema';
-import heroImage from '@assets/imageFondEcran_1752353923064.png';
+import heroImage from '@assets/imgBG2_1752354555706.png';
 
 export default function Home() {
   const { data: products, isLoading } = useQuery<Product[]>({
@@ -26,17 +26,45 @@ export default function Home() {
             backgroundImage: `url(${heroImage})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+        
+        {/* Floating Products */}
+        <div className="absolute inset-0 z-5">
+          {featuredProducts.slice(0, 3).map((product, index) => (
+            <div
+              key={`floating-${product.id}`}
+              className={`absolute w-20 h-20 md:w-28 md:h-28 rounded-full bg-white/95 shadow-2xl flex items-center justify-center animate-pulse hover:scale-125 transition-all duration-500 cursor-pointer ${
+                index === 0 ? 'top-1/4 right-1/5 md:right-1/4' : 
+                index === 1 ? 'bottom-1/4 right-1/6 md:right-1/5' : 
+                'top-1/2 right-1/12 md:right-1/6'
+              }`}
+              style={{
+                animationDelay: `${index * 0.8}s`,
+                animationDuration: '2.5s'
+              }}
+            >
+              <div
+                className="w-16 h-16 md:w-20 md:h-20 bg-cover bg-center rounded-full border-2 border-rose-200"
+                style={{
+                  backgroundImage: `url(${product.image})`,
+                }}
+              />
+              <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">+</span>
+              </div>
+            </div>
+          ))}
+        </div>
         
         <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
             {t('home.hero.title')}
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto drop-shadow-lg">
             {t('home.hero.subtitle')}
           </p>
           <Link href="/products">
-            <Button size="lg" className="bg-rose-primary hover:bg-rose-light text-white px-8 py-4 text-lg">
+            <Button size="lg" className="bg-rose-primary hover:bg-rose-light text-white px-8 py-4 text-lg shadow-xl">
               {t('home.hero.cta')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
