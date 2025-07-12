@@ -42,9 +42,7 @@ export default function AdminProducts() {
 
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: number) => {
-      return await apiRequest(`/api/products/${productId}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest(`/api/products/${productId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
