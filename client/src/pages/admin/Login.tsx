@@ -25,9 +25,42 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      await login(email, password, true); // true for admin login
-      // Le hook useAuth gère automatiquement la redirection vers /admin/dashboard
-      // Pas besoin de redirection manuelle ici
+      // Appel direct à l'API sans passer par le hook useAuth
+      const response = await fetch('/api/auth/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        let errorMessage = "Email ou mot de passe incorrect.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Keep default message if response is not JSON
+        }
+        throw new Error(errorMessage);
+      }
+
+      const responseData = await response.json();
+      const { token, user: userData } = responseData;
+      
+      // Stocker le token
+      localStorage.setItem('authToken', token);
+      
+      // Afficher le message de succès
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue dans l'interface d'administration!",
+      });
+
+      // Redirection forcée après un court délai
+      setTimeout(() => {
+        window.location.replace('/admin');
+      }, 1500);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');

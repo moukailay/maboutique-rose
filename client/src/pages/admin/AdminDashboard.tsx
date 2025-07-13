@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -20,6 +21,14 @@ import AdminLayout from '@/components/admin/AdminLayout';
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
+  
+  // Vérification de l'authentification admin
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      window.location.href = '/admin/login';
+    }
+  }, []);
 
   // Fetch orders
   const { data: orders = [] } = useQuery({

@@ -90,10 +90,8 @@ export function useAuthState() {
 
       // Redirect based on role  
       if (userData.role === 'admin') {
-        // Pour les admins, utilisez window.location pour forcer la redirection
-        setTimeout(() => {
-          window.location.href = '/admin';
-        }, 100);
+        // Pour les admins, ne pas rediriger automatiquement
+        // La redirection sera gérée par la page de login
       } else {
         setLocation('/');
       }
