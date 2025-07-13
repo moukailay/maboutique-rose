@@ -410,6 +410,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin API endpoints
+  app.get("/api/admin/customers", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/contacts", async (req, res) => {
+    try {
+      const contacts = await storage.getAllContacts();
+      res.json(contacts);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/admin/contacts/:id/read", async (req, res) => {
+    try {
+      const contactId = parseInt(req.params.id);
+      const contact = await storage.markContactAsRead(contactId);
+      if (!contact) {
+        return res.status(404).json({ error: "Contact not found" });
+      }
+      res.json(contact);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getAllReviews();
+      res.json(reviews);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/admin/reviews/:id", async (req, res) => {
+    try {
+      const reviewId = parseInt(req.params.id);
+      const { isApproved } = req.body;
+      const review = await storage.updateReviewApproval(reviewId, isApproved);
+      if (!review) {
+        return res.status(404).json({ error: "Review not found" });
+      }
+      res.json(review);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/chat/messages/:id/read", async (req, res) => {
+    try {
+      const messageId = parseInt(req.params.id);
+      const message = await storage.markChatMessageAsRead(messageId);
+      if (!message) {
+        return res.status(404).json({ error: "Message not found" });
+      }
+      res.json(message);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.patch('/api/chat/messages/:id/read', async (req, res) => {
     try {
       const id = parseInt(req.params.id);

@@ -30,6 +30,8 @@ import AddProduct from "@/pages/admin/AddProduct";
 import EditProduct from "@/pages/admin/EditProduct";
 import AdminOrders from "@/pages/admin/Orders";
 import OrderDetail from "@/pages/admin/OrderDetail";
+import AdminCustomers from "@/pages/admin/Customers";
+import AdminMessages from "@/pages/admin/Messages";
 
 function Router() {
   return (
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/admin/products/:id/edit" component={EditProduct} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/orders/:id" component={OrderDetail} />
+      <Route path="/admin/customers" component={AdminCustomers} />
+      <Route path="/admin/messages" component={AdminMessages} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />

@@ -96,15 +96,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     },
     { 
       icon: MessageSquare, 
-      label: 'Avis clients', 
-      href: '/admin/reviews',
-      active: location === '/admin/reviews'
-    },
-    { 
-      icon: MessageSquare, 
-      label: 'Messages Chat', 
-      href: '/admin/chat',
-      active: location === '/admin/chat',
+      label: 'Messages & Avis', 
+      href: '/admin/messages',
+      active: location === '/admin/messages',
       badge: unreadMessages > 0 ? unreadMessages : undefined
     },
     { 

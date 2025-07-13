@@ -28,7 +28,7 @@ import {
   type InsertChatMessage,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, like, ilike } from "drizzle-orm";
+import { eq, and, like, ilike, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -87,6 +87,13 @@ export interface IStorage {
     password: string;
     role?: 'user' | 'admin';
   }): Promise<User>;
+
+  // Admin specific methods
+  getAllUsers(): Promise<User[]>;
+  getAllContacts(): Promise<Contact[]>;
+  markContactAsRead(id: number): Promise<Contact | undefined>;
+  getAllReviews(): Promise<Review[]>;
+  updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -423,6 +430,37 @@ export class DatabaseStorage implements IStorage {
   async markChatMessageAsRead(id: number): Promise<ChatMessage | undefined> {
     const [chatMessage] = await db.update(chatMessages).set({ isRead: true }).where(eq(chatMessages.id, id)).returning();
     return chatMessage || undefined;
+  }
+
+  // Admin specific methods
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async getAllContacts(): Promise<Contact[]> {
+    return await db.select().from(contacts).orderBy(desc(contacts.createdAt));
+  }
+
+  async markContactAsRead(id: number): Promise<Contact | undefined> {
+    const [contact] = await db
+      .update(contacts)
+      .set({ isRead: true })
+      .where(eq(contacts.id, id))
+      .returning();
+    return contact || undefined;
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return await db.select().from(reviews).orderBy(desc(reviews.createdAt));
+  }
+
+  async updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined> {
+    const [review] = await db
+      .update(reviews)
+      .set({ isApproved })
+      .where(eq(reviews.id, id))
+      .returning();
+    return review || undefined;
   }
 }
 

@@ -1,160 +1,174 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
-  Eye, 
-  Ban, 
-  CheckCircle, 
-  MoreHorizontal,
-  Users,
+  Users, 
+  Mail, 
+  Phone, 
   Calendar,
   ShoppingCart,
-  DollarSign
+  Eye
 } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
 
 interface Customer {
   id: number;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  registrationDate: string;
-  ordersCount: number;
-  totalSpent: number;
-  status: 'active' | 'blocked';
+  role: 'user' | 'admin';
+  createdAt: string;
+  orderCount?: number;
+  totalSpent?: number;
   lastOrderDate?: string;
 }
 
 export default function AdminCustomers() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
 
-  // Mock data - in real app, this would come from API
-  const customers: Customer[] = [
-    { id: 1, name: 'Marie Dubois', email: 'marie.dubois@email.com', registrationDate: '2023-06-15', ordersCount: 8, totalSpent: 456.50, status: 'active', lastOrderDate: '2024-01-15' },
-    { id: 2, name: 'Jean Martin', email: 'jean.martin@email.com', registrationDate: '2023-08-22', ordersCount: 12, totalSpent: 789.90, status: 'active', lastOrderDate: '2024-01-14' },
-    { id: 3, name: 'Sophie Chen', email: 'sophie.chen@email.com', registrationDate: '2023-09-10', ordersCount: 15, totalSpent: 1245.00, status: 'active', lastOrderDate: '2024-01-13' },
-    { id: 4, name: 'Pierre Blanc', email: 'pierre.blanc@email.com', registrationDate: '2023-11-05', ordersCount: 3, totalSpent: 167.30, status: 'blocked', lastOrderDate: '2023-12-20' },
-    { id: 5, name: 'Claire Lopez', email: 'claire.lopez@email.com', registrationDate: '2023-12-01', ordersCount: 6, totalSpent: 356.75, status: 'active', lastOrderDate: '2024-01-11' },
-    { id: 6, name: 'Thomas Bernard', email: 'thomas.bernard@email.com', registrationDate: '2024-01-03', ordersCount: 2, totalSpent: 89.50, status: 'active', lastOrderDate: '2024-01-10' },
-    { id: 7, name: 'Emma Rousseau', email: 'emma.rousseau@email.com', registrationDate: '2024-01-08', ordersCount: 1, totalSpent: 45.00, status: 'active', lastOrderDate: '2024-01-08' }
-  ];
-
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  // Fetch customers from database
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['/api/admin/customers'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/admin/customers');
+      return response.json();
+    }
   });
 
-  const handleToggleStatus = (customerId: number, currentStatus: string) => {
-    // In real app, this would call API to toggle customer status
-    const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
-    console.log('Toggle customer status:', customerId, newStatus);
-  };
+  // Fetch orders to calculate customer stats
+  const { data: orders = [] } = useQuery({
+    queryKey: ['/api/orders'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/orders');
+      return response.json();
+    }
+  });
 
-  const handleViewProfile = (customerId: number) => {
-    // In real app, this would navigate to customer profile page
-    console.log('View customer profile:', customerId);
-  };
+  // Calculate customer statistics
+  const customersWithStats = users.map(user => {
+    const customerOrders = orders.filter(order => order.customerEmail === user.email);
+    return {
+      ...user,
+      orderCount: customerOrders.length,
+      totalSpent: customerOrders.reduce((sum, order) => sum + parseFloat(order.total), 0),
+      lastOrderDate: customerOrders.length > 0 
+        ? Math.max(...customerOrders.map(o => new Date(o.createdAt).getTime()))
+        : null
+    };
+  });
 
-  const getStatusColor = (status: string) => {
-    return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-  };
+  const filteredCustomers = customersWithStats.filter(customer => {
+    const matchesSearch = customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         customer.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         customer.email.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
 
-  const getStatusText = (status: string) => {
-    return status === 'active' ? 'Actif' : 'Bloqué';
-  };
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
-  const getCustomerTier = (totalSpent: number) => {
-    if (totalSpent >= 1000) return { tier: 'VIP', color: 'bg-purple-100 text-purple-800' };
-    if (totalSpent >= 500) return { tier: 'Premium', color: 'bg-blue-100 text-blue-800' };
-    return { tier: 'Standard', color: 'bg-gray-100 text-gray-800' };
-  };
-
-  const stats = {
-    total: customers.length,
-    active: customers.filter(c => c.status === 'active').length,
-    blocked: customers.filter(c => c.status === 'blocked').length,
-    newThisMonth: customers.filter(c => new Date(c.registrationDate) >= new Date('2024-01-01')).length
-  };
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="text-center py-8">
+            <p className="text-text-medium">Erreur lors du chargement des clients</p>
+            <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-text-dark">Gestion des Clients</h1>
-          <p className="text-text-medium">
-            {filteredCustomers.length} client{filteredCustomers.length !== 1 ? 's' : ''}
-            {searchQuery && ` trouvé${filteredCustomers.length !== 1 ? 's' : ''} pour "${searchQuery}"`}
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-text-dark">Gestion des clients</h1>
+            <p className="text-text-medium">
+              Voir et gérer les comptes clients
+            </p>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Users className="h-8 w-8 text-rose-primary" />
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-text-dark">{stats.total}</div>
-                  <div className="text-sm text-text-medium">Total clients</div>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{filteredCustomers.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Nouveaux cette semaine</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {filteredCustomers.filter(c => {
+                  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                  return new Date(c.createdAt) > weekAgo;
+                }).length}
               </div>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-text-dark">{stats.active}</div>
-                  <div className="text-sm text-text-medium">Clients actifs</div>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Clients actifs</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {filteredCustomers.filter(c => c.orderCount > 0).length}
               </div>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Ban className="h-8 w-8 text-red-600" />
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-text-dark">{stats.blocked}</div>
-                  <div className="text-sm text-text-medium">Clients bloqués</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Calendar className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-text-dark">{stats.newThisMonth}</div>
-                  <div className="text-sm text-text-medium">Nouveaux ce mois</div>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Chiffre d'affaires total</CardTitle>
+              <div className="text-rose-primary">CAD</div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {filteredCustomers.reduce((sum, c) => sum + (c.totalSpent || 0), 0).toFixed(2)}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* Search and Filters */}
         <Card>
           <CardHeader>
             <CardTitle>Filtres</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -165,29 +179,6 @@ export default function AdminCustomers() {
                     className="pl-10"
                   />
                 </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant={statusFilter === 'all' ? 'default' : 'outline'}
-                  onClick={() => setStatusFilter('all')}
-                  className={statusFilter === 'all' ? 'bg-rose-primary hover:bg-rose-light' : ''}
-                >
-                  Tous
-                </Button>
-                <Button
-                  variant={statusFilter === 'active' ? 'default' : 'outline'}
-                  onClick={() => setStatusFilter('active')}
-                  className={statusFilter === 'active' ? 'bg-rose-primary hover:bg-rose-light' : ''}
-                >
-                  Actifs
-                </Button>
-                <Button
-                  variant={statusFilter === 'blocked' ? 'default' : 'outline'}
-                  onClick={() => setStatusFilter('blocked')}
-                  className={statusFilter === 'blocked' ? 'bg-rose-primary hover:bg-rose-light' : ''}
-                >
-                  Bloqués
-                </Button>
               </div>
             </div>
           </CardContent>
@@ -208,88 +199,62 @@ export default function AdminCustomers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Client</TableHead>
-                    <TableHead>Inscription</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Commandes</TableHead>
                     <TableHead>Total dépensé</TableHead>
-                    <TableHead>Niveau</TableHead>
-                    <TableHead>Statut</TableHead>
+                    <TableHead>Dernière commande</TableHead>
+                    <TableHead>Inscrit le</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCustomers.map((customer) => {
-                    const tier = getCustomerTier(customer.totalSpent);
-                    return (
-                      <TableRow key={customer.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium text-text-dark">{customer.name}</div>
-                            <div className="text-sm text-text-medium">{customer.email}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-text-dark">
-                            {new Date(customer.registrationDate).toLocaleDateString('fr-FR')}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <ShoppingCart className="h-4 w-4 text-gray-400 mr-1" />
-                            <span className="text-text-dark">{customer.ordersCount}</span>
-                          </div>
-                          {customer.lastOrderDate && (
-                            <div className="text-xs text-text-medium">
-                              Dernière: {new Date(customer.lastOrderDate).toLocaleDateString('fr-FR')}
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 text-gray-400 mr-1" />
-                            <span className="font-medium text-text-dark">{customer.totalSpent.toFixed(2)} CAD</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={tier.color}>
-                            {tier.tier}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(customer.status)}>
-                            {getStatusText(customer.status)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleViewProfile(customer.id)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                Voir profil
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleToggleStatus(customer.id, customer.status)}>
-                                {customer.status === 'active' ? (
-                                  <>
-                                    <Ban className="mr-2 h-4 w-4" />
-                                    Bloquer
-                                  </>
-                                ) : (
-                                  <>
-                                    <CheckCircle className="mr-2 h-4 w-4" />
-                                    Débloquer
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell>
+                        <div className="font-medium text-text-dark">
+                          {customer.firstName} {customer.lastName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-gray-400" />
+                          <span className="text-text-dark">{customer.email}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={customer.role === 'admin' ? 'default' : 'outline'}>
+                          {customer.role === 'admin' ? 'Admin' : 'Client'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-text-dark">{customer.orderCount || 0}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium text-text-dark">
+                          {(customer.totalSpent || 0).toFixed(2)} CAD
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-text-dark">
+                          {customer.lastOrderDate 
+                            ? new Date(customer.lastOrderDate).toLocaleDateString('fr-FR')
+                            : 'Aucune'
+                          }
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-text-dark">
+                          {new Date(customer.createdAt).toLocaleDateString('fr-FR')}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             )}
