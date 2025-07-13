@@ -55,8 +55,14 @@ export default function Categories() {
     }
   };
 
-  const getCategoryImage = (categoryName: string) => {
-    const name = categoryName.toLowerCase();
+  const getCategoryImage = (category: Category) => {
+    // Use the uploaded image if available, otherwise fallback to default
+    if (category.image) {
+      return category.image;
+    }
+    
+    // Fallback images based on category name
+    const name = category.name.toLowerCase();
     switch(name) {
       case 'tisanes':
         return 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&h=600&fit=crop&auto=format';
@@ -139,7 +145,7 @@ export default function Categories() {
               {/* Image */}
               <div className="relative aspect-video overflow-hidden">
                 <img 
-                  src={getCategoryImage(category.name)} 
+                  src={getCategoryImage(category)} 
                   alt={category.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
