@@ -24,7 +24,7 @@ import NotFound from "@/pages/not-found";
 
 // Admin pages
 import AdminLogin from "@/pages/admin/Login";
-import AdminRedirect from "@/pages/admin/AdminRedirect";
+import AdminSuccess from "@/pages/admin/AdminSuccess";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AddProduct from "@/pages/admin/AddProduct";
@@ -40,6 +40,7 @@ function Router() {
     <Switch>
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/success" component={AdminSuccess} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />
