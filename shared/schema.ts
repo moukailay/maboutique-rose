@@ -24,8 +24,10 @@ export const categories = pgTable("categories", {
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull().unique(),
+  image: text("image"),
   parentId: integer("parent_id").references(() => categories.id),
   sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const products = pgTable("products", {
