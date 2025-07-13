@@ -28,9 +28,31 @@ export default function AdminSuccess() {
       if (response.ok) {
         // Token valide, rediriger vers le dashboard
         console.log('Token valide, redirection vers dashboard');
-        setTimeout(() => {
-          window.location.href = '/admin/dashboard';
-        }, 2000);
+        
+        // Méthodes multiples de redirection pour la production
+        const redirectToDashboard = () => {
+          const dashboardUrl = `${window.location.origin}/admin/dashboard`;
+          
+          // Méthode 1: window.location.href
+          window.location.href = dashboardUrl;
+          
+          // Méthode 2: Fallback après 1 seconde
+          setTimeout(() => {
+            if (window.location.pathname !== '/admin/dashboard') {
+              window.location.replace(dashboardUrl);
+            }
+          }, 1000);
+          
+          // Méthode 3: Fallback final après 3 secondes
+          setTimeout(() => {
+            if (window.location.pathname !== '/admin/dashboard') {
+              window.location.assign(dashboardUrl);
+            }
+          }, 3000);
+        };
+        
+        // Redirection immédiate
+        redirectToDashboard();
       } else {
         throw new Error(`Token invalide (status: ${response.status})`);
       }
@@ -80,12 +102,15 @@ export default function AdminSuccess() {
         </p>
         {!isVerifying && (
           <div className="mt-6">
-            <a 
-              href="/admin/dashboard"
+            <button
+              onClick={() => {
+                const dashboardUrl = `${window.location.origin}/admin/dashboard`;
+                window.location.href = dashboardUrl;
+              }}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
             >
               Accéder au dashboard
-            </a>
+            </button>
           </div>
         )}
       </div>

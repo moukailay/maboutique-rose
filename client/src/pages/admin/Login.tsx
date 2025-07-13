@@ -57,9 +57,8 @@ export default function AdminLogin() {
         description: "Bienvenue dans l'interface d'administration!",
       });
 
-      // Redirection vers une page de succès intermédiaire
-      const baseUrl = window.location.origin;
-      window.location.href = `${baseUrl}/admin/success`;
+      // Redirection directe vers le portail admin
+      window.location.href = '/admin/portal';
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
