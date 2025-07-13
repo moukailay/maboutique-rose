@@ -92,11 +92,7 @@ export default function AdminCategories() {
   // Add category mutation
   const addCategoryMutation = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      const response = await apiRequest('POST', '/api/categories', data);
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Erreur lors de la création: ${response.status}`);
-      }
+      const response = await apiRequest('/api/categories', { method: 'POST', data });
       return response.json();
     },
     onSuccess: () => {
@@ -121,11 +117,7 @@ export default function AdminCategories() {
   // Update category mutation
   const updateCategoryMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: CategoryFormData }) => {
-      const response = await apiRequest('PUT', `/api/categories/${id}`, data);
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Erreur lors de la mise à jour: ${response.status}`);
-      }
+      const response = await apiRequest(`/api/categories/${id}`, { method: 'PUT', data });
       return response.json();
     },
     onSuccess: () => {
@@ -151,7 +143,7 @@ export default function AdminCategories() {
   // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest('DELETE', `/api/categories/${id}`);
+      const response = await apiRequest(`/api/categories/${id}`, { method: 'DELETE' });
       return response.json();
     },
     onSuccess: () => {
