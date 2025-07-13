@@ -88,9 +88,12 @@ export function useAuthState() {
         description: `Bienvenue ${userData.firstName} !`,
       });
 
-      // Redirect based on role
+      // Redirect based on role  
       if (userData.role === 'admin') {
-        setLocation('/admin/dashboard');
+        // Pour les admins, utilisez window.location pour forcer la redirection
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 100);
       } else {
         setLocation('/');
       }

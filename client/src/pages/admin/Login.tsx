@@ -26,11 +26,9 @@ export default function AdminLogin() {
 
     try {
       await login(email, password, true); // true for admin login
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue dans l'interface d'administration!",
-      });
-      setLocation('/admin');
+      // Le hook useAuth gère automatiquement la redirection vers /admin/dashboard
+      // Pas besoin de redirection manuelle ici
+      
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
       toast({
