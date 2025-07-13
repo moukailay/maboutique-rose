@@ -238,6 +238,104 @@ export class DatabaseStorage implements IStorage {
         role: "admin",
       });
     }
+
+    // Create test orders if none exist
+    const existingOrders = await this.getOrders();
+    if (existingOrders.length === 0) {
+      const testOrders = [
+        {
+          customerName: "Marie Dubois",
+          customerEmail: "marie.dubois@email.com",
+          customerPhone: "+1 (514) 555-0123",
+          shippingAddress: "123 rue Saint-Denis, Montréal, QC H2X 3K8",
+          total: "89.99",
+          status: "delivered" as const,
+          paymentMethod: "credit_card",
+          notes: "Commande livrée avec succès",
+        },
+        {
+          customerName: "Jean Martin",
+          customerEmail: "jean.martin@email.com",
+          customerPhone: "+1 (418) 555-0456",
+          shippingAddress: "456 boulevard René-Lévesque, Québec, QC G1R 2B5",
+          total: "156.50",
+          status: "shipped" as const,
+          paymentMethod: "paypal",
+          notes: "Expédié par Purolator",
+        },
+        {
+          customerName: "Sophie Tremblay",
+          customerEmail: "sophie.tremblay@email.com",
+          customerPhone: "+1 (450) 555-0789",
+          shippingAddress: "789 avenue du Parc, Laval, QC H7N 5Y7",
+          total: "234.75",
+          status: "pending" as const,
+          paymentMethod: "interac",
+          notes: "En attente de confirmation de paiement",
+        },
+      ];
+
+      for (const order of testOrders) {
+        await this.createOrder(order);
+      }
+    }
+
+    // Create test contacts if none exist
+    const existingContacts = await this.getAllContacts();
+    if (existingContacts.length === 0) {
+      const testContacts = [
+        {
+          name: "Alexandra Bouchard",
+          email: "alexandra.bouchard@email.com",
+          subject: "Question sur les produits pour peaux sensibles",
+          message: "Bonjour, j'aimerais savoir si vous avez des produits pour les peaux sensibles ?",
+          isRead: false,
+        },
+        {
+          name: "Pierre Gagnon",
+          email: "pierre.gagnon@email.com",
+          subject: "Commentaire positif",
+          message: "Excellent service ! J'ai reçu ma commande rapidement. Merci !",
+          isRead: true,
+        },
+      ];
+
+      for (const contact of testContacts) {
+        await this.createContact(contact);
+      }
+    }
+
+    // Create test users if none exist
+    const existingUsers = await this.getAllUsers();
+    if (existingUsers.length <= 1) { // Only admin user exists
+      const testUsers = [
+        {
+          firstName: "Marie",
+          lastName: "Dubois",
+          email: "marie.dubois@email.com",
+          password: "password123",
+          role: "user" as const,
+        },
+        {
+          firstName: "Jean",
+          lastName: "Martin",
+          email: "jean.martin@email.com",
+          password: "password123",
+          role: "user" as const,
+        },
+        {
+          firstName: "Sophie",
+          lastName: "Tremblay",
+          email: "sophie.tremblay@email.com",
+          password: "password123",
+          role: "user" as const,
+        },
+      ];
+
+      for (const user of testUsers) {
+        await this.createUserWithAuth(user);
+      }
+    }
   }
 
   // User methods

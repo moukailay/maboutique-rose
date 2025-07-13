@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
@@ -248,9 +248,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/categories", async (req, res) => {
     try {
       const categories = await storage.getCategories();
+      console.log("Categories fetched:", categories.length);
       res.json(categories);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching categories" });
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Error fetching categories", error: error.message });
     }
   });
 
@@ -393,7 +395,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orders = await storage.getOrders();
       res.json(orders);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching orders" });
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ message: "Error fetching orders", error: error.message });
     }
   });
 
