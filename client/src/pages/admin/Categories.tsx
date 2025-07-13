@@ -38,7 +38,20 @@ const categorySchema = z.object({
   description: z.string().min(1, 'La description est requise'),
   image: z.string().optional(),
   sortOrder: z.number().min(0).default(0),
-});
+}).transform(data => ({
+  ...data,
+  slug: data.name.toLowerCase()
+    .replace(/[àáâäã]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôöõ]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/[ç]/g, 'c')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}));
 
 // Image upload function
 const uploadImage = async (file: File): Promise<string> => {

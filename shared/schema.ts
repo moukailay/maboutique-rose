@@ -161,6 +161,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
 export const insertCategorySchema = createInsertSchema(categories).omit({
   id: true,
   createdAt: true,
+}).extend({
+  slug: z.string().optional(),
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({

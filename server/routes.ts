@@ -309,7 +309,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/categories", async (req, res) => {
     try {
-      const categoryData = insertCategorySchema.parse(req.body);
+      // Auto-generate slug if not provided
+      const requestData = { ...req.body };
+      if (!requestData.slug && requestData.name) {
+        requestData.slug = requestData.name.toLowerCase()
+          .replace(/[àáâäã]/g, 'a')
+          .replace(/[èéêë]/g, 'e')
+          .replace(/[ìíîï]/g, 'i')
+          .replace(/[òóôöõ]/g, 'o')
+          .replace(/[ùúûü]/g, 'u')
+          .replace(/[ç]/g, 'c')
+          .replace(/[ñ]/g, 'n')
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+      
+      const categoryData = insertCategorySchema.parse(requestData);
       const category = await storage.createCategory(categoryData);
       res.status(201).json(category);
     } catch (error) {
@@ -326,7 +342,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = Number(req.params.id);
       console.log("Updating category with data:", req.body);
       
-      const categoryData = insertCategorySchema.parse(req.body);
+      // Auto-generate slug if not provided
+      const requestData = { ...req.body };
+      if (!requestData.slug && requestData.name) {
+        requestData.slug = requestData.name.toLowerCase()
+          .replace(/[àáâäã]/g, 'a')
+          .replace(/[èéêë]/g, 'e')
+          .replace(/[ìíîï]/g, 'i')
+          .replace(/[òóôöõ]/g, 'o')
+          .replace(/[ùúûü]/g, 'u')
+          .replace(/[ç]/g, 'c')
+          .replace(/[ñ]/g, 'n')
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+      
+      const categoryData = insertCategorySchema.parse(requestData);
       console.log("Parsed category data:", categoryData);
       
       const category = await storage.updateCategory(id, categoryData);
