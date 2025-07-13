@@ -141,17 +141,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const token = req.headers.authorization?.replace('Bearer ', '');
       
+      console.log('Token verification attempt:', { token: token ? 'presente' : 'absente', length: token?.length });
+      
       if (!token || !token.startsWith('fake-jwt-token-')) {
+        console.log('Token invalid or missing');
         return res.status(401).json({ message: "Invalid token" });
       }
       
       const userId = parseInt(token.replace('fake-jwt-token-', ''));
+      console.log('Extracting user ID from token:', userId);
+      
       const user = await storage.getUser(userId);
       
       if (!user) {
+        console.log('User not found for ID:', userId);
         return res.status(401).json({ message: "User not found" });
       }
       
+      console.log('User verification successful:', user.email);
       res.json({
         id: user.id,
         firstName: user.firstName,
@@ -160,6 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       });
     } catch (error) {
+      console.error('Error in auth verification:', error);
       res.status(500).json({ message: "Server error" });
     }
   });
