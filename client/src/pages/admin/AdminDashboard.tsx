@@ -27,7 +27,25 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('authToken');
     if (!token) {
       window.location.href = '/admin/login';
+      return;
     }
+    
+    // Vérifier la validité du token
+    fetch('/api/auth/verify', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        localStorage.removeItem('authToken');
+        window.location.href = '/admin/login';
+      }
+    })
+    .catch(() => {
+      localStorage.removeItem('authToken');
+      window.location.href = '/admin/login';
+    });
   }, []);
 
   // Fetch orders

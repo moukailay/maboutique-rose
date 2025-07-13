@@ -59,7 +59,7 @@ export default function AdminLogin() {
 
       // Redirection forcée après un court délai
       setTimeout(() => {
-        window.location.replace('/admin');
+        window.location.href = '/admin/redirect';
       }, 1500);
       
     } catch (err: any) {
