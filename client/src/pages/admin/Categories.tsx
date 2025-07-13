@@ -40,6 +40,24 @@ const categorySchema = z.object({
   sortOrder: z.number().min(0).default(0),
 });
 
+// Image upload function
+const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  });
+  
+  if (!response.ok) {
+    throw new Error('Erreur lors du téléchargement de l\'image');
+  }
+  
+  const data = await response.json();
+  return data.url;
+};
+
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 export default function AdminCategories() {
@@ -47,6 +65,7 @@ export default function AdminCategories() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -164,6 +183,26 @@ export default function AdminCategories() {
     }
   };
 
+  const handleImageUpload = async (file: File, form: any) => {
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      form.setValue('image', imageUrl);
+      toast({
+        title: "Image téléchargée",
+        description: "L'image a été téléchargée avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger l'image.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -246,9 +285,50 @@ export default function AdminCategories() {
                     name="image"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>URL de l'image</FormLabel>
+                        <FormLabel>Image de la catégorie</FormLabel>
                         <FormControl>
-                          <Input placeholder="https://example.com/image.jpg" {...field} />
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    await handleImageUpload(file, addForm);
+                                  }
+                                }}
+                                disabled={isUploading}
+                                className="hidden"
+                                id="add-image-upload"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => document.getElementById('add-image-upload')?.click()}
+                                disabled={isUploading}
+                              >
+                                {isUploading ? 'Téléchargement...' : 'Choisir une image'}
+                              </Button>
+                            </div>
+                            {field.value && (
+                              <div className="flex items-center gap-2">
+                                <img 
+                                  src={field.value} 
+                                  alt="Aperçu" 
+                                  className="w-16 h-16 object-cover rounded"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => field.onChange('')}
+                                >
+                                  Supprimer
+                                </Button>
+                              </div>
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -457,9 +537,50 @@ export default function AdminCategories() {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL de l'image</FormLabel>
+                      <FormLabel>Image de la catégorie</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  await handleImageUpload(file, editForm);
+                                }
+                              }}
+                              disabled={isUploading}
+                              className="hidden"
+                              id="edit-image-upload"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => document.getElementById('edit-image-upload')?.click()}
+                              disabled={isUploading}
+                            >
+                              {isUploading ? 'Téléchargement...' : 'Choisir une image'}
+                            </Button>
+                          </div>
+                          {field.value && (
+                            <div className="flex items-center gap-2">
+                              <img 
+                                src={field.value} 
+                                alt="Aperçu" 
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => field.onChange('')}
+                              >
+                                Supprimer
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
