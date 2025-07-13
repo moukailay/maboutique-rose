@@ -40,8 +40,7 @@ function Router() {
     <Switch>
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/redirect" component={AdminRedirect} />
-      <Route path="/admin" component={AdminRedirect} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/products/add" component={AddProduct} />

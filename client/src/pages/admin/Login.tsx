@@ -57,10 +57,21 @@ export default function AdminLogin() {
         description: "Bienvenue dans l'interface d'administration!",
       });
 
-      // Redirection forcée après un court délai
-      setTimeout(() => {
-        window.location.href = '/admin/redirect';
-      }, 1500);
+      // Redirection multiple avec méthodes de fallback
+      try {
+        // Méthode 1: Utilisation de l'history API
+        if (window.history && window.history.pushState) {
+          window.history.pushState(null, '', '/admin/dashboard');
+          window.location.reload();
+        } else {
+          // Méthode 2: Redirection classique
+          window.location.href = '/admin/dashboard';
+        }
+      } catch (error) {
+        // Méthode 3: Fallback final
+        console.error('Redirection error:', error);
+        window.location.assign('/admin/dashboard');
+      }
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
