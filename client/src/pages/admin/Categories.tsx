@@ -52,11 +52,7 @@ export default function AdminCategories() {
 
   // Fetch categories
   const { data: categories = [], isLoading, error } = useQuery({
-    queryKey: ['/api/categories'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/categories');
-      return response.json();
-    }
+    queryKey: ['/api/categories']
   });
 
   // Forms

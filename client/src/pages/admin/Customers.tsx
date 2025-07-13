@@ -34,20 +34,12 @@ export default function AdminCustomers() {
 
   // Fetch customers from database
   const { data: users = [], isLoading, error } = useQuery({
-    queryKey: ['/api/admin/customers'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/customers');
-      return response.json();
-    }
+    queryKey: ['/api/admin/customers']
   });
 
   // Fetch orders to calculate customer stats
   const { data: orders = [] } = useQuery({
-    queryKey: ['/api/orders'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/orders');
-      return response.json();
-    }
+    queryKey: ['/api/orders']
   });
 
   // Calculate customer statistics

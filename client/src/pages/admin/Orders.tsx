@@ -61,11 +61,7 @@ export default function AdminOrders() {
 
   // Fetch orders from API
   const { data: orders = [], isLoading, error } = useQuery({
-    queryKey: ['/api/orders'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/orders');
-      return response.json();
-    }
+    queryKey: ['/api/orders']
   });
 
   // Update order status mutation
