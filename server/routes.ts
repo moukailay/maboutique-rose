@@ -324,7 +324,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/categories/:id", async (req, res) => {
     try {
       const id = Number(req.params.id);
+      console.log("Updating category with data:", req.body);
+      
       const categoryData = insertCategorySchema.parse(req.body);
+      console.log("Parsed category data:", categoryData);
+      
       const category = await storage.updateCategory(id, categoryData);
       if (!category) {
         return res.status(404).json({ message: "Category not found" });
@@ -333,6 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating category:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid category data", errors: error.errors });
       }
       res.status(500).json({ message: "Error updating category", error: error.message });
