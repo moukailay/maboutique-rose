@@ -249,9 +249,19 @@ export default function AdminCustomers() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" title="Voir détails">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            title="Envoyer un email"
+                            onClick={() => window.open(`mailto:${customer.email}`, '_blank')}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

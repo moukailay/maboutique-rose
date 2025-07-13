@@ -1,84 +1,199 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Search, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  FolderOpen,
+  Image as ImageIcon
+} from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, FolderOpen } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
-import type { Category } from '@shared/schema';
+
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  slug: string;
+  image?: string;
+  sortOrder: number;
+  createdAt: string;
+  parentId?: number;
+}
+
+const categorySchema = z.object({
+  name: z.string().min(1, 'Le nom est requis'),
+  description: z.string().min(1, 'La description est requise'),
+  image: z.string().optional(),
+  sortOrder: z.number().min(0).default(0),
+});
+
+type CategoryFormData = z.infer<typeof categorySchema>;
 
 export default function AdminCategories() {
-  const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: ''
-  });
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: categories, isLoading } = useQuery<Category[]>({
+  // Fetch categories
+  const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['/api/categories'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/categories');
+      return response.json();
+    }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // In real app, this would call API to create/update category
-      const action = editingCategory ? 'modifiée' : 'créée';
-      console.log('Saving category:', formData);
-      
+  // Forms
+  const addForm = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      image: '',
+      sortOrder: 0,
+    }
+  });
+
+  const editForm = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+  });
+
+  // Add category mutation
+  const addCategoryMutation = useMutation({
+    mutationFn: async (data: CategoryFormData) => {
+      const response = await apiRequest('POST', '/api/categories', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      setIsAddDialogOpen(false);
+      addForm.reset();
       toast({
-        title: `Catégorie ${action}`,
-        description: `La catégorie a été ${action} avec succès.`,
+        title: "Catégorie ajoutée",
+        description: "La nouvelle catégorie a été créée avec succès.",
       });
-      
-      setIsDialogOpen(false);
-      setEditingCategory(null);
-      setFormData({ name: '', description: '' });
-    } catch (error) {
+    },
+    onError: (error: any) => {
       toast({
         title: "Erreur",
-        description: "Une erreur s'est produite lors de la sauvegarde.",
+        description: error.message || "Impossible d'ajouter la catégorie.",
         variant: "destructive",
       });
     }
-  };
+  });
 
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
-    setFormData({
-      name: category.name,
-      description: category.description || ''
-    });
-    setIsDialogOpen(true);
-  };
+  // Update category mutation
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: CategoryFormData }) => {
+      const response = await apiRequest('PUT', `/api/categories/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
+      setIsEditDialogOpen(false);
+      setEditingCategory(null);
+      editForm.reset();
+      toast({
+        title: "Catégorie mise à jour",
+        description: "La catégorie a été modifiée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de modifier la catégorie.",
+        variant: "destructive",
+      });
+    }
+  });
 
-  const handleDelete = (categoryId: number) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
-      // In real app, this would call API to delete category
-      console.log('Delete category:', categoryId);
+  // Delete category mutation
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('DELETE', `/api/categories/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/categories'] });
       toast({
         title: "Catégorie supprimée",
         description: "La catégorie a été supprimée avec succès.",
       });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer la catégorie.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const filteredCategories = categories.filter(category => {
+    const matchesSearch = category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         category.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    editForm.reset({
+      name: category.name,
+      description: category.description,
+      image: category.image || '',
+      sortOrder: category.sortOrder,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
+      deleteCategoryMutation.mutate(id);
     }
   };
 
-  const handleNewCategory = () => {
-    setEditingCategory(null);
-    setFormData({ name: '', description: '' });
-    setIsDialogOpen(true);
-  };
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="text-center py-8">
+            <p className="text-text-medium">Erreur lors du chargement des catégories</p>
+            <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -86,67 +201,142 @@ export default function AdminCategories() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-text-dark">Gestion des Catégories</h1>
+            <h1 className="text-3xl font-bold text-text-dark">Gestion des catégories</h1>
             <p className="text-text-medium">
-              {categories?.length || 0} catégorie{categories?.length !== 1 ? 's' : ''}
+              Gérer les catégories de produits
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button 
-                onClick={handleNewCategory}
-                className="bg-rose-primary hover:bg-rose-light"
-              >
-                <Plus className="mr-2 h-4 w-4" />
+              <Button className="bg-rose-primary hover:bg-rose-light">
+                <Plus className="h-4 w-4 mr-2" />
                 Nouvelle catégorie
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>
-                  {editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
-                </DialogTitle>
+                <DialogTitle>Ajouter une catégorie</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nom de la catégorie *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="Ex: Miel & Apiculture"
-                    required
+              <Form {...addForm}>
+                <form onSubmit={addForm.handleSubmit((data) => addCategoryMutation.mutate(data))} className="space-y-4">
+                  <FormField
+                    control={addForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nom de la catégorie" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleChange('description', e.target.value)}
-                    placeholder="Description de la catégorie..."
-                    rows={3}
+                  <FormField
+                    control={addForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Description de la catégorie" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                  >
-                    Annuler
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="bg-rose-primary hover:bg-rose-light"
-                  >
-                    {editingCategory ? 'Modifier' : 'Créer'}
-                  </Button>
-                </div>
-              </form>
+                  <FormField
+                    control={addForm.control}
+                    name="image"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL de l'image</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://example.com/image.jpg" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={addForm.control}
+                    name="sortOrder"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ordre de tri</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="0" 
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                      Annuler
+                    </Button>
+                    <Button type="submit" disabled={addCategoryMutation.isPending}>
+                      {addCategoryMutation.isPending ? 'Création...' : 'Créer'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Stats Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FolderOpen className="h-5 w-5" />
+              Statistiques
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-text-dark">{categories.length}</div>
+                <div className="text-sm text-text-medium">Catégories totales</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-text-dark">
+                  {categories.filter(c => c.image).length}
+                </div>
+                <div className="text-sm text-text-medium">Avec images</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-text-dark">
+                  {categories.filter(c => !c.image).length}
+                </div>
+                <div className="text-sm text-text-medium">Sans images</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Search */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Rechercher</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher une catégorie..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Categories Table */}
         <Card>
@@ -154,64 +344,69 @@ export default function AdminCategories() {
             <CardTitle>Liste des catégories</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {filteredCategories.length === 0 ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-primary mx-auto"></div>
-                <p className="text-text-medium mt-2">Chargement des catégories...</p>
-              </div>
-            ) : !categories || categories.length === 0 ? (
-              <div className="text-center py-8">
-                <FolderOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-text-medium">Aucune catégorie trouvée</p>
-                <Button 
-                  onClick={handleNewCategory}
-                  className="mt-4 bg-rose-primary hover:bg-rose-light"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Créer la première catégorie
-                </Button>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Image</TableHead>
                     <TableHead>Nom</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead>Produits</TableHead>
+                    <TableHead>Ordre</TableHead>
+                    <TableHead>Créé le</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {categories.map((category) => (
+                  {filteredCategories.map((category) => (
                     <TableRow key={category.id}>
                       <TableCell>
-                        <div className="font-medium text-text-dark">{category.name}</div>
+                        {category.image ? (
+                          <img 
+                            src={category.image} 
+                            alt={category.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <ImageIcon className="h-5 w-5 text-gray-400" />
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <div className="text-text-medium max-w-md">
-                          {category.description || 'Aucune description'}
+                        <div className="font-medium text-text-dark">{category.name}</div>
+                        <div className="text-sm text-text-medium">{category.slug}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-text-dark max-w-xs truncate">
+                          {category.description}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-text-dark">{category.sortOrder}</div>
                       </TableCell>
                       <TableCell>
                         <div className="text-text-dark">
-                          {/* In real app, this would show actual product count */}
-                          {Math.floor(Math.random() * 20) + 1} produits
+                          {new Date(category.createdAt).toLocaleDateString('fr-FR')}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
                             onClick={() => handleEdit(category)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
                             onClick={() => handleDelete(category.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-800"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -224,6 +419,86 @@ export default function AdminCategories() {
             )}
           </CardContent>
         </Card>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Modifier la catégorie</DialogTitle>
+            </DialogHeader>
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit((data) => 
+                editingCategory && updateCategoryMutation.mutate({ id: editingCategory.id, data })
+              )} className="space-y-4">
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nom de la catégorie" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Description de la catégorie" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL de l'image</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="sortOrder"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ordre de tri</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={updateCategoryMutation.isPending}>
+                    {updateCategoryMutation.isPending ? 'Modification...' : 'Modifier'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );

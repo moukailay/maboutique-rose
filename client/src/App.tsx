@@ -32,6 +32,7 @@ import AdminOrders from "@/pages/admin/Orders";
 import OrderDetail from "@/pages/admin/OrderDetail";
 import AdminCustomers from "@/pages/admin/Customers";
 import AdminMessages from "@/pages/admin/Messages";
+import AdminCategories from "@/pages/admin/Categories";
 
 function Router() {
   return (
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/admin/orders/:id" component={OrderDetail} />
       <Route path="/admin/customers" component={AdminCustomers} />
       <Route path="/admin/messages" component={AdminMessages} />
+      <Route path="/admin/categories" component={AdminCategories} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />

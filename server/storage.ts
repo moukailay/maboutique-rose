@@ -43,6 +43,8 @@ export interface IStorage {
   getCategory(id: number): Promise<Category | undefined>;
   getCategoryBySlug(slug: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
+  updateCategory(id: number, category: InsertCategory): Promise<Category | undefined>;
+  deleteCategory(id: number): Promise<boolean>;
 
   // Products
   getProducts(): Promise<Product[]>;
@@ -298,6 +300,16 @@ export class DatabaseStorage implements IStorage {
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const [category] = await db.insert(categories).values(insertCategory).returning();
     return category;
+  }
+
+  async updateCategory(id: number, updateData: InsertCategory): Promise<Category | undefined> {
+    const [category] = await db.update(categories).set(updateData).where(eq(categories.id, id)).returning();
+    return category || undefined;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await db.delete(categories).where(eq(categories.id, id));
+    return result.rowCount > 0;
   }
 
   // Product methods

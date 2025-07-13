@@ -180,11 +180,13 @@ export default function AdminOrders() {
   }
 
   if (error) {
+    console.error('Error loading orders:', error);
     return (
       <AdminLayout>
         <div className="space-y-6">
           <div className="text-center py-8">
             <p className="text-text-medium">Erreur lors du chargement des commandes</p>
+            <p className="text-sm text-red-500 mt-2">Détails: {error.message}</p>
             <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
               Réessayer
             </Button>
