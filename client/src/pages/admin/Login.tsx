@@ -48,8 +48,12 @@ export default function AdminLogin() {
       const responseData = await response.json();
       const { token, user: userData } = responseData;
       
-      // Stocker le token
+      // Stocker le token dans localStorage (nettoyage des anciennes clés)
+      localStorage.removeItem('adminToken'); // Nettoyer l'ancienne clé
       localStorage.setItem('authToken', token);
+      
+      // Debug pour vérifier le stockage
+      console.log('Token stocké:', localStorage.getItem('authToken'));
       
       // Afficher le message de succès
       toast({

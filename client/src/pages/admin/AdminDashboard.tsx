@@ -25,7 +25,23 @@ export default function AdminDashboard() {
   // Vérification de l'authentification admin
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    if (!token) {
+    const adminToken = localStorage.getItem('adminToken');
+    
+    console.log('Dashboard - authToken:', token);
+    console.log('Dashboard - adminToken:', adminToken);
+    
+    // Nettoyage des anciennes clés et migration
+    if (adminToken && !token) {
+      localStorage.removeItem('adminToken');
+      localStorage.setItem('authToken', adminToken);
+      console.log('Migration du token effectuée');
+    }
+    
+    const finalToken = localStorage.getItem('authToken');
+    console.log('Dashboard - finalToken:', finalToken);
+    
+    if (!finalToken) {
+      console.log('Pas de token, redirection vers login');
       window.location.replace('/admin/login');
       return;
     }
