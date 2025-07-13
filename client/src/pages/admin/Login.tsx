@@ -57,8 +57,10 @@ export default function AdminLogin() {
         description: "Bienvenue dans l'interface d'administration!",
       });
 
-      // Redirection directe vers le portail admin
-      window.location.href = '/admin/portal';
+      // Redirection simple et directe vers le dashboard
+      setTimeout(() => {
+        window.location.href = '/admin/dashboard';
+      }, 1000);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
