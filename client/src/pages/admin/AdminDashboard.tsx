@@ -44,7 +44,7 @@ export default function AdminDashboard() {
     
     if (!finalToken) {
       console.log('Pas de token, redirection vers login');
-      window.location.replace('/admin/login');
+      setLocation('/admin/login');
       return;
     }
     
@@ -61,10 +61,9 @@ export default function AdminDashboard() {
       if (!response.ok) {
         console.log('Token invalide, redirection vers login');
         localStorage.removeItem('authToken');
-        window.location.replace('/admin/login');
+        setLocation('/admin/login');
       } else {
         console.log('Token valide, dashboard peut s\'afficher');
-        // Ne pas forcer de rafraîchissement ici car cela efface le token
         console.log('Dashboard prêt à s\'afficher avec le token valide');
       }
     })
