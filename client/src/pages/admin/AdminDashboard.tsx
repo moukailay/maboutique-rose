@@ -48,11 +48,10 @@ export default function AdminDashboard() {
       return;
     }
     
-    // Temporairement désactiver la vérification pour diagnostiquer
-    console.log('Vérification du token désactivée temporairement');
-    
     // Vérifier la validité du token
-    /*fetch('/api/auth/verify', {
+    console.log('Vérification du token...');
+    
+    fetch('/api/auth/verify', {
       headers: {
         'Authorization': `Bearer ${finalToken}`
       }
@@ -65,13 +64,18 @@ export default function AdminDashboard() {
         window.location.replace('/admin/login');
       } else {
         console.log('Token valide, dashboard peut s\'afficher');
+        // Forcer un re-render si on est toujours sur /admin/login
+        if (window.location.pathname === '/admin/login') {
+          console.log('Forçage du rafraîchissement depuis login vers dashboard');
+          window.location.replace('/admin/dashboard');
+        }
       }
     })
     .catch(error => {
       console.log('Erreur de vérification du token:', error);
       // Ne pas supprimer le token en cas d'erreur réseau
       console.log('Erreur réseau, on garde le token');
-    });*/
+    });
   }, []);
 
   // Fetch orders

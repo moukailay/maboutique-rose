@@ -29,9 +29,10 @@ export default function AdminLogin() {
       // Utiliser le hook useAuth avec isAdmin = true
       await login(email, password, true);
       
-      // La redirection sera gérée après le login
+      // Forcer un rechargement complet de la page après la connexion réussie
+      // Cela garantit que le routeur se met à jour correctement
       setTimeout(() => {
-        setLocation('/admin/dashboard');
+        window.location.href = '/admin/dashboard';
       }, 500);
       
     } catch (err: any) {
