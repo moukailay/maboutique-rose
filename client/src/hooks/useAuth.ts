@@ -88,15 +88,10 @@ export function useAuthState() {
         description: `Bienvenue ${userData.firstName} !`,
       });
 
-      // Redirect based on role and current location
+      // Redirect based on role  
       if (userData.role === 'admin') {
-        // Si on est sur la page admin login, rediriger vers success
-        if (window.location.pathname === '/admin/login') {
-          // Ne pas rediriger ici, c'est géré par la page AdminLogin
-          return;
-        } else {
-          // Si admin se connecte depuis la page publique, rediriger vers admin
-          setLocation('/admin/dashboard');
+        if (!isAdmin) {               // On vient de /login (publique)
+          setLocation('/admin/success');
         }
       } else {
         setLocation('/');

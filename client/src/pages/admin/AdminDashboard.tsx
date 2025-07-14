@@ -39,7 +39,7 @@ export default function AdminDashboard() {
       localStorage.removeItem('adminToken');
     }
     
-    const finalToken = localStorage.getItem('authToken');
+    const finalToken = token || adminToken;
     console.log('Dashboard - finalToken:', finalToken);
     
     if (!finalToken) {
