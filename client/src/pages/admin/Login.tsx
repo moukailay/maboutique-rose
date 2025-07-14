@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Eye, EyeOff } from 'lucide-react';
-import { forceAdminNavigation } from '@/utils/forceNavigation';
+
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('admin@rose-d-eden.fr');
@@ -62,8 +62,10 @@ export default function AdminLogin() {
         description: "Bienvenue dans l'interface d'administration!",
       });
 
-      // Utiliser la fonction de navigation forcée
-      forceAdminNavigation();
+      // Redirection avec wouter après un court délai pour laisser le toast s'afficher
+      setTimeout(() => {
+        setLocation('/admin/dashboard');
+      }, 100);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
