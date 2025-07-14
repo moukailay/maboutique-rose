@@ -64,11 +64,8 @@ export default function AdminDashboard() {
         window.location.replace('/admin/login');
       } else {
         console.log('Token valide, dashboard peut s\'afficher');
-        // Forcer un re-render si on est toujours sur /admin/login
-        if (window.location.pathname === '/admin/login') {
-          console.log('Forçage du rafraîchissement depuis login vers dashboard');
-          window.location.replace('/admin/dashboard');
-        }
+        // Ne pas forcer de rafraîchissement ici car cela efface le token
+        console.log('Dashboard prêt à s\'afficher avec le token valide');
       }
     })
     .catch(error => {
