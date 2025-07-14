@@ -63,23 +63,34 @@ export default function AdminLogin() {
 
       // Redirection immédiate - plusieurs méthodes
       console.log('Tentative de redirection vers dashboard...');
+      console.log('Chemin actuel:', window.location.pathname);
       
       // Méthode 1: Utiliser le routeur wouter
+      console.log('Utilisation de setLocation...');
       setLocation('/admin/dashboard');
       
-      // Méthode 2: Fallback avec window.location
+      // Méthode 2: Redirection immédiate
+      console.log('Utilisation de window.location.href...');
+      window.location.href = '/admin/dashboard';
+      
+      // Méthode 3: Fallback après délai
       setTimeout(() => {
+        console.log('Fallback après 100ms, chemin actuel:', window.location.pathname);
         if (window.location.pathname !== '/admin/dashboard') {
-          window.location.href = '/admin/dashboard';
+          console.log('Redirection forcée avec replace...');
+          window.location.replace('/admin/dashboard');
         }
       }, 100);
       
-      // Méthode 3: Force reload si nécessaire
+      // Méthode 4: Utiliser l'historique du navigateur
       setTimeout(() => {
+        console.log('Fallback avec pushState après 200ms...');
         if (window.location.pathname !== '/admin/dashboard') {
-          window.location.replace('/admin/dashboard');
+          window.history.pushState(null, '', '/admin/dashboard');
+          // Forcer le rechargement de la page
+          window.location.reload();
         }
-      }, 500);
+      }, 200);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
