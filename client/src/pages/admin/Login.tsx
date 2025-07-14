@@ -29,14 +29,10 @@ export default function AdminLogin() {
       // Utiliser le hook useAuth avec isAdmin = true
       await login(email, password, true);
       
-      // Utiliser le routeur wouter pour la navigation
-      // Ne pas utiliser window.location car cela recharge la page et perd le contexte
+      // Rediriger vers la page de succès qui gérera la vérification et la redirection
       setTimeout(() => {
-        console.log('Navigation vers dashboard avec wouter');
-        setLocation('/admin/dashboard');
-        // Forcer un re-render du routeur en changeant temporairement l'URL
-        window.history.pushState({}, '', '/admin/dashboard');
-      }, 500);
+        window.location.href = '/admin/success';
+      }, 100);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
