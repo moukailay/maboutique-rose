@@ -31,10 +31,12 @@ export default function AdminDashboard() {
     console.log('Dashboard - adminToken:', adminToken);
     
     // Nettoyage des anciennes clés et migration
-    if (adminToken && !token) {
+    if (adminToken) {
+      if (!token) {
+        localStorage.setItem('authToken', adminToken);
+        console.log('Migration du token effectuée');
+      }
       localStorage.removeItem('adminToken');
-      localStorage.setItem('authToken', adminToken);
-      console.log('Migration du token effectuée');
     }
     
     const finalToken = localStorage.getItem('authToken');
@@ -45,6 +47,25 @@ export default function AdminDashboard() {
       window.location.replace('/admin/login');
       return;
     }
+    
+    // Vérifier la validité du token
+    fetch('/api/auth/verify', {
+      headers: {
+        'Authorization': `Bearer ${finalToken}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.log('Token invalide, redirection vers login');
+        localStorage.removeItem('authToken');
+        window.location.replace('/admin/login');
+      }
+    })
+    .catch(error => {
+      console.log('Erreur de vérification du token:', error);
+      localStorage.removeItem('authToken');
+      window.location.replace('/admin/login');
+    });
   }, []);
 
   // Fetch orders
