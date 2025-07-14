@@ -61,10 +61,25 @@ export default function AdminLogin() {
         description: "Bienvenue dans l'interface d'administration!",
       });
 
-      // Redirection simple et directe vers le dashboard
+      // Redirection immédiate - plusieurs méthodes
+      console.log('Tentative de redirection vers dashboard...');
+      
+      // Méthode 1: Utiliser le routeur wouter
+      setLocation('/admin/dashboard');
+      
+      // Méthode 2: Fallback avec window.location
       setTimeout(() => {
-        window.location.href = '/admin/dashboard';
-      }, 1000);
+        if (window.location.pathname !== '/admin/dashboard') {
+          window.location.href = '/admin/dashboard';
+        }
+      }, 100);
+      
+      // Méthode 3: Force reload si nécessaire
+      setTimeout(() => {
+        if (window.location.pathname !== '/admin/dashboard') {
+          window.location.replace('/admin/dashboard');
+        }
+      }, 500);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
