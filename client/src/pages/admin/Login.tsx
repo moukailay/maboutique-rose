@@ -26,54 +26,16 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      // Appel direct à l'API sans passer par le hook useAuth
-      const response = await fetch('/api/auth/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        let errorMessage = "Email ou mot de passe incorrect.";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // Keep default message if response is not JSON
-        }
-        throw new Error(errorMessage);
-      }
-
-      const responseData = await response.json();
-      const { token, user: userData } = responseData;
+      // Utiliser le hook useAuth avec isAdmin = true
+      await login(email, password, true);
       
-      // Stocker le token dans localStorage (nettoyage des anciennes clés)
-      localStorage.removeItem('adminToken'); // Nettoyer l'ancienne clé
-      localStorage.setItem('authToken', token);
-      
-      // Debug pour vérifier le stockage
-      console.log('Token stocké:', localStorage.getItem('authToken'));
-      
-      // Afficher le message de succès
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue dans l'interface d'administration!",
-      });
-
-      // Redirection avec wouter après un court délai pour laisser le toast s'afficher
+      // La redirection sera gérée après le login
       setTimeout(() => {
         setLocation('/admin/dashboard');
-      }, 100);
+      }, 500);
       
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
-      toast({
-        title: "Erreur de connexion",
-        description: err.message || "Identifiants invalides",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
