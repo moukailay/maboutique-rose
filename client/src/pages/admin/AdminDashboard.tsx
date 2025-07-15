@@ -154,36 +154,36 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-text-dark">Tableau de bord</h1>
-          <p className="text-text-medium">
+        <div className="mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-text-dark">Tableau de bord</h1>
+          <p className="text-text-medium text-sm lg:text-base">
             Bienvenue dans votre panneau d'administration Rose-D'Éden
           </p>
         </div>
 
         {/* Main Actions - Les 3 sections principales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Gestion des commandes */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation('/admin/orders')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-medium">Gestion des commandes</CardTitle>
-              <ShoppingCart className="h-8 w-8 text-rose-primary" />
+              <CardTitle className="text-sm lg:text-lg font-medium">Gestion des commandes</CardTitle>
+              <ShoppingCart className="h-6 w-6 lg:h-8 lg:w-8 text-rose-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-text-medium mb-4">
+              <div className="text-xs lg:text-sm text-text-medium mb-3 lg:mb-4">
                 Voir et gérer toutes les commandes
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-text-dark">{orders.length}</div>
+                <div className="text-xl lg:text-2xl font-bold text-text-dark">{orders.length}</div>
                 <Button 
                   onClick={(e) => {
                     e.stopPropagation();
                     setLocation('/admin/orders');
                   }}
                   size="sm"
-                  className="bg-rose-primary hover:bg-rose-light"
+                  className="bg-rose-primary hover:bg-rose-light text-xs lg:text-sm"
                 >
-                  Gérer les commandes
+                  Gérer
                 </Button>
               </div>
             </CardContent>
@@ -192,24 +192,24 @@ export default function AdminDashboard() {
           {/* Gestion des clients */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation('/admin/customers')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-medium">Gestion des clients</CardTitle>
-              <Users className="h-8 w-8 text-rose-primary" />
+              <CardTitle className="text-sm lg:text-lg font-medium">Gestion des clients</CardTitle>
+              <Users className="h-6 w-6 lg:h-8 lg:w-8 text-rose-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-text-medium mb-4">
+              <div className="text-xs lg:text-sm text-text-medium mb-3 lg:mb-4">
                 Voir et gérer les comptes clients
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-text-dark">{customers.length}</div>
+                <div className="text-xl lg:text-2xl font-bold text-text-dark">{customers.length}</div>
                 <Button 
                   onClick={(e) => {
                     e.stopPropagation();
                     setLocation('/admin/customers');
                   }}
                   size="sm"
-                  className="bg-rose-primary hover:bg-rose-light"
+                  className="bg-rose-primary hover:bg-rose-light text-xs lg:text-sm"
                 >
-                  Gérer les clients
+                  Gérer
                 </Button>
               </div>
             </CardContent>
@@ -218,15 +218,15 @@ export default function AdminDashboard() {
           {/* Messages et avis */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation('/admin/messages')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-medium">Messages et avis</CardTitle>
-              <MessageSquare className="h-8 w-8 text-rose-primary" />
+              <CardTitle className="text-sm lg:text-lg font-medium">Messages et avis</CardTitle>
+              <MessageSquare className="h-6 w-6 lg:h-8 lg:w-8 text-rose-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-text-medium mb-4">
+              <div className="text-xs lg:text-sm text-text-medium mb-3 lg:mb-4">
                 Gérer les messages et avis clients
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-text-dark">
+                <div className="text-xl lg:text-2xl font-bold text-text-dark">
                   {unreadContacts + pendingReviews}
                 </div>
                 <Button 
@@ -235,9 +235,9 @@ export default function AdminDashboard() {
                     setLocation('/admin/messages');
                   }}
                   size="sm"
-                  className="bg-rose-primary hover:bg-rose-light"
+                  className="bg-rose-primary hover:bg-rose-light text-xs lg:text-sm"
                 >
-                  Voir les messages
+                  Voir
                 </Button>
               </div>
             </CardContent>
@@ -245,15 +245,15 @@ export default function AdminDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Commandes totales</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Commandes totales</CardTitle>
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{orders.length}</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-lg lg:text-2xl font-bold">{orders.length}</div>
+              <p className="text-xs text-muted-foreground hidden lg:block">
                 +{recentOrders.length} cette semaine
               </p>
             </CardContent>
@@ -261,12 +261,12 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Chiffre d'affaires</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Chiffre d'affaires</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalRevenue.toFixed(2)} CAD</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-lg lg:text-2xl font-bold">{totalRevenue.toFixed(2)} CAD</div>
+              <p className="text-xs text-muted-foreground hidden lg:block">
                 Total des ventes
               </p>
             </CardContent>
@@ -274,12 +274,12 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Produits</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Produits</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{products.length}</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-lg lg:text-2xl font-bold">{products.length}</div>
+              <p className="text-xs text-muted-foreground hidden lg:block">
                 Produits en catalogue
               </p>
             </CardContent>
@@ -287,12 +287,12 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Clients</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Clients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{customers.length}</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-lg lg:text-2xl font-bold">{customers.length}</div>
+              <p className="text-xs text-muted-foreground hidden lg:block">
                 Clients inscrits
               </p>
             </CardContent>
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Recent Orders */}
           <Card>
             <CardHeader>
@@ -369,13 +369,13 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Actions rapides</CardTitle>
+            <CardTitle className="text-base lg:text-lg">Actions rapides</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Button 
                 onClick={() => setLocation('/admin/products/add')}
-                className="bg-rose-primary hover:bg-rose-light"
+                className="bg-rose-primary hover:bg-rose-light text-sm lg:text-base"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Ajouter un produit
@@ -383,6 +383,7 @@ export default function AdminDashboard() {
               <Button 
                 onClick={() => setLocation('/admin/orders')}
                 variant="outline"
+                className="text-sm lg:text-base"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Voir toutes les commandes
@@ -390,6 +391,7 @@ export default function AdminDashboard() {
               <Button 
                 onClick={() => setLocation('/admin/messages')}
                 variant="outline"
+                className="text-sm lg:text-base"
               >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Gérer les messages

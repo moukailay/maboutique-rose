@@ -25,7 +25,9 @@ import {
   Bell, 
   Plus, 
   List,
-  FolderOpen
+  FolderOpen,
+  Menu,
+  X
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -35,6 +37,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Récupérer le nombre de messages non lus
   const { data: unreadMessages = 0 } = useQuery({
@@ -118,12 +121,30 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-50 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg">
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:static lg:inset-0`}>
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center justify-center border-b border-gray-200">
+          <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
             <h1 className="text-xl font-bold text-rose-primary">ROSE-D'ÉDEN</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Navigation */}
@@ -137,10 +158,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       ? 'bg-rose-primary hover:bg-rose-light text-white' 
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
-                  onClick={() => setLocation(item.href)}
+                  onClick={() => {
+                    setLocation(item.href);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
                   {item.badge && (
                     <Badge variant="destructive" className="ml-auto text-xs">
                       {item.badge}
@@ -156,10 +180,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         variant="ghost"
                         size="sm"
                         className="w-full justify-start text-gray-600 hover:bg-gray-100"
-                        onClick={() => setLocation(subItem.href)}
+                        onClick={() => {
+                          setLocation(subItem.href);
+                          setIsMobileMenuOpen(false);
+                        }}
                       >
                         <subItem.icon className="mr-2 h-3 w-3" />
-                        {subItem.label}
+                        <span className="truncate">{subItem.label}</span>
                       </Button>
                     ))}
                   </div>
@@ -173,7 +200,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <Button
               variant="ghost"
               className="w-full justify-start text-red-600 hover:bg-red-50"
-              onClick={handleLogout}
+              onClick={() => {
+                handleLogout();
+                setIsMobileMenuOpen(false);
+              }}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion
@@ -183,25 +213,35 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </div>
 
       {/* Main Content */}
-      <div className="pl-64">
+      <div className="lg:pl-64">
         {/* Top Navigation */}
         <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
-          <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex h-16 items-center justify-between px-4 lg:px-6">
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+
             {/* Search */}
-            <div className="flex-1 max-w-lg">
+            <div className="flex-1 max-w-lg mx-4">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Rechercher produits, commandes, clients..."
+                  placeholder="Rechercher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm"
                 />
               </div>
             </div>
 
             {/* User Menu */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               {/* Notifications */}
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
@@ -245,7 +285,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-4 lg:p-6">
           {children}
         </main>
       </div>
