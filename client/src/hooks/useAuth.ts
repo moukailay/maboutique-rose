@@ -25,8 +25,12 @@ export function useAuthState() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing token on mount
-    const token = localStorage.getItem('authToken');
+    // On tente finalToken ➜ adminToken ➜ authToken (du plus sûr au plus simple)
+    const token =
+      localStorage.getItem('finalToken')  ||
+      localStorage.getItem('adminToken')  ||
+      localStorage.getItem('authToken');
+
     if (token) {
       verifyToken(token);
     } else {
@@ -55,56 +59,79 @@ export function useAuthState() {
     }
   };
 
+  // -----------------------------------------------------------------------------
+  // Hook d’authentification : login (version corrigée)
+  // -----------------------------------------------------------------------------
   const login = async (email: string, password: string, isAdmin = false) => {
     try {
+      // 1️⃣ Endpoint selon le contexte (admin vs public)
       const endpoint = isAdmin ? '/api/auth/admin/login' : '/api/auth/login';
+
+      // 2️⃣ Requête HTTP
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
+      // 3️⃣ Gestion d’erreur
       if (!response.ok) {
-        let errorMessage = "Email ou mot de passe incorrect.";
+        let msg = 'Email ou mot de passe incorrect.';
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // If response is not JSON, keep default message
-        }
-        throw new Error(errorMessage);
+          const { message } = await response.json();
+          if (message) msg = message;
+        } catch {/* réponse non-JSON */}
+        throw new Error(msg);
       }
 
-      const responseData = await response.json();
-      const { token, user: userData } = responseData;
-      
+      // 4️⃣ Données renvoyées
+      const { token, user: userData } = await response.json();
+
+      // 5️⃣ Stockage des jetons ================================================
+      /**
+       * • authToken  : toujours présent (facilite verifyToken côté public)
+       * • adminToken : nécessaire pour le flux /admin/success
+       */
       localStorage.setItem('authToken', token);
+      if (userData.role === 'admin') {
+        localStorage.setItem('adminToken', token);
+      }
+
+      // 6️⃣ Contexte + toast
       setUser(userData);
-      
       toast({
-        title: "Connexion réussie",
+        title: 'Connexion réussie',
         description: `Bienvenue ${userData.firstName} !`,
       });
 
-      // Redirect based on role  
+      // 7️⃣ Redirection =========================================================
       if (userData.role === 'admin') {
-        if (!isAdmin) {               // On vient de /login (publique)
-          setLocation('/admin/success');
-        }
+        /**
+         * • Depuis /admin/login  (isAdmin = true) :
+         *   la page a déjà son propre `window.location.href = '/admin/success'`
+         *   donc on ne touche à rien.
+         *
+         * • Depuis /login (isAdmin = false) :
+         *   on déclenche nous-mêmes /admin/success pour échanger adminToken
+         *   contre finalToken avant d’entrer dans le dashboard.
+         */
+        if (!isAdmin) setLocation('/admin/success');
       } else {
-        setLocation('/');
+        setLocation('/'); // utilisateur classique
       }
-    } catch (error) {
+    }
+    //---------------------------------------------------------------------------
+    catch (error) {
       toast({
-        title: "Erreur de connexion",
-        description: error instanceof Error ? error.message : "Email ou mot de passe incorrect.",
-        variant: "destructive",
+        title: 'Erreur de connexion',
+        description:
+          error instanceof Error ? error.message : 'Email ou mot de passe incorrect.',
+        variant: 'destructive',
       });
       throw error;
     }
   };
+
 
   const register = async (userData: RegisterData) => {
     try {

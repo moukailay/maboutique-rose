@@ -48,14 +48,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem('authToken');
     if (!token) {
       setLocation('/admin/login');
     }
   }, [setLocation]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('adminToken'); // Nettoyer aussi l'ancien token
     setLocation('/admin/login');
   };
 

@@ -1,5 +1,4 @@
-import { useAuth } from "@/components/auth/AuthProvider";
-import { useTranslation } from "@/hooks/useTranslation";
+import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +29,6 @@ interface Product {
 }
 
 export default function AdminProducts() {
-  const { user } = useAuth();
-  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -66,20 +63,7 @@ export default function AdminProducts() {
     }
   };
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Accès non autorisé
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Vous devez être administrateur pour accéder à cette page.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // La vérification d'authentification est gérée par AdminLayout
 
   const filteredProducts = products?.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -89,22 +73,20 @@ export default function AdminProducts() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">Chargement des produits...</p>
-            </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Chargement des produits...</p>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminLayout>
+      <div className="space-y-6">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -220,12 +202,12 @@ export default function AdminProducts() {
         {/* Back to Dashboard */}
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
           <Button asChild variant="outline">
-            <Link href="/admin">
+            <Link href="/admin/dashboard">
               ← Retour au tableau de bord
             </Link>
           </Button>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
