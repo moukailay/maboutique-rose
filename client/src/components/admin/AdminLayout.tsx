@@ -132,7 +132,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:static lg:inset-0`}>
+      }`}>
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
