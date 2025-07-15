@@ -26,33 +26,20 @@ export default function AdminSuccess() {
     .then(response => {
       console.log('Response status:', response.status);
       if (response.ok) {
-        // Token valide, rediriger vers le dashboard
+        // Token valide, s'assurer qu'il est bien stocké et rediriger
         console.log('Token valide, redirection vers dashboard');
         
-        // Méthodes multiples de redirection pour la production
-        const redirectToDashboard = () => {
-          const dashboardUrl = `${window.location.origin}/admin/dashboard`;
-          
-          // Méthode 1: window.location.href
-          window.location.href = dashboardUrl;
-          
-          // Méthode 2: Fallback après 1 seconde
-          setTimeout(() => {
-            if (window.location.pathname !== '/admin/dashboard') {
-              window.location.replace(dashboardUrl);
-            }
-          }, 1000);
-          
-          // Méthode 3: Fallback final après 3 secondes
-          setTimeout(() => {
-            if (window.location.pathname !== '/admin/dashboard') {
-              window.location.assign(dashboardUrl);
-            }
-          }, 3000);
-        };
+        // Vérifier et re-stocker le token si nécessaire
+        const storedToken = localStorage.getItem('authToken');
+        if (!storedToken) {
+          console.log('Token manquant, le remettre');
+          localStorage.setItem('authToken', token);
+        }
         
-        // Redirection immédiate
-        redirectToDashboard();
+        // Utiliser une redirection simple et directe
+        setTimeout(() => {
+          window.location.replace('/admin/dashboard');
+        }, 500);
       } else {
         throw new Error(`Token invalide (status: ${response.status})`);
       }

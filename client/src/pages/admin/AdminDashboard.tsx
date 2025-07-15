@@ -24,30 +24,50 @@ export default function AdminDashboard() {
   
   // Vérification de l'authentification admin
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const adminToken = localStorage.getItem('adminToken');
-    
-    console.log('Dashboard - authToken:', token);
-    console.log('Dashboard - adminToken:', adminToken);
-    
-    // Nettoyage des anciennes clés et migration
-    if (adminToken) {
-      if (!token) {
-        localStorage.setItem('authToken', adminToken);
-        console.log('Migration du token effectuée');
+    // Attendre un petit délai pour que le token soit bien stocké
+    const checkToken = () => {
+      const token = localStorage.getItem('authToken');
+      const adminToken = localStorage.getItem('adminToken');
+      
+      console.log('Dashboard - authToken:', token);
+      console.log('Dashboard - adminToken:', adminToken);
+      
+      // Nettoyage des anciennes clés et migration
+      if (adminToken) {
+        if (!token) {
+          localStorage.setItem('authToken', adminToken);
+          console.log('Migration du token effectuée');
+        }
+        localStorage.removeItem('adminToken');
       }
-      localStorage.removeItem('adminToken');
-    }
+      
+      const finalToken = token || adminToken;
+      console.log('Dashboard - finalToken:', finalToken);
+      
+      return finalToken;
+    };
     
-    const finalToken = token || adminToken;
-    console.log('Dashboard - finalToken:', finalToken);
+    // Vérifier le token avec un petit délai
+    const finalToken = checkToken();
     
+    // Si pas de token, attendre 200ms et réessayer une fois
     if (!finalToken) {
-      console.log('Pas de token, redirection vers login');
-      setLocation('/admin/login');
+      setTimeout(() => {
+        const retryToken = checkToken();
+        if (!retryToken) {
+          console.log('Pas de token après retry, redirection vers login');
+          setLocation('/admin/login');
+          return;
+        }
+        verifyToken(retryToken);
+      }, 200);
       return;
     }
     
+    verifyToken(finalToken);
+  }, []);
+
+  const verifyToken = (finalToken: string) => {
     // Vérifier la validité du token
     console.log('Vérification du token...');
     
@@ -72,7 +92,7 @@ export default function AdminDashboard() {
       // Ne pas supprimer le token en cas d'erreur réseau
       console.log('Erreur réseau, on garde le token');
     });
-  }, []);
+  };
 
   // Fetch orders
   const { data: orders = [] } = useQuery({
