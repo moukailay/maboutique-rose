@@ -663,17 +663,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/testimonials", upload.single('image'), async (req, res) => {
     try {
-      const testimonialData = insertTestimonialSchema.parse({
-        ...req.body,
-        rating: parseInt(req.body.rating),
-        sortOrder: parseInt(req.body.sortOrder) || 0,
-        isActive: req.body.isActive === 'true',
-        image: req.file ? `/uploads/${req.file.filename}` : undefined
-      });
+      console.log("Received testimonial data:", req.body);
+      console.log("Received file:", req.file);
       
-      const testimonial = await storage.createTestimonial(testimonialData);
+      const testimonialData = {
+        name: req.body.name || '',
+        title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
+        content: req.body.content || '',
+        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image && req.body.image.trim() !== '' ? req.body.image : null),
+        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? req.body.videoUrl : null,
+        rating: parseInt(req.body.rating) || 5,
+        isActive: req.body.isActive === 'true' || req.body.isActive === true,
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+      };
+      
+      console.log("Parsed testimonial data:", testimonialData);
+      
+      const validatedData = insertTestimonialSchema.parse(testimonialData);
+      const testimonial = await storage.createTestimonial(validatedData);
       res.status(201).json(testimonial);
     } catch (error: any) {
+      console.error("Error creating testimonial:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid testimonial data", errors: error.errors });
       }
@@ -684,20 +694,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/testimonials/:id", upload.single('image'), async (req, res) => {
     try {
       const testimonialId = parseInt(req.params.id);
-      const testimonialData = insertTestimonialSchema.parse({
-        ...req.body,
-        rating: parseInt(req.body.rating),
-        sortOrder: parseInt(req.body.sortOrder) || 0,
-        isActive: req.body.isActive === 'true',
-        image: req.file ? `/uploads/${req.file.filename}` : req.body.image
-      });
+      console.log("Updating testimonial ID:", testimonialId);
+      console.log("Received update data:", req.body);
+      console.log("Received file:", req.file);
       
-      const testimonial = await storage.updateTestimonial(testimonialId, testimonialData);
+      const testimonialData = {
+        name: req.body.name || '',
+        title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
+        content: req.body.content || '',
+        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image && req.body.image.trim() !== '' ? req.body.image : null),
+        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? req.body.videoUrl : null,
+        rating: parseInt(req.body.rating) || 5,
+        isActive: req.body.isActive === 'true' || req.body.isActive === true,
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+      };
+      
+      console.log("Parsed update data:", testimonialData);
+      
+      const validatedData = insertTestimonialSchema.parse(testimonialData);
+      const testimonial = await storage.updateTestimonial(testimonialId, validatedData);
       if (!testimonial) {
         return res.status(404).json({ message: "Testimonial not found" });
       }
       res.json(testimonial);
     } catch (error: any) {
+      console.error("Error updating testimonial:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid testimonial data", errors: error.errors });
       }
