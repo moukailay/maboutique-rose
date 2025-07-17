@@ -8,6 +8,7 @@ import {
   contacts,
   newsletters,
   chatMessages,
+  testimonials,
   type User,
   type InsertUser,
   type Product,
@@ -26,6 +27,8 @@ import {
   type InsertNewsletter,
   type ChatMessage,
   type InsertChatMessage,
+  type Testimonial,
+  type InsertTestimonial,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, like, ilike, desc } from "drizzle-orm";
@@ -96,6 +99,13 @@ export interface IStorage {
   markContactAsRead(id: number): Promise<Contact | undefined>;
   getAllReviews(): Promise<Review[]>;
   updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined>;
+
+  // Testimonials
+  getTestimonials(): Promise<Testimonial[]>;
+  getTestimonial(id: number): Promise<Testimonial | undefined>;
+  createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
+  updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined>;
+  deleteTestimonial(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -302,6 +312,65 @@ export class DatabaseStorage implements IStorage {
 
       for (const contact of testContacts) {
         await this.createContact(contact);
+      }
+    }
+
+    // Create test testimonials if none exist
+    const existingTestimonials = await this.getTestimonials();
+    if (existingTestimonials.length === 0) {
+      const testTestimonials = [
+        {
+          name: "Marie Dubois",
+          title: "Montréal, QC",
+          content: "J'adore les produits de Rose-d'Éden ! Leur huile d'argan a transformé ma peau. Service client exceptionnel et livraison rapide. Je recommande vivement !",
+          rating: 5,
+          isActive: true,
+          sortOrder: 1,
+        },
+        {
+          name: "Jean-Pierre Tremblay",
+          title: "Propriétaire d'une boutique bio",
+          content: "Nous vendons les produits Rose-d'Éden depuis 2 ans. Nos clients sont ravis de la qualité et de l'efficacité. Partenaire fiable avec d'excellents produits naturels.",
+          rating: 5,
+          isActive: true,
+          sortOrder: 2,
+        },
+        {
+          name: "Sophie Martin",
+          title: "Québec, QC",
+          content: "Les tisanes de Rose-d'Éden sont devenues un incontournable de ma routine bien-être. Goût authentique et bienfaits remarquables. Merci pour ces produits d'exception !",
+          rating: 5,
+          isActive: true,
+          sortOrder: 3,
+        },
+        {
+          name: "Alexandra Bouchard",
+          title: "Naturopathe",
+          content: "Je recommande régulièrement les produits Rose-d'Éden à mes patients. Qualité irréprochable, ingrédients naturels et résultats visibles. Une marque de confiance.",
+          rating: 5,
+          isActive: true,
+          sortOrder: 4,
+        },
+        {
+          name: "Pierre Gagnon",
+          title: "Laval, QC",
+          content: "Commande facile, produits de qualité supérieure et service après-vente impeccable. Rose-d'Éden dépasse mes attentes à chaque fois !",
+          rating: 5,
+          isActive: true,
+          sortOrder: 5,
+        },
+        {
+          name: "Catherine Morin",
+          title: "Herboriste",
+          content: "En tant que professionnelle, j'apprécie particulièrement la traçabilité et la pureté des produits Rose-d'Éden. Excellent travail !",
+          rating: 5,
+          isActive: true,
+          sortOrder: 6,
+        },
+      ];
+
+      for (const testimonial of testTestimonials) {
+        await this.createTestimonial(testimonial);
       }
     }
 
@@ -571,6 +640,47 @@ export class DatabaseStorage implements IStorage {
       .where(eq(reviews.id, id))
       .returning();
     return review || undefined;
+  }
+
+  // Testimonials
+  async getTestimonials(): Promise<Testimonial[]> {
+    return await db
+      .select()
+      .from(testimonials)
+      .where(eq(testimonials.isActive, true))
+      .orderBy(testimonials.sortOrder, testimonials.createdAt);
+  }
+
+  async getTestimonial(id: number): Promise<Testimonial | undefined> {
+    const [testimonial] = await db
+      .select()
+      .from(testimonials)
+      .where(eq(testimonials.id, id));
+    return testimonial || undefined;
+  }
+
+  async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
+    const [newTestimonial] = await db
+      .insert(testimonials)
+      .values(testimonial)
+      .returning();
+    return newTestimonial;
+  }
+
+  async updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined> {
+    const [updatedTestimonial] = await db
+      .update(testimonials)
+      .set(testimonial)
+      .where(eq(testimonials.id, id))
+      .returning();
+    return updatedTestimonial || undefined;
+  }
+
+  async deleteTestimonial(id: number): Promise<boolean> {
+    const result = await db
+      .delete(testimonials)
+      .where(eq(testimonials.id, id));
+    return (result.rowCount || 0) > 0;
   }
 }
 

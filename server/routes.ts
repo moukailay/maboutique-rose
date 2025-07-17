@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertTestimonialSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import multer from "multer";
@@ -635,6 +635,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(message);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Testimonials routes
+  app.get("/api/testimonials", async (req, res) => {
+    try {
+      const testimonials = await storage.getTestimonials();
+      res.json(testimonials);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching testimonials", error: error.message });
+    }
+  });
+
+  app.get("/api/testimonials/:id", async (req, res) => {
+    try {
+      const testimonialId = parseInt(req.params.id);
+      const testimonial = await storage.getTestimonial(testimonialId);
+      if (!testimonial) {
+        return res.status(404).json({ message: "Testimonial not found" });
+      }
+      res.json(testimonial);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching testimonial", error: error.message });
+    }
+  });
+
+  app.post("/api/testimonials", upload.single('image'), async (req, res) => {
+    try {
+      const testimonialData = insertTestimonialSchema.parse({
+        ...req.body,
+        rating: parseInt(req.body.rating),
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+        isActive: req.body.isActive === 'true',
+        image: req.file ? `/uploads/${req.file.filename}` : undefined
+      });
+      
+      const testimonial = await storage.createTestimonial(testimonialData);
+      res.status(201).json(testimonial);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid testimonial data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating testimonial", error: error.message });
+    }
+  });
+
+  app.put("/api/testimonials/:id", upload.single('image'), async (req, res) => {
+    try {
+      const testimonialId = parseInt(req.params.id);
+      const testimonialData = insertTestimonialSchema.parse({
+        ...req.body,
+        rating: parseInt(req.body.rating),
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+        isActive: req.body.isActive === 'true',
+        image: req.file ? `/uploads/${req.file.filename}` : req.body.image
+      });
+      
+      const testimonial = await storage.updateTestimonial(testimonialId, testimonialData);
+      if (!testimonial) {
+        return res.status(404).json({ message: "Testimonial not found" });
+      }
+      res.json(testimonial);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid testimonial data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating testimonial", error: error.message });
+    }
+  });
+
+  app.delete("/api/testimonials/:id", async (req, res) => {
+    try {
+      const testimonialId = parseInt(req.params.id);
+      const deleted = await storage.deleteTestimonial(testimonialId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Testimonial not found" });
+      }
+      res.json({ message: "Testimonial deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting testimonial", error: error.message });
     }
   });
 

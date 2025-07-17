@@ -27,7 +27,8 @@ import {
   List,
   FolderOpen,
   Menu,
-  X
+  X,
+  Star
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -104,6 +105,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       href: '/admin/messages',
       active: location === '/admin/messages',
       badge: unreadMessages > 0 ? unreadMessages : undefined
+    },
+    { 
+      icon: Star, 
+      label: 'Témoignages', 
+      href: '/admin/testimonials',
+      active: location === '/admin/testimonials'
     },
     { 
       icon: BarChart3, 

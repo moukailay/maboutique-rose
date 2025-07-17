@@ -34,6 +34,7 @@ import OrderDetail from "@/pages/admin/OrderDetail";
 import AdminCustomers from "@/pages/admin/Customers";
 import AdminMessages from "@/pages/admin/Messages";
 import AdminCategories from "@/pages/admin/Categories";
+import AdminTestimonials from "@/pages/admin/Testimonials";
 
 function Router() {
   return (
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/admin/customers" component={AdminCustomers} />
       <Route path="/admin/messages" component={AdminMessages} />
       <Route path="/admin/categories" component={AdminCategories} />
+      <Route path="/admin/testimonials" component={AdminTestimonials} />
       
       {/* Public routes */}
       <Route path="/" component={Home} />
