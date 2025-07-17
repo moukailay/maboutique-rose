@@ -30,7 +30,7 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      await apiRequest("POST", "/api/contact", formData);
+      await apiRequest("/api/contact", { method: "POST", data: formData });
       toast({
         title: "Message envoyé !",
         description: "Nous vous répondrons dans les plus brefs délais.",

@@ -17,7 +17,7 @@ export default function Footer() {
 
     setIsSubscribing(true);
     try {
-      await apiRequest('POST', '/api/newsletter', { email });
+      await apiRequest('/api/newsletter', { method: 'POST', data: { email } });
       toast({
         title: "Inscription réussie !",
         description: "Merci de vous être inscrit à notre newsletter.",

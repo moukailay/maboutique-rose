@@ -68,7 +68,7 @@ export default function Checkout() {
       };
 
       // Save order to database
-      const response = await apiRequest('POST', '/api/orders', orderData);
+      const response = await apiRequest('/api/orders', { method: 'POST', data: orderData });
       const createdOrder = await response.json();
 
       setOrderId(createdOrder.id);

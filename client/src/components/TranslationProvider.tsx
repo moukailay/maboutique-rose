@@ -22,7 +22,7 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
   }, [language]);
 
   const t = (key: string): string => {
-    const translation = translations[language]?.[key];
+    const translation = translations[language]?.[key as keyof typeof translations[typeof language]];
     if (!translation) {
       console.warn(`Translation key "${key}" not found for language "${language}"`);
       return key;

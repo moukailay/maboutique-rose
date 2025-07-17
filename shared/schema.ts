@@ -25,7 +25,7 @@ export const categories = pgTable("categories", {
   description: text("description"),
   slug: text("slug").notNull().unique(),
   image: text("image"),
-  parentId: integer("parent_id").references(() => categories.id),
+  parentId: integer("parent_id"),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -70,6 +70,7 @@ export const reviews = pgTable("reviews", {
   userId: integer("user_id").references(() => users.id),
   rating: integer("rating").notNull(),
   comment: text("comment"),
+  isApproved: boolean("is_approved").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -79,6 +80,7 @@ export const contacts = pgTable("contacts", {
   email: text("email").notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -162,7 +164,7 @@ export const insertCategorySchema = createInsertSchema(categories).omit({
   id: true,
   createdAt: true,
 }).extend({
-  slug: z.string().optional(),
+  slug: z.string().min(1),
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({

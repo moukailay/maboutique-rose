@@ -98,7 +98,7 @@ export default function AdminDashboard() {
   const { data: orders = [] } = useQuery({
     queryKey: ['/api/orders'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/orders');
+      const response = await apiRequest('/api/orders');
       return response.json();
     }
   });
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
   const { data: customers = [] } = useQuery({
     queryKey: ['/api/admin/customers'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/customers');
+      const response = await apiRequest('/api/admin/customers');
       return response.json();
     }
   });
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
   const { data: contacts = [] } = useQuery({
     queryKey: ['/api/admin/contacts'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/contacts');
+      const response = await apiRequest('/api/admin/contacts');
       return response.json();
     }
   });
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
   const { data: reviews = [] } = useQuery({
     queryKey: ['/api/admin/reviews'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/reviews');
+      const response = await apiRequest('/api/admin/reviews');
       return response.json();
     }
   });
@@ -134,21 +134,21 @@ export default function AdminDashboard() {
   const { data: products = [] } = useQuery({
     queryKey: ['/api/products'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/products');
+      const response = await apiRequest('/api/products');
       return response.json();
     }
   });
 
   // Calculate statistics
-  const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
-  const recentOrders = orders.filter(order => {
+  const totalRevenue = orders.reduce((sum: number, order: any) => sum + parseFloat(order.total), 0);
+  const recentOrders = orders.filter((order: any) => {
     const orderDate = new Date(order.createdAt);
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     return orderDate > weekAgo;
   });
 
-  const unreadContacts = contacts.filter(contact => !contact.isRead).length;
-  const pendingReviews = reviews.filter(review => !review.isApproved).length;
+  const unreadContacts = contacts.filter((contact: any) => !contact.isRead).length;
+  const pendingReviews = reviews.filter((review: any) => !review.isApproved).length;
 
   return (
     <AdminLayout>
