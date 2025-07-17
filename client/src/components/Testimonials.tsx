@@ -172,7 +172,9 @@ export default function Testimonials() {
     );
   }
 
-  if (testimonials.length === 0) {
+  const activeTestimonials = testimonials.filter((testimonial: Testimonial) => testimonial.isActive);
+  
+  if (activeTestimonials.length === 0) {
     return null;
   }
 
@@ -201,8 +203,10 @@ export default function Testimonials() {
 
         {/* Testimonials grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial: Testimonial) => (
-            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          {activeTestimonials
+            .sort((a: Testimonial, b: Testimonial) => a.sortOrder - b.sortOrder)
+            .map((testimonial: Testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
       </div>

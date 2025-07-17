@@ -29,8 +29,16 @@ export async function apiRequest(
   const authToken = localStorage.getItem('authToken');
   const headers: Record<string, string> = {};
   
+  let body: string | FormData | undefined;
+  
   if (data) {
-    headers["Content-Type"] = "application/json";
+    if (data instanceof FormData) {
+      // Don't set Content-Type for FormData, let browser set it with boundary
+      body = data;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(data);
+    }
   }
   
   if (authToken) {
@@ -40,7 +48,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    body,
     credentials: "include",
   });
 
