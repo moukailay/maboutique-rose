@@ -641,16 +641,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Route pour répondre à un message de chat
   app.post('/api/chat/messages/:id/response', async (req, res) => {
     try {
-      // Vérification JWT au lieu de req.isAuthenticated()
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Token required' });
-      }
-
-      const token = authHeader.substring(7);
-      const user = await storage.verifyToken(token);
+      // Vérification du token comme dans /api/auth/verify
+      const token = req.headers.authorization?.replace('Bearer ', '');
       
-      if (!user || user.role !== 'admin') {
+      console.log('Token verification attempt:', { token: token ? 'presente' : 'absente', length: token?.length });
+      
+      if (!token || !token.startsWith('fake-jwt-token-')) {
+        console.log('Token invalid or missing');
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+      
+      const userId = parseInt(token.replace('fake-jwt-token-', ''));
+      console.log('Extracting user ID from token:', userId);
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        console.log('User not found:', userId);
+        return res.status(401).json({ error: 'User not found' });
+      }
+      
+      console.log('User verification successful:', user.email);
+      
+      if (user.role !== 'admin') {
         return res.status(401).json({ error: 'Admin access required' });
       }
 
