@@ -19,8 +19,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero Section with Carousel */}
-      <section className="py-8 px-6">
+      {/* Hero Section with Carousel - Full Width */}
+      <section className="w-full">
         <HeroCarousel />
       </section>
 

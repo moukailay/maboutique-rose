@@ -95,7 +95,7 @@ export default function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[400px] md:h-[500px] lg:h-[650px] xl:h-[700px] rounded-lg overflow-hidden group bg-rose-50 dark:bg-rose-950">
+    <div className="relative h-[400px] md:h-[500px] lg:h-[650px] xl:h-[700px] w-full overflow-hidden group bg-rose-50 dark:bg-rose-950">
       {/* Slides */}
       <div className="relative h-full">
         {activeSlides.map((slide, index) => (
@@ -117,7 +117,7 @@ export default function HeroCarousel() {
                   <img
                     src={imageUrl}
                     alt={`${slide.title} - Image ${imageIndex + 1}`}
-                    className="w-full h-full object-contain md:object-cover lg:object-contain xl:object-contain"
+                    className="w-full h-full object-cover lg:object-contain 2xl:object-cover"
                     loading="lazy"
                   />
                 </div>
