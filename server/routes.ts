@@ -638,6 +638,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route pour répondre à un message de chat
+  app.post('/api/chat/messages/:id/response', async (req, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== 'admin') {
+        return res.status(401).json({ error: 'Admin access required' });
+      }
+
+      const messageId = parseInt(req.params.id);
+      const { response } = req.body;
+      
+      if (!response || response.trim() === '') {
+        return res.status(400).json({ error: 'Response cannot be empty' });
+      }
+
+      const updatedMessage = await storage.respondToChatMessage(
+        messageId, 
+        response.trim(), 
+        req.user.id
+      );
+      
+      if (!updatedMessage) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+      
+      res.json(updatedMessage);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Testimonials routes
   app.get("/api/testimonials", async (req, res) => {
     try {

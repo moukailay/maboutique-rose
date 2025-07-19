@@ -97,6 +97,9 @@ export const chatMessages = pgTable("chat_messages", {
   url: text("url"),
   ipAddress: text("ip_address"),
   isRead: boolean("is_read").notNull().default(false),
+  adminResponse: text("admin_response"),
+  respondedAt: timestamp("responded_at"),
+  respondedBy: integer("responded_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -178,6 +181,13 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   }),
 }));
 
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  respondedByUser: one(users, {
+    fields: [chatMessages.respondedBy],
+    references: [users.id],
+  }),
+}));
+
 export const testimonialsRelations = relations(testimonials, ({ one }) => ({
   product: one(products, {
     fields: [testimonials.productId],
@@ -230,6 +240,7 @@ export const insertNewsletterSchema = createInsertSchema(newsletters).omit({
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   id: true,
   createdAt: true,
+  respondedAt: true,
 });
 
 export const insertTestimonialSchema = createInsertSchema(testimonials).omit({

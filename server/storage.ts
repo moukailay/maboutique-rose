@@ -86,6 +86,7 @@ export interface IStorage {
   getChatMessages(): Promise<ChatMessage[]>;
   createChatMessage(chatMessage: InsertChatMessage): Promise<ChatMessage>;
   markChatMessageAsRead(id: number): Promise<ChatMessage | undefined>;
+  respondToChatMessage(id: number, response: string, adminId: number): Promise<ChatMessage | undefined>;
 
   // Auth
   createUserWithAuth(userData: {
@@ -620,6 +621,20 @@ export class DatabaseStorage implements IStorage {
   async markChatMessageAsRead(id: number): Promise<ChatMessage | undefined> {
     const [chatMessage] = await db.update(chatMessages).set({ isRead: true }).where(eq(chatMessages.id, id)).returning();
     return chatMessage || undefined;
+  }
+
+  async respondToChatMessage(id: number, response: string, adminId: number): Promise<ChatMessage | undefined> {
+    const [updated] = await db
+      .update(chatMessages)
+      .set({ 
+        adminResponse: response,
+        respondedAt: new Date(),
+        respondedBy: adminId,
+        isRead: true
+      })
+      .where(eq(chatMessages.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   // Admin specific methods
