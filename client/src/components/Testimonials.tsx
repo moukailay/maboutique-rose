@@ -8,12 +8,18 @@ interface Testimonial {
   name: string;
   title?: string;
   content: string;
+  productId?: number;
   image?: string;
   videoUrl?: string;
   rating: number;
   isActive: boolean;
   sortOrder: number;
   createdAt: string;
+  product?: {
+    id: number;
+    name: string;
+    images: string[];
+  };
 }
 
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
@@ -48,19 +54,19 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
       </div>
 
       <div className="relative z-10">
-        {/* Profile section */}
+        {/* Product section */}
         <div className="flex items-center mb-4">
-          {testimonial.image ? (
+          {testimonial.product?.images?.[0] ? (
             <div className="relative">
               <img
-                src={testimonial.image}
-                alt={testimonial.name}
-                className="w-16 h-16 rounded-full object-cover border-3 border-rose-200 dark:border-rose-600 shadow-lg transform group-hover:scale-110 transition-transform duration-500"
+                src={testimonial.product.images[0]}
+                alt={testimonial.product.name}
+                className="w-16 h-16 rounded-lg object-cover border-2 border-rose-200 dark:border-rose-600 shadow-lg transform group-hover:scale-110 transition-transform duration-500"
               />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-rose-300/20 to-pink-300/20 group-hover:from-rose-300/40 group-hover:to-pink-300/40 transition-all duration-500" />
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-rose-300/20 to-pink-300/20 group-hover:from-rose-300/40 group-hover:to-pink-300/40 transition-all duration-500" />
             </div>
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:scale-110 transition-transform duration-500">
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg transform group-hover:scale-110 transition-transform duration-500">
               {testimonial.name.charAt(0)}
             </div>
           )}
@@ -69,7 +75,11 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
             <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-300">
               {testimonial.name}
             </h3>
-            {testimonial.title && (
+            {testimonial.product?.name ? (
+              <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">
+                {testimonial.product.name}
+              </p>
+            ) : testimonial.title && (
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 {testimonial.title}
               </p>

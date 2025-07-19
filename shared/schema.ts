@@ -105,7 +105,8 @@ export const testimonials = pgTable("testimonials", {
   name: text("name").notNull(),
   title: text("title"), // Job title or location
   content: text("content").notNull(),
-  image: text("image"), // Profile image URL
+  productId: integer("product_id").references(() => products.id), // Product being reviewed
+  image: text("image"), // Profile image URL (optional)
   videoUrl: text("video_url"), // Video testimonial URL
   rating: integer("rating").notNull().default(5),
   isActive: boolean("is_active").notNull().default(true),
@@ -174,6 +175,13 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   user: one(users, {
     fields: [reviews.userId],
     references: [users.id],
+  }),
+}));
+
+export const testimonialsRelations = relations(testimonials, ({ one }) => ({
+  product: one(products, {
+    fields: [testimonials.productId],
+    references: [products.id],
   }),
 }));
 

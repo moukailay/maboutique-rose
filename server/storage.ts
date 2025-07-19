@@ -653,10 +653,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Testimonials
-  async getTestimonials(): Promise<Testimonial[]> {
+  async getTestimonials(): Promise<(Testimonial & { product?: Product })[]> {
     return await db
-      .select()
+      .select({
+        id: testimonials.id,
+        name: testimonials.name,
+        title: testimonials.title,
+        content: testimonials.content,
+        productId: testimonials.productId,
+        image: testimonials.image,
+        videoUrl: testimonials.videoUrl,
+        rating: testimonials.rating,
+        isActive: testimonials.isActive,
+        sortOrder: testimonials.sortOrder,
+        createdAt: testimonials.createdAt,
+        product: {
+          id: products.id,
+          name: products.name,
+          images: products.images,
+        },
+      })
       .from(testimonials)
+      .leftJoin(products, eq(testimonials.productId, products.id))
       .where(eq(testimonials.isActive, true))
       .orderBy(testimonials.sortOrder, testimonials.createdAt);
   }
