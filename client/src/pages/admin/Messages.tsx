@@ -79,24 +79,30 @@ export default function AdminMessages() {
   const { data: chatMessages = [], isLoading: loadingChatMessages, error: chatError } = useQuery({
     queryKey: ['/api/chat/messages'],
     queryFn: async () => {
-      console.log('Fetching chat messages...');
-      const response = await apiRequest('GET', '/api/chat/messages');
-      console.log('Chat messages response status:', response.status);
-      console.log('Chat messages response headers:', response.headers.get('content-type'));
+      // Force request to Express server by using absolute URL
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/api/chat/messages`;
       
-      // Check if response is HTML instead of JSON
-      const text = await response.text();
-      console.log('Raw response text (first 200 chars):', text.substring(0, 200));
+      const authToken = localStorage.getItem('authToken');
+      const headers: Record<string, string> = {};
       
-      try {
-        const data = JSON.parse(text);
-        console.log('Chat messages data parsed successfully:', data);
-        return data;
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Full response text:', text);
-        throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`;
       }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Chat messages loaded successfully:', data.length, 'messages');
+      return data;
     }
   });
 
@@ -411,13 +417,6 @@ export default function AdminMessages() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 text-xs">
-                  DEBUG: loadingChatMessages={loadingChatMessages.toString()}, chatMessages.length={chatMessages.length}
-                  <br />
-                  Error: {chatError ? String(chatError) : 'No error'}
-                  <br />
-                  Messages: {JSON.stringify(chatMessages.slice(0, 2), null, 2)}
-                </div>
                 {loadingChatMessages ? (
                   <div className="flex items-center justify-center h-32">
                     <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
