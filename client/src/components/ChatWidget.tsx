@@ -5,11 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 
+interface ChatMessage {
+  id: number;
+  message: string;
+  adminResponse?: string;
+  respondedAt?: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'support';
+  sender: 'user' | 'support' | 'admin';
   timestamp: Date;
+  isFromDatabase?: boolean;
 }
 
 export default function ChatWidget() {
@@ -19,6 +29,8 @@ export default function ChatWidget() {
   const [isTyping, setIsTyping] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [messageCounter, setMessageCounter] = useState(0);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [hasNewAdminResponse, setHasNewAdminResponse] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const { t, language } = useTranslation();
@@ -31,6 +43,69 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Récupérer les messages de chat depuis la base de données
+  const fetchChatMessages = async () => {
+    try {
+      const response = await fetch('/api/chat/messages/user', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const dbMessages = await response.json();
+        setChatMessages(dbMessages);
+        
+        // Convertir les messages de la base de données en format Message
+        const convertedMessages: Message[] = [];
+        
+        dbMessages.forEach((chatMsg: ChatMessage) => {
+          // Ajouter le message utilisateur
+          convertedMessages.push({
+            id: `db-user-${chatMsg.id}`,
+            text: chatMsg.message,
+            sender: 'user',
+            timestamp: new Date(chatMsg.createdAt),
+            isFromDatabase: true
+          });
+          
+          // Ajouter la réponse admin si elle existe
+          if (chatMsg.adminResponse) {
+            convertedMessages.push({
+              id: `db-admin-${chatMsg.id}`,
+              text: chatMsg.adminResponse,
+              sender: 'admin',
+              timestamp: new Date(chatMsg.respondedAt || chatMsg.createdAt),
+              isFromDatabase: true
+            });
+          }
+        });
+        
+        // Remplacer les messages existants par ceux de la base de données
+        setMessages(convertedMessages);
+        
+        // Vérifier s'il y a de nouvelles réponses admin
+        const hasNewResponses = dbMessages.some((msg: ChatMessage) => 
+          msg.adminResponse && !msg.isRead
+        );
+        setHasNewAdminResponse(hasNewResponses);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des messages:', error);
+    }
+  };
+
+  // Récupérer les messages au chargement du composant et périodiquement
+  useEffect(() => {
+    fetchChatMessages();
+    
+    // Vérifier les nouvelles réponses toutes les 10 secondes
+    const interval = setInterval(fetchChatMessages, 10000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Gestionnaire de clic extérieur pour fermer le chat
   useEffect(() => {
@@ -51,7 +126,8 @@ export default function ChatWidget() {
 
   // Messages d'accueil automatiques avec séquence
   useEffect(() => {
-    if (messages.length === 0) {
+    // Seulement afficher les messages d'accueil s'il n'y a pas de messages de la DB
+    if (messages.length === 0 && chatMessages.length === 0) {
       const welcomeMessage1: Message = {
         id: `welcome-${messageCounter}`,
         text: t('chat.welcome'),
@@ -74,7 +150,14 @@ export default function ChatWidget() {
         setMessageCounter(prev => prev + 1);
       }, 1500);
     }
-  }, [t, messageCounter, messages.length]);
+  }, [t, messageCounter, messages.length, chatMessages.length]);
+
+  // Marquer les nouvelles réponses comme vues quand on ouvre le chat
+  useEffect(() => {
+    if (isOpen && hasNewAdminResponse) {
+      setHasNewAdminResponse(false);
+    }
+  }, [isOpen, hasNewAdminResponse]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -109,6 +192,11 @@ export default function ChatWidget() {
           url: window.location.href
         }),
       });
+      
+      // Récupérer les messages mis à jour après l'envoi
+      setTimeout(() => {
+        fetchChatMessages();
+      }, 500);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde du message:', error);
     }
@@ -166,6 +254,11 @@ export default function ChatWidget() {
             {isOnline && !isOpen && (
               <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
             )}
+            {hasNewAdminResponse && !isOpen && (
+              <div className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                <span className="text-xs text-white font-bold">!</span>
+              </div>
+            )}
           </Button>
           
           {/* Tooltip d'aide */}
@@ -219,9 +312,17 @@ export default function ChatWidget() {
                     key={message.id}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} items-start space-x-2`}
                   >
-                    {message.sender === 'support' && (
-                      <div className="w-8 h-8 bg-rose-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Headphones className="h-4 w-4 text-white" />
+                    {(message.sender === 'support' || message.sender === 'admin') && (
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.sender === 'admin' 
+                          ? 'bg-blue-600' 
+                          : 'bg-rose-primary'
+                      }`}>
+                        {message.sender === 'admin' ? (
+                          <User className="h-4 w-4 text-white" />
+                        ) : (
+                          <Headphones className="h-4 w-4 text-white" />
+                        )}
                       </div>
                     )}
                     
@@ -230,16 +331,23 @@ export default function ChatWidget() {
                         className={`px-4 py-2 rounded-2xl text-sm ${
                           message.sender === 'user'
                             ? 'bg-rose-primary text-white rounded-br-md'
+                            : message.sender === 'admin'
+                            ? 'bg-blue-50 border border-blue-200 text-blue-900 rounded-bl-md dark:bg-blue-900 dark:text-blue-100'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-md'
                         }`}
                       >
                         {message.text}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1 px-2">
-                        {message.timestamp.toLocaleTimeString('fr-CA', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
+                      <div className="text-xs text-gray-500 mt-1 px-2 flex items-center justify-between">
+                        <span>
+                          {message.timestamp.toLocaleTimeString('fr-CA', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </span>
+                        {message.sender === 'admin' && (
+                          <span className="text-blue-600 font-medium text-xs">Admin</span>
+                        )}
                       </div>
                     </div>
                     

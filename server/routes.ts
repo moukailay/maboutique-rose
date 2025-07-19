@@ -555,6 +555,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route publique pour récupérer les messages du chat côté client
+  app.get('/api/chat/messages/user', async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Admin API endpoints
   app.get("/api/admin/customers", async (req, res) => {
     try {
