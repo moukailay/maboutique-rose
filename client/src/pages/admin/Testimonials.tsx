@@ -221,6 +221,7 @@ export default function AdminTestimonials() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
       toast({
         title: "Témoignage créé",
         description: "Le témoignage a été ajouté avec succès.",
@@ -246,6 +247,7 @@ export default function AdminTestimonials() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
       toast({
         title: "Témoignage modifié",
         description: "Le témoignage a été modifié avec succès.",
@@ -267,6 +269,7 @@ export default function AdminTestimonials() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
       toast({
         title: "Témoignage supprimé",
         description: "Le témoignage a été supprimé avec succès.",

@@ -143,6 +143,16 @@ Currency: All prices displayed in Canadian Dollars (CAD).
 - Order confirmation displays actual order ID for customer reference
 - System tested with multiple test orders showing different statuses and customer information
 
+### Enhanced Testimonials System with Cache Management (January 2025)
+- Fixed critical cache invalidation issue where admin testimonial changes didn't reflect on homepage
+- Created separate API endpoints: /api/testimonials (active only) vs /api/admin/testimonials (all testimonials)
+- Implemented getAllTestimonials() method in storage for complete admin access
+- Added dual cache invalidation on admin operations to update both admin interface and public homepage
+- Enhanced admin interface with visual status indicators (VISIBLE/MASQUÉ labels)
+- Created functional modal system for detailed testimonial viewing with image/content layout
+- Redesigned testimonials to social media format with large product images and text below
+- Real-time synchronization between admin changes and public display without manual refresh required
+
 ### Mobile-Responsive Admin Dashboard (January 2025)
 - Transformed admin dashboard into fully mobile-responsive interface
 - Added hamburger menu with collapsible sidebar for mobile navigation
