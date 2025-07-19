@@ -76,11 +76,15 @@ export default function AdminMessages() {
   });
 
   // Fetch chat messages
-  const { data: chatMessages = [], isLoading: loadingChatMessages } = useQuery({
+  const { data: chatMessages = [], isLoading: loadingChatMessages, error: chatError } = useQuery({
     queryKey: ['/api/chat/messages'],
     queryFn: async () => {
+      console.log('Fetching chat messages...');
       const response = await apiRequest('GET', '/api/chat/messages');
-      return response.json();
+      console.log('Chat messages response status:', response.status);
+      const data = await response.json();
+      console.log('Chat messages data:', data);
+      return data;
     }
   });
 
@@ -397,6 +401,8 @@ export default function AdminMessages() {
               <CardContent>
                 <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 text-xs">
                   DEBUG: loadingChatMessages={loadingChatMessages.toString()}, chatMessages.length={chatMessages.length}
+                  <br />
+                  Error: {chatError ? String(chatError) : 'No error'}
                   <br />
                   Messages: {JSON.stringify(chatMessages.slice(0, 2), null, 2)}
                 </div>
