@@ -40,7 +40,7 @@ export default function AdminHeroSlides() {
 
   const createSlideMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await apiRequest('POST', '/api/hero-slides', data);
+      const response = await apiRequest('/api/hero-slides', { method: 'POST', data });
       return response.json();
     },
     onSuccess: () => {
@@ -63,7 +63,7 @@ export default function AdminHeroSlides() {
 
   const updateSlideMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: FormData }) => {
-      const response = await apiRequest('PUT', `/api/hero-slides/${id}`, data);
+      const response = await apiRequest(`/api/hero-slides/${id}`, { method: 'PUT', data });
       return response.json();
     },
     onSuccess: () => {
@@ -87,7 +87,7 @@ export default function AdminHeroSlides() {
 
   const deleteSlideMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest('DELETE', `/api/hero-slides/${id}`);
+      const response = await apiRequest(`/api/hero-slides/${id}`, { method: 'DELETE' });
       return response.json();
     },
     onSuccess: () => {
