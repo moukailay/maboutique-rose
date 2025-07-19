@@ -82,9 +82,21 @@ export default function AdminMessages() {
       console.log('Fetching chat messages...');
       const response = await apiRequest('GET', '/api/chat/messages');
       console.log('Chat messages response status:', response.status);
-      const data = await response.json();
-      console.log('Chat messages data:', data);
-      return data;
+      console.log('Chat messages response headers:', response.headers.get('content-type'));
+      
+      // Check if response is HTML instead of JSON
+      const text = await response.text();
+      console.log('Raw response text (first 200 chars):', text.substring(0, 200));
+      
+      try {
+        const data = JSON.parse(text);
+        console.log('Chat messages data parsed successfully:', data);
+        return data;
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Full response text:', text);
+        throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
+      }
     }
   });
 
