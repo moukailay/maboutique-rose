@@ -104,7 +104,8 @@ export interface IStorage {
   updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined>;
 
   // Testimonials
-  getTestimonials(): Promise<Testimonial[]>;
+  getTestimonials(): Promise<(Testimonial & { product?: Product })[]>;
+  getAllTestimonials(): Promise<(Testimonial & { product?: Product })[]>;
   getTestimonial(id: number): Promise<Testimonial | undefined>;
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
   updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined>;
@@ -676,6 +677,31 @@ export class DatabaseStorage implements IStorage {
       .from(testimonials)
       .leftJoin(products, eq(testimonials.productId, products.id))
       .where(eq(testimonials.isActive, true))
+      .orderBy(testimonials.sortOrder, testimonials.createdAt);
+  }
+
+  async getAllTestimonials(): Promise<(Testimonial & { product?: Product })[]> {
+    return await db
+      .select({
+        id: testimonials.id,
+        name: testimonials.name,
+        title: testimonials.title,
+        content: testimonials.content,
+        productId: testimonials.productId,
+        image: testimonials.image,
+        videoUrl: testimonials.videoUrl,
+        rating: testimonials.rating,
+        isActive: testimonials.isActive,
+        sortOrder: testimonials.sortOrder,
+        createdAt: testimonials.createdAt,
+        product: {
+          id: products.id,
+          name: products.name,
+          images: products.images,
+        },
+      })
+      .from(testimonials)
+      .leftJoin(products, eq(testimonials.productId, products.id))
       .orderBy(testimonials.sortOrder, testimonials.createdAt);
   }
 

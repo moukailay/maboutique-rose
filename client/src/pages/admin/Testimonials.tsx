@@ -204,9 +204,9 @@ export default function AdminTestimonials() {
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | undefined>();
 
   const { data: testimonials = [], isLoading } = useQuery({
-    queryKey: ['/api/testimonials'],
+    queryKey: ['/api/admin/testimonials'],
     queryFn: async () => {
-      const response = await apiRequest('/api/testimonials');
+      const response = await apiRequest('/api/admin/testimonials');
       return response.json();
     }
   });
@@ -220,7 +220,7 @@ export default function AdminTestimonials() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
       toast({
         title: "Témoignage créé",
         description: "Le témoignage a été ajouté avec succès.",
@@ -245,7 +245,7 @@ export default function AdminTestimonials() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
       toast({
         title: "Témoignage modifié",
         description: "Le témoignage a été modifié avec succès.",
@@ -266,7 +266,7 @@ export default function AdminTestimonials() {
       await apiRequest(`/api/testimonials/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/testimonials'] });
       toast({
         title: "Témoignage supprimé",
         description: "Le témoignage a été supprimé avec succès.",

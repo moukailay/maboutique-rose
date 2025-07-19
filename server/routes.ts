@@ -648,6 +648,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route to get ALL testimonials (active and inactive)
+  app.get("/api/admin/testimonials", async (req, res) => {
+    try {
+      const testimonials = await storage.getAllTestimonials();
+      res.json(testimonials);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching all testimonials", error: error.message });
+    }
+  });
+
   app.get("/api/testimonials/:id", async (req, res) => {
     try {
       const testimonialId = parseInt(req.params.id);
