@@ -169,10 +169,11 @@ export default function AdminMessages() {
   const unreadChatMessages = chatMessages.filter(message => !message.isRead).length;
   const unansweredChatMessages = chatMessages.filter(message => !message.adminResponse).length;
 
-  const filteredChatMessages = chatMessages.filter(message =>
-    message.message?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    message.adminResponse?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredChatMessages = chatMessages.filter(message => {
+    if (!searchQuery.trim()) return true; // Show all if no search query
+    return message.message?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           (message.adminResponse && message.adminResponse.toLowerCase().includes(searchQuery.toLowerCase()));
+  });
 
   return (
     <AdminLayout>
@@ -398,7 +399,7 @@ export default function AdminMessages() {
                   <div className="flex items-center justify-center h-32">
                     <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
                   </div>
-                ) : filteredChatMessages.length === 0 ? (
+                ) : chatMessages.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-text-medium">Aucun message de chat trouvé</p>
                   </div>
@@ -414,7 +415,7 @@ export default function AdminMessages() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredChatMessages.map((message) => (
+                      {chatMessages.map((message) => (
                         <TableRow key={message.id}>
                           <TableCell>
                             {message.adminResponse ? (
