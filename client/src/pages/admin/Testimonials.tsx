@@ -368,7 +368,8 @@ export default function AdminTestimonials() {
         
         <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
           <span>Total: {testimonials.length}</span>
-          <span>Actifs: {testimonials.filter((t: Testimonial) => t.isActive).length}</span>
+          <span className="text-green-600 dark:text-green-400">Actifs: {testimonials.filter((t: Testimonial) => t.isActive).length}</span>
+          <span className="text-gray-500 dark:text-gray-500">Inactifs: {testimonials.filter((t: Testimonial) => !t.isActive).length}</span>
         </div>
       </div>
 
@@ -398,7 +399,11 @@ export default function AdminTestimonials() {
           {filteredTestimonials.map((testimonial: Testimonial) => (
             <div
               key={testimonial.id}
-              className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+              className={`rounded-lg p-6 shadow-sm border hover:shadow-md transition-all ${
+                testimonial.isActive 
+                  ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" 
+                  : "bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 opacity-75"
+              }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
@@ -427,9 +432,15 @@ export default function AdminTestimonials() {
                 
                 <div className="flex items-center space-x-2">
                   {testimonial.isActive ? (
-                    <Eye className="w-4 h-4 text-green-500" />
+                    <div className="flex items-center space-x-1">
+                      <Eye className="w-4 h-4 text-green-500" />
+                      <span className="text-xs font-medium text-green-600 dark:text-green-400">VISIBLE</span>
+                    </div>
                   ) : (
-                    <EyeOff className="w-4 h-4 text-gray-400" />
+                    <div className="flex items-center space-x-1">
+                      <EyeOff className="w-4 h-4 text-gray-400" />
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">MASQUÉ</span>
+                    </div>
                   )}
                   {testimonial.videoUrl && (
                     <Video className="w-4 h-4 text-blue-500" />
