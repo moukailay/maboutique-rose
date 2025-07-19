@@ -44,97 +44,125 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   };
 
   return (
-    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 p-6 border border-gray-100 dark:border-gray-700">
-      {/* Subtle 3D effect with gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-50/50 via-transparent to-pink-50/50 dark:from-rose-900/20 dark:via-transparent dark:to-pink-900/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      {/* Quote icon */}
-      <div className="absolute -top-4 -left-4 w-8 h-8 bg-rose-400 dark:bg-rose-500 rounded-full flex items-center justify-center shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform duration-500">
-        <Quote className="w-4 h-4 text-white" />
-      </div>
+    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
+      {/* Grande image du témoignage (photo client) */}
+      {testimonial.image && (
+        <div className="relative">
+          <img
+            src={testimonial.image}
+            alt={`Témoignage de ${testimonial.name}`}
+            className="w-full h-64 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        </div>
+      )}
 
-      <div className="relative z-10">
-        {/* Product section */}
-        <div className="flex items-center mb-4">
-          {testimonial.product?.images?.[0] ? (
-            <div className="relative">
-              <img
-                src={testimonial.product.images[0]}
-                alt={testimonial.product.name}
-                className="w-16 h-16 rounded-lg object-cover border-2 border-rose-200 dark:border-rose-600 shadow-lg transform group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-rose-300/20 to-pink-300/20 group-hover:from-rose-300/40 group-hover:to-pink-300/40 transition-all duration-500" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg transform group-hover:scale-110 transition-transform duration-500">
+      {/* Contenu */}
+      <div className="p-6">
+        {/* Informations client */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
               {testimonial.name.charAt(0)}
             </div>
-          )}
-          
-          <div className="ml-4 flex-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-300">
-              {testimonial.name}
-            </h3>
-            {testimonial.product?.name ? (
-              <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">
-                {testimonial.product.name}
-              </p>
-            ) : testimonial.title && (
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {testimonial.title}
-              </p>
-            )}
-            <div className="flex items-center mt-1">
+            <div className="ml-3">
+              <div className="flex items-center">
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  {testimonial.name}
+                </h3>
+                <div className="w-4 h-4 ml-2 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              {testimonial.title && (
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {testimonial.title}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center mb-1">
               {renderStars(testimonial.rating)}
             </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {new Date(testimonial.createdAt).toLocaleDateString('fr-FR')}
+            </p>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="relative">
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 transform group-hover:translate-x-1 transition-transform duration-300">
-            "{testimonial.content}"
+        {/* Texte du témoignage */}
+        <div className="mb-4">
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {testimonial.content}
           </p>
-          
-          {/* Video section */}
-          {testimonial.videoUrl && (
-            <div className="mt-4">
-              {!showVideo ? (
-                <button
-                  onClick={handleVideoPlay}
-                  className="w-full relative overflow-hidden rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 text-white py-3 px-4 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group/btn"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                      <path d="M6.271 5.055a.5.5 0 0 1 .52-.014L11 7.055a.5.5 0 0 1 0 .89L6.791 9.959a.5.5 0 0 1-.791-.389V5.5a.5.5 0 0 1 .271-.445z"/>
-                    </svg>
-                    Voir le témoignage vidéo
-                  </span>
-                </button>
-              ) : (
-                <div className="relative rounded-lg overflow-hidden shadow-xl">
-                  {isVideoLoading && (
-                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
-                      <div className="w-8 h-8 border-4 border-rose-400 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  )}
-                  <iframe
-                    src={testimonial.videoUrl}
-                    className="w-full h-48 rounded-lg"
-                    frameBorder="0"
-                    allowFullScreen
-                    onLoad={() => setIsVideoLoading(false)}
-                  />
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* 3D depth effect */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/5 to-pink-500/5 transform translate-x-1 translate-y-1 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500" />
+        {/* Réponse de l'entreprise (si applicable) */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border-l-4 border-rose-400">
+          <div className="flex items-center mb-2">
+            <div className="w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">R</span>
+            </div>
+            <span className="ml-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+              Rose-d'Éden a répondu:
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {testimonial.product?.name ? 
+              `Merci ${testimonial.name.split(' ')[0]} ! Nous sommes ravis que notre ${testimonial.product.name} vous donne satisfaction. Continuez à prendre soin de vous naturellement ! 🌹` :
+              `Merci beaucoup ${testimonial.name.split(' ')[0]} pour ce merveilleux témoignage ! Votre confiance nous encourage à continuer d'offrir les meilleurs produits naturels. 🌿`
+            }
+          </p>
+        </div>
+
+        {/* Nom du produit si disponible */}
+        {testimonial.product?.name && (
+          <div className="mt-4 flex items-center justify-center">
+            <div className="bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium text-rose-600 dark:text-rose-400">
+                {testimonial.product.name}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Video section */}
+        {testimonial.videoUrl && (
+          <div className="mt-4">
+            {!showVideo ? (
+              <button
+                onClick={handleVideoPlay}
+                className="w-full relative overflow-hidden rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 text-white py-3 px-4 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group/btn"
+              >
+                <span className="relative flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M6.271 5.055a.5.5 0 0 1 .52-.014L11 7.055a.5.5 0 0 1 0 .89L6.791 9.959a.5.5 0 0 1-.791-.389V5.5a.5.5 0 0 1 .271-.445z"/>
+                  </svg>
+                  Voir le témoignage vidéo
+                </span>
+              </button>
+            ) : (
+              <div className="relative rounded-lg overflow-hidden shadow-xl">
+                {isVideoLoading && (
+                  <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+                    <div className="w-8 h-8 border-4 border-rose-400 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                <iframe
+                  src={testimonial.videoUrl}
+                  className="w-full h-48 rounded-lg"
+                  frameBorder="0"
+                  allowFullScreen
+                  onLoad={() => setIsVideoLoading(false)}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -211,8 +239,8 @@ export default function Testimonials() {
           </p>
         </div>
 
-        {/* Testimonials grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Testimonials grid - Format post/avis */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {activeTestimonials
             .sort((a: Testimonial, b: Testimonial) => a.sortOrder - b.sortOrder)
             .map((testimonial: Testimonial) => (
