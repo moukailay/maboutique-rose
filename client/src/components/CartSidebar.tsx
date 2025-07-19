@@ -2,9 +2,11 @@ import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/cart';
 import { Link } from 'wouter';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function CartSidebar() {
   const { items, isOpen, toggleCart, updateQuantity, removeItem, getTotalPrice } = useCart();
+  const { t } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -20,7 +22,7 @@ export default function CartSidebar() {
       <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-50 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-text-dark">Panier</h2>
+          <h2 className="text-lg font-semibold text-text-dark">{t('nav.cart')}</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -35,10 +37,10 @@ export default function CartSidebar() {
         <div className="flex-1 overflow-y-auto p-6">
           {items.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-text-medium">Votre panier est vide</p>
+              <p className="text-text-medium">{t('cart.empty')}</p>
               <Link href="/products">
                 <Button className="mt-4 bg-rose-primary hover:bg-rose-light">
-                  Découvrir nos produits
+                  {t('cart.empty.cta')}
                 </Button>
               </Link>
             </div>
@@ -92,7 +94,7 @@ export default function CartSidebar() {
         {items.length > 0 && (
           <div className="p-6 border-t border-gray-200">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-semibold text-text-dark">Total:</span>
+              <span className="text-lg font-semibold text-text-dark">{t('cart.total')}:</span>
               <span className="text-lg font-bold text-rose-primary">
                 {getTotalPrice().toFixed(2)} CAD
               </span>
@@ -102,7 +104,7 @@ export default function CartSidebar() {
                 className="w-full bg-rose-primary hover:bg-rose-light"
                 onClick={toggleCart}
               >
-                Procéder au paiement
+                {t('cart.checkout')}
               </Button>
             </Link>
           </div>

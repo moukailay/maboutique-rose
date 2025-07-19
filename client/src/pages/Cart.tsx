@@ -3,9 +3,11 @@ import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCart } from '@/lib/cart';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCart();
+  const { t } = useTranslation();
 
   if (items.length === 0) {
     return (
@@ -14,14 +16,14 @@ export default function Cart() {
           <div className="text-center py-16">
             <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-text-dark mb-4">
-              Votre panier est vide
+              {t('cart.empty')}
             </h1>
             <p className="text-lg text-text-medium mb-8">
-              Découvrez nos produits naturels et ajoutez-les à votre panier.
+              {t('cart.empty.text')}
             </p>
             <Link href="/products">
               <Button className="bg-rose-primary hover:bg-rose-light">
-                Découvrir nos produits
+                {t('cart.empty.cta')}
               </Button>
             </Link>
           </div>
@@ -35,10 +37,10 @@ export default function Cart() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-text-dark mb-2">
-            Votre Panier
+            {t('cart.title')}
           </h1>
           <p className="text-lg text-text-medium">
-            {items.length} article{items.length > 1 ? 's' : ''} dans votre panier
+            {items.length} {t('cart.item_count')}{items.length > 1 ? t('cart.items_count') : ''} {t('cart.in_cart')}
           </p>
         </div>
 

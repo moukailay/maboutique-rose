@@ -14,8 +14,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Contact() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,11 +58,10 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Contactez-nous
+            {t('contact.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Une question ? Un conseil ? Notre équipe est là pour vous
-            accompagner.
+            {t('contact.subtitle')}
           </p>
         </div>
 
@@ -69,14 +70,14 @@ export default function Contact() {
           <Card className="shadow-lg bg-white dark:bg-gray-800 border-0">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                Envoyez-nous un message
+                {t('contact.form.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="name" className="text-gray-900 dark:text-white">
-                    Nom complet *
+                    {t('contact.form.name')}
                   </Label>
                   <Input
                     id="name"
@@ -90,7 +91,7 @@ export default function Contact() {
 
                 <div>
                   <Label htmlFor="email" className="text-gray-900 dark:text-white">
-                    Adresse email *
+                    {t('contact.form.email')}
                   </Label>
                   <Input
                     id="email"
@@ -104,26 +105,26 @@ export default function Contact() {
 
                 <div>
                   <Label htmlFor="subject" className="text-gray-900 dark:text-white">
-                    Sujet *
+                    {t('contact.form.subject')}
                   </Label>
                   <Select
                     value={formData.subject}
                     onValueChange={(value) => handleChange("subject", value)}
                   >
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Choisir un sujet" />
+                      <SelectValue placeholder={t('contact.form.subject_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="general">Demande générale</SelectItem>
-                      <SelectItem value="product">Question produit</SelectItem>
-                      <SelectItem value="order">Problème commande</SelectItem>
+                      <SelectItem value="general">{t('contact.form.subject_general')}</SelectItem>
+                      <SelectItem value="product">{t('contact.form.subject_product')}</SelectItem>
+                      <SelectItem value="order">{t('contact.form.subject_order')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <Label htmlFor="message" className="text-gray-900 dark:text-white">
-                    Message *
+                    {t('contact.form.message')}
                   </Label>
                   <Textarea
                     id="message"
@@ -140,7 +141,7 @@ export default function Contact() {
                   disabled={isSubmitting}
                   className="w-full bg-rose-primary hover:bg-rose-light"
                 >
-                  {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
+                  {isSubmitting ? "Envoi en cours..." : t('contact.form.submit')}
                 </Button>
               </form>
             </CardContent>

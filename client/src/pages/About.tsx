@@ -1,18 +1,20 @@
 import { Leaf, Tag, Handshake, Users, Globe, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function About() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-text-dark mb-6">
-            À propos de ROSE-D'ÉDEN
+            {t('about.title')}
           </h1>
           <p className="text-xl text-text-medium max-w-3xl mx-auto">
-            Depuis plus de 10 ans, nous nous engageons à vous offrir des produits naturels d'exception, 
-            sélectionnés avec soin auprès de producteurs locaux et responsables.
+            {t('about.subtitle')}
           </p>
         </div>
 
@@ -27,12 +29,10 @@ export default function About() {
           </div>
           <div className="flex flex-col justify-center">
             <h2 className="text-3xl font-bold text-text-dark mb-6">
-              Notre Mission
+              {t('about.mission.title')}
             </h2>
             <p className="text-lg text-text-medium mb-6">
-              Chez ROSE-D'ÉDEN, nous croyons que la nature nous offre tout ce dont nous avons besoin pour 
-              prendre soin de nous-mêmes et de notre environnement. Notre mission est de vous connecter 
-              avec les meilleurs produits naturels, authentiques et responsables.
+              {t('about.mission.text')}
             </p>
             <p className="text-lg text-text-medium">
               Nous travaillons directement avec des producteurs locaux qui partagent nos valeurs 
@@ -44,7 +44,7 @@ export default function About() {
         {/* Values Section */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-text-dark text-center mb-12">
-            Nos Valeurs
+            {t('about.values.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="text-center">
@@ -53,11 +53,10 @@ export default function About() {
                   <Leaf className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
-                  Engagement Écologique
+                  {t('about.values.eco.title')}
                 </h3>
                 <p className="text-text-medium">
-                  Nous privilégions les produits biologiques et les pratiques durables 
-                  pour préserver notre planète.
+                  {t('about.values.eco.text')}
                 </p>
               </CardContent>
             </Card>
@@ -68,11 +67,10 @@ export default function About() {
                   <Tag className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
-                  Qualité Garantie
+                  {t('about.values.quality.title')}
                 </h3>
                 <p className="text-text-medium">
-                  Chaque produit est rigoureusement sélectionné et testé pour vous assurer 
-                  une qualité exceptionnelle.
+                  {t('about.values.quality.text')}
                 </p>
               </CardContent>
             </Card>
@@ -83,11 +81,10 @@ export default function About() {
                   <Handshake className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-dark mb-4">
-                  Commerce Équitable
+                  {t('about.values.social.title')}
                 </h3>
                 <p className="text-text-medium">
-                  Nous soutenons les producteurs locaux et pratiquons un commerce 
-                  juste et équitable.
+                  {t('about.values.social.text')}
                 </p>
               </CardContent>
             </Card>

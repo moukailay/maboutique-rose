@@ -10,11 +10,13 @@ import { useCart } from '@/lib/cart';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuthState } from '@/hooks/useAuth';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const { user } = useAuthState();
+  const { t } = useTranslation();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);

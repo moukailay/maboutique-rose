@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/lib/cart';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { Product, Review } from '@shared/schema';
 
 export default function ProductDetail() {
@@ -15,6 +16,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ['/api/products', id],
@@ -47,8 +49,8 @@ export default function ProductDetail() {
     }
     
     toast({
-      title: "Produit ajouté",
-      description: `${quantity} x ${product.name} ajouté(s) au panier.`,
+      title: t('product.added_to_cart'),
+      description: `${quantity} x ${product.name} ${t('product.added_suffix')}`,
     });
   };
 
@@ -77,10 +79,10 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-text-dark mb-4">Produit non trouvé</h1>
+          <h1 className="text-2xl font-bold text-text-dark mb-4">{t('product.not_found')}</h1>
           <Link href="/products">
             <Button className="bg-rose-primary hover:bg-rose-light">
-              Retour aux produits
+              {t('product.back_to_products')}
             </Button>
           </Link>
         </div>
@@ -99,7 +101,7 @@ export default function ProductDetail() {
         <Link href="/products">
           <Button variant="ghost" className="mb-8">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour aux produits
+            {t('product.back_to_products')}
           </Button>
         </Link>
 
@@ -151,27 +153,27 @@ export default function ProductDetail() {
                   ))}
                 </div>
                 <span className="text-sm text-text-medium">
-                  ({reviews?.length || 0} avis)
+                  ({reviews?.length || 0} {t('product.reviews')}
                 </span>
               </div>
               <p className="text-3xl font-bold text-rose-primary mb-4">{product.price} CAD</p>
               
               <div className="flex items-center space-x-2 mb-4">
                 <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>
-                  {product.stock > 0 ? `En stock (${product.stock})` : 'Rupture de stock'}
+                  {product.stock > 0 ? `${t('product.in_stock')}${product.stock})` : t('product.out_of_stock')}
                 </Badge>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-text-dark mb-2">Description</h3>
+              <h3 className="text-lg font-semibold text-text-dark mb-2">{t('product.description')}</h3>
               <p className="text-text-medium">{product.description}</p>
             </div>
 
             {/* Quantity and Add to Cart */}
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
-                <span className="text-text-dark font-medium">Quantité:</span>
+                <span className="text-text-dark font-medium">{t('product.quantity')}</span>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
@@ -197,7 +199,7 @@ export default function ProductDetail() {
                 className="w-full bg-rose-primary hover:bg-rose-light"
                 size="lg"
               >
-                Ajouter au panier
+                {t('product.add_to_cart')}
               </Button>
             </div>
           </div>
@@ -205,10 +207,10 @@ export default function ProductDetail() {
 
         {/* Reviews */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-text-dark mb-6">Avis clients</h2>
+          <h2 className="text-2xl font-bold text-text-dark mb-6">{t('product.customer_reviews')}</h2>
           
           {!reviews || reviews.length === 0 ? (
-            <p className="text-text-medium">Aucun avis pour ce produit.</p>
+            <p className="text-text-medium">{t('product.no_reviews')}</p>
           ) : (
             <div className="space-y-4">
               {reviews.map((review) => (
