@@ -641,7 +641,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Route pour répondre à un message de chat
   app.post('/api/chat/messages/:id/response', async (req, res) => {
     try {
-      if (!req.isAuthenticated() || req.user?.role !== 'admin') {
+      // Vérification JWT au lieu de req.isAuthenticated()
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Token required' });
+      }
+
+      const token = authHeader.substring(7);
+      const user = await storage.verifyToken(token);
+      
+      if (!user || user.role !== 'admin') {
         return res.status(401).json({ error: 'Admin access required' });
       }
 
@@ -655,7 +664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedMessage = await storage.respondToChatMessage(
         messageId, 
         response.trim(), 
-        req.user.id
+        user.id
       );
       
       if (!updatedMessage) {
@@ -664,6 +673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedMessage);
     } catch (error: any) {
+      console.error('Error responding to chat message:', error);
       res.status(500).json({ error: error.message });
     }
   });
