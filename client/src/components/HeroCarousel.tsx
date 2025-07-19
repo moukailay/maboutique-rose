@@ -95,7 +95,7 @@ export default function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden group">
+    <div className="relative h-[400px] md:h-[500px] lg:h-[650px] xl:h-[700px] rounded-lg overflow-hidden group bg-rose-50 dark:bg-rose-950">
       {/* Slides */}
       <div className="relative h-full">
         {activeSlides.map((slide, index) => (
@@ -110,16 +110,20 @@ export default function HeroCarousel() {
               {slide.images?.map((imageUrl, imageIndex) => (
                 <div
                   key={imageIndex}
-                  className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+                  className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
                     imageIndex === currentImageIndex ? 'opacity-100' : 'opacity-0'
                   }`}
-                  style={{
-                    backgroundImage: `url('${imageUrl}')`,
-                  }}
-                />
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`${slide.title} - Image ${imageIndex + 1}`}
+                    className="w-full h-full object-contain md:object-cover lg:object-contain xl:object-contain"
+                    loading="lazy"
+                  />
+                </div>
               ))}
               {/* Overlay */}
-              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
             </div>
 
             {/* Content */}
