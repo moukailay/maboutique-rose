@@ -133,22 +133,6 @@ export default function HeroCarousel() {
                     {slide.subtitle}
                   </p>
                 )}
-                {slide.buttonText && (
-                  <Button 
-                    className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 text-lg rounded-full"
-                    onClick={() => {
-                      if (slide.buttonLink) {
-                        if (slide.buttonLink.startsWith('http')) {
-                          window.open(slide.buttonLink, '_blank');
-                        } else {
-                          window.location.href = slide.buttonLink;
-                        }
-                      }
-                    }}
-                  >
-                    {slide.buttonText}
-                  </Button>
-                )}
               </div>
             </div>
           </div>

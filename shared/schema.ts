@@ -118,8 +118,6 @@ export const heroSlides = pgTable("hero_slides", {
   title: text("title").notNull(),
   subtitle: text("subtitle"),
   images: text("images").array().notNull(),
-  buttonText: text("button_text"),
-  buttonLink: text("button_link"),
   isActive: boolean("is_active").notNull().default(true),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),

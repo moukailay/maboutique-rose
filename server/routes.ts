@@ -789,8 +789,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: req.body.title || '',
         subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
         images: images,
-        buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
-        buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };
@@ -842,8 +840,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: req.body.title || '',
         subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
         images: allImages,
-        buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
-        buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };

@@ -17,8 +17,6 @@ interface HeroSlideFormData {
   subtitle: string;
   images: File[];
   imageUrls?: string[];
-  buttonText: string;
-  buttonLink: string;
   isActive: boolean;
   sortOrder: number;
 }
@@ -32,8 +30,6 @@ export default function AdminHeroSlides() {
     title: '',
     subtitle: '',
     images: [],
-    buttonText: '',
-    buttonLink: '',
     isActive: true,
     sortOrder: 0,
   });
@@ -115,8 +111,6 @@ export default function AdminHeroSlides() {
       title: '',
       subtitle: '',
       images: [],
-      buttonText: '',
-      buttonLink: '',
       isActive: true,
       sortOrder: 0,
     });
@@ -129,8 +123,6 @@ export default function AdminHeroSlides() {
       subtitle: slide.subtitle || '',
       images: [],
       imageUrls: slide.images || [],
-      buttonText: slide.buttonText || '',
-      buttonLink: slide.buttonLink || '',
       isActive: slide.isActive,
       sortOrder: slide.sortOrder || 0,
     });
@@ -143,14 +135,12 @@ export default function AdminHeroSlides() {
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('subtitle', formData.subtitle);
-    formDataToSend.append('buttonText', formData.buttonText);
-    formDataToSend.append('buttonLink', formData.buttonLink);
     formDataToSend.append('isActive', formData.isActive.toString());
     formDataToSend.append('sortOrder', formData.sortOrder.toString());
     
     // Ajouter les nouvelles images
-    formData.images.forEach((image, index) => {
-      formDataToSend.append(`images`, image);
+    formData.images.forEach((image) => {
+      formDataToSend.append('images', image);
     });
     
     // Ajouter les URLs d'images existantes si on édite
@@ -237,11 +227,16 @@ export default function AdminHeroSlides() {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    images: e.target.files ? Array.from(e.target.files) : []
-                  }))}
-                  required={!editingSlide && formData.images.length === 0}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const newFiles = Array.from(e.target.files);
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        images: [...prev.images, ...newFiles]
+                      }));
+                    }
+                  }}
+                  required={!editingSlide && formData.images.length === 0 && (!formData.imageUrls || formData.imageUrls.length === 0)}
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   Chaque slide peut contenir plusieurs images qui défileront automatiquement
@@ -304,30 +299,7 @@ export default function AdminHeroSlides() {
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="buttonText">Texte du bouton</Label>
-                <Input
-                  id="buttonText"
-                  value={formData.buttonText}
-                  onChange={(e) => setFormData(prev => ({ ...prev, buttonText: e.target.value }))}
-                  placeholder="Texte du bouton d'action"
-                />
-              </div>
 
-              <div>
-                <Label htmlFor="buttonLink">Lien du bouton</Label>
-                <Input
-                  id="buttonLink"
-                  value={formData.buttonLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
-                  placeholder="/products ou https://example.com"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  <strong>Le lien du bouton</strong> détermine où les visiteurs iront quand ils cliquent sur le bouton de votre slide. 
-                  Exemples : "/products" pour voir tous les produits, "/categories/miels" pour une catégorie spécifique, 
-                  ou "https://example.com" pour un site externe.
-                </p>
-              </div>
 
               <div>
                 <Label htmlFor="sortOrder">Ordre d'affichage</Label>
@@ -419,12 +391,7 @@ export default function AdminHeroSlides() {
                 <span>Ordre: {slide.sortOrder || 0}</span>
                 <span>{slide.images?.length || 0} image(s)</span>
               </div>
-              {slide.buttonText && (
-                <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 mb-2">
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  {slide.buttonText} → {slide.buttonLink || '/'}
-                </div>
-              )}
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
