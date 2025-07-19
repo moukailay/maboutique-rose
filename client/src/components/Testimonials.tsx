@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "../hooks/useTranslation";
 import { Star, Quote } from "lucide-react";
 import { useState } from "react";
+import { TestimonialModal } from "./TestimonialModal";
 
 interface Testimonial {
   id: number;
@@ -22,7 +23,7 @@ interface Testimonial {
   };
 }
 
-const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
+const TestimonialCard = ({ testimonial, onOpenModal }: { testimonial: Testimonial; onOpenModal: () => void }) => {
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
 
@@ -44,7 +45,10 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   };
 
   return (
-    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div 
+      className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer transform hover:scale-105"
+      onClick={onOpenModal}
+    >
       {/* Grande image du témoignage (photo client) */}
       {testimonial.image && (
         <div className="relative">
@@ -170,6 +174,8 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
 
 export default function Testimonials() {
   const { t } = useTranslation();
+  const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: testimonials = [], isLoading } = useQuery({
     queryKey: ['/api/testimonials'],
@@ -244,10 +250,29 @@ export default function Testimonials() {
           {activeTestimonials
             .sort((a: Testimonial, b: Testimonial) => a.sortOrder - b.sortOrder)
             .map((testimonial: Testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+              <TestimonialCard 
+                key={testimonial.id} 
+                testimonial={testimonial} 
+                onOpenModal={() => {
+                  setSelectedTestimonial(testimonial);
+                  setIsModalOpen(true);
+                }}
+              />
           ))}
         </div>
       </div>
+
+      {/* Modal de témoignage */}
+      {selectedTestimonial && (
+        <TestimonialModal
+          testimonial={selectedTestimonial}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedTestimonial(null);
+          }}
+        />
+      )}
     </section>
   );
 }
