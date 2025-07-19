@@ -762,15 +762,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/hero-slides", upload.single('image'), async (req, res) => {
+  app.post("/api/hero-slides", upload.array('images', 10), async (req, res) => {
     try {
       console.log("Received hero slide data:", req.body);
-      console.log("Received file:", req.file);
+      console.log("Received files:", req.files);
+      
+      // Traiter les fichiers d'images
+      const images = [];
+      if (req.files && Array.isArray(req.files)) {
+        for (const file of req.files) {
+          images.push(`/uploads/${file.filename}`);
+        }
+      }
+      
+      // Ajouter les images existantes si elles existent
+      if (req.body.existingImages) {
+        try {
+          const existingImages = JSON.parse(req.body.existingImages);
+          images.push(...existingImages);
+        } catch (e) {
+          console.error("Error parsing existing images:", e);
+        }
+      }
       
       const slideData = {
         title: req.body.title || '',
         subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
-        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || ''),
+        images: images,
         buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
         buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
@@ -791,17 +809,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/hero-slides/:id", upload.single('image'), async (req, res) => {
+  app.put("/api/hero-slides/:id", upload.array('images', 10), async (req, res) => {
     try {
       const slideId = parseInt(req.params.id);
       console.log("Updating hero slide ID:", slideId);
       console.log("Received update data:", req.body);
-      console.log("Received file:", req.file);
+      console.log("Received files:", req.files);
+      
+      // Traiter les nouvelles images
+      const newImages = [];
+      if (req.files && Array.isArray(req.files)) {
+        for (const file of req.files) {
+          newImages.push(`/uploads/${file.filename}`);
+        }
+      }
+      
+      // Récupérer les images existantes
+      const existingImages = [];
+      if (req.body.existingImages) {
+        try {
+          const parsed = JSON.parse(req.body.existingImages);
+          existingImages.push(...parsed);
+        } catch (e) {
+          console.error("Error parsing existing images:", e);
+        }
+      }
+      
+      // Combiner toutes les images
+      const allImages = [...existingImages, ...newImages];
       
       const slideData = {
         title: req.body.title || '',
         subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
-        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || ''),
+        images: allImages,
         buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
         buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,

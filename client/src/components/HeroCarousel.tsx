@@ -8,13 +8,14 @@ import type { HeroSlide } from '@shared/schema';
 export default function HeroCarousel() {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const { data: slides = [], isLoading } = useQuery<HeroSlide[]>({
     queryKey: ['/api/hero-slides'],
   });
 
-  // Filter active slides
-  const activeSlides = slides.filter(slide => slide.isActive);
+  // Filter active slides that have images
+  const activeSlides = slides.filter(slide => slide.isActive && slide.images && slide.images.length > 0);
 
   // Auto-advance slides
   useEffect(() => {
@@ -22,21 +23,39 @@ export default function HeroCarousel() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
+      setCurrentImageIndex(0); // Reset image index when changing slides
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
   }, [activeSlides.length]);
 
+  // Auto-advance images within current slide
+  useEffect(() => {
+    if (activeSlides.length === 0) return;
+    
+    const currentSlideData = activeSlides[currentSlide];
+    if (!currentSlideData?.images || currentSlideData.images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % currentSlideData.images.length);
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [activeSlides, currentSlide]);
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
+    setCurrentImageIndex(0);
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
+    setCurrentImageIndex(0);
   };
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
+    setCurrentImageIndex(0);
   };
 
   if (isLoading) {
@@ -86,13 +105,19 @@ export default function HeroCarousel() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            {/* Background Image */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url('${slide.image}')`,
-              }}
-            >
+            {/* Background Images Carousel */}
+            <div className="absolute inset-0">
+              {slide.images?.map((imageUrl, imageIndex) => (
+                <div
+                  key={imageIndex}
+                  className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+                    imageIndex === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    backgroundImage: `url('${imageUrl}')`,
+                  }}
+                />
+              ))}
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/40"></div>
             </div>

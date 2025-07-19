@@ -15,8 +15,8 @@ import type { HeroSlide, InsertHeroSlide } from '@shared/schema';
 interface HeroSlideFormData {
   title: string;
   subtitle: string;
-  image: File | null;
-  imageUrl?: string;
+  images: File[];
+  imageUrls?: string[];
   buttonText: string;
   buttonLink: string;
   isActive: boolean;
@@ -31,7 +31,7 @@ export default function AdminHeroSlides() {
   const [formData, setFormData] = useState<HeroSlideFormData>({
     title: '',
     subtitle: '',
-    image: null,
+    images: [],
     buttonText: '',
     buttonLink: '',
     isActive: true,
@@ -114,7 +114,7 @@ export default function AdminHeroSlides() {
     setFormData({
       title: '',
       subtitle: '',
-      image: null,
+      images: [],
       buttonText: '',
       buttonLink: '',
       isActive: true,
@@ -127,8 +127,8 @@ export default function AdminHeroSlides() {
     setFormData({
       title: slide.title,
       subtitle: slide.subtitle || '',
-      image: null,
-      imageUrl: slide.image,
+      images: [],
+      imageUrls: slide.images || [],
       buttonText: slide.buttonText || '',
       buttonLink: slide.buttonLink || '',
       isActive: slide.isActive,
@@ -148,10 +148,14 @@ export default function AdminHeroSlides() {
     formDataToSend.append('isActive', formData.isActive.toString());
     formDataToSend.append('sortOrder', formData.sortOrder.toString());
     
-    if (formData.image) {
-      formDataToSend.append('image', formData.image);
-    } else if (editingSlide && formData.imageUrl) {
-      formDataToSend.append('image', formData.imageUrl);
+    // Ajouter les nouvelles images
+    formData.images.forEach((image, index) => {
+      formDataToSend.append(`images`, image);
+    });
+    
+    // Ajouter les URLs d'images existantes si on édite
+    if (editingSlide && formData.imageUrls) {
+      formDataToSend.append('existingImages', JSON.stringify(formData.imageUrls));
     }
 
     if (editingSlide) {
@@ -227,24 +231,75 @@ export default function AdminHeroSlides() {
               </div>
 
               <div>
-                <Label htmlFor="image">Image *</Label>
+                <Label htmlFor="images">Images * (Vous pouvez sélectionner plusieurs images)</Label>
                 <Input
-                  id="image"
+                  id="images"
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
-                    image: e.target.files ? e.target.files[0] : null 
+                    images: e.target.files ? Array.from(e.target.files) : []
                   }))}
-                  required={!editingSlide}
+                  required={!editingSlide && formData.images.length === 0}
                 />
-                {formData.imageUrl && (
-                  <div className="mt-2">
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Aperçu" 
-                      className="w-32 h-20 object-cover rounded border"
-                    />
+                <p className="text-sm text-gray-500 mt-1">
+                  Chaque slide peut contenir plusieurs images qui défileront automatiquement
+                </p>
+                
+                {/* Aperçu des nouvelles images sélectionnées */}
+                {formData.images.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Nouvelles images sélectionnées :</p>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.images.map((file, index) => (
+                        <div key={index} className="relative">
+                          <img 
+                            src={URL.createObjectURL(file)}
+                            alt={`Nouvelle image ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({
+                              ...prev,
+                              images: prev.images.filter((_, i) => i !== index)
+                            }))}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Aperçu des images existantes lors de l'édition */}
+                {formData.imageUrls && formData.imageUrls.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Images actuelles :</p>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.imageUrls.map((url, index) => (
+                        <div key={index} className="relative">
+                          <img 
+                            src={url}
+                            alt={`Image actuelle ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({
+                              ...prev,
+                              imageUrls: prev.imageUrls?.filter((_, i) => i !== index)
+                            }))}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -267,6 +322,11 @@ export default function AdminHeroSlides() {
                   onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
                   placeholder="/products ou https://example.com"
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  <strong>Le lien du bouton</strong> détermine où les visiteurs iront quand ils cliquent sur le bouton de votre slide. 
+                  Exemples : "/products" pour voir tous les produits, "/categories/miels" pour une catégorie spécifique, 
+                  ou "https://example.com" pour un site externe.
+                </p>
               </div>
 
               <div>
@@ -314,11 +374,24 @@ export default function AdminHeroSlides() {
         {slides.map((slide) => (
           <Card key={slide.id} className="overflow-hidden">
             <div className="relative h-40">
-              <img 
-                src={slide.image} 
-                alt={slide.title}
-                className="w-full h-full object-cover"
-              />
+              {slide.images && slide.images.length > 0 ? (
+                <div className="relative w-full h-full">
+                  <img 
+                    src={slide.images[0]} 
+                    alt={slide.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {slide.images.length > 1 && (
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                      +{slide.images.length - 1} autres images
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <Image className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
               <div className="absolute top-2 right-2 flex gap-1">
                 {slide.isActive ? (
                   <div className="bg-green-500 text-white px-2 py-1 rounded text-xs flex items-center">
@@ -344,13 +417,14 @@ export default function AdminHeroSlides() {
               )}
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
                 <span>Ordre: {slide.sortOrder || 0}</span>
-                {slide.buttonText && (
-                  <div className="flex items-center">
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    {slide.buttonText}
-                  </div>
-                )}
+                <span>{slide.images?.length || 0} image(s)</span>
               </div>
+              {slide.buttonText && (
+                <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 mb-2">
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  {slide.buttonText} → {slide.buttonLink || '/'}
+                </div>
+              )}
               <div className="flex gap-2">
                 <Button
                   variant="outline"

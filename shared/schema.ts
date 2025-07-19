@@ -117,7 +117,7 @@ export const heroSlides = pgTable("hero_slides", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   subtitle: text("subtitle"),
-  image: text("image").notNull(),
+  images: text("images").array().notNull(),
   buttonText: text("button_text"),
   buttonLink: text("button_link"),
   isActive: boolean("is_active").notNull().default(true),
