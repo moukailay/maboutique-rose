@@ -139,7 +139,30 @@ export default function AdminMessages() {
   // Respond to chat message
   const respondToChatMutation = useMutation({
     mutationFn: async ({ messageId, response }: { messageId: number; response: string }) => {
-      const apiResponse = await apiRequest('POST', `/api/chat/messages/${messageId}/response`, { response });
+      // Use same approach as chat messages loading
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/api/chat/messages/${messageId}/response`;
+      
+      const authToken = localStorage.getItem('authToken');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`;
+      }
+      
+      const apiResponse = await fetch(url, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({ response }),
+      });
+      
+      if (!apiResponse.ok) {
+        throw new Error(`HTTP error! status: ${apiResponse.status}`);
+      }
+      
       return apiResponse.json();
     },
     onSuccess: () => {
@@ -159,7 +182,26 @@ export default function AdminMessages() {
   // Mark chat message as read
   const markChatMessageReadMutation = useMutation({
     mutationFn: async (messageId: number) => {
-      const response = await apiRequest('PUT', `/api/chat/messages/${messageId}/read`);
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/api/chat/messages/${messageId}/read`;
+      
+      const authToken = localStorage.getItem('authToken');
+      const headers: Record<string, string> = {};
+      
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -282,7 +324,7 @@ export default function AdminMessages() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="contacts" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="contacts" className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
