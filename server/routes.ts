@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertTestimonialSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertTestimonialSchema, insertHeroSlideSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import multer from "multer";
@@ -736,6 +736,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Testimonial deleted successfully" });
     } catch (error: any) {
       res.status(500).json({ message: "Error deleting testimonial", error: error.message });
+    }
+  });
+
+  // Hero Slides routes
+  app.get("/api/hero-slides", async (req, res) => {
+    try {
+      const slides = await storage.getHeroSlides();
+      res.json(slides);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching hero slides", error: error.message });
+    }
+  });
+
+  app.get("/api/hero-slides/:id", async (req, res) => {
+    try {
+      const slideId = parseInt(req.params.id);
+      const slide = await storage.getHeroSlide(slideId);
+      if (!slide) {
+        return res.status(404).json({ message: "Hero slide not found" });
+      }
+      res.json(slide);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching hero slide", error: error.message });
+    }
+  });
+
+  app.post("/api/hero-slides", upload.single('image'), async (req, res) => {
+    try {
+      console.log("Received hero slide data:", req.body);
+      console.log("Received file:", req.file);
+      
+      const slideData = {
+        title: req.body.title || '',
+        subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
+        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || ''),
+        buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
+        buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
+        isActive: req.body.isActive === 'true' || req.body.isActive === true,
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+      };
+      
+      console.log("Parsed hero slide data:", slideData);
+      
+      const validatedData = insertHeroSlideSchema.parse(slideData);
+      const slide = await storage.createHeroSlide(validatedData);
+      res.status(201).json(slide);
+    } catch (error: any) {
+      console.error("Error creating hero slide:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid hero slide data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating hero slide", error: error.message });
+    }
+  });
+
+  app.put("/api/hero-slides/:id", upload.single('image'), async (req, res) => {
+    try {
+      const slideId = parseInt(req.params.id);
+      console.log("Updating hero slide ID:", slideId);
+      console.log("Received update data:", req.body);
+      console.log("Received file:", req.file);
+      
+      const slideData = {
+        title: req.body.title || '',
+        subtitle: req.body.subtitle && req.body.subtitle.trim() !== '' ? req.body.subtitle : null,
+        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image || ''),
+        buttonText: req.body.buttonText && req.body.buttonText.trim() !== '' ? req.body.buttonText : null,
+        buttonLink: req.body.buttonLink && req.body.buttonLink.trim() !== '' ? req.body.buttonLink : null,
+        isActive: req.body.isActive === 'true' || req.body.isActive === true,
+        sortOrder: parseInt(req.body.sortOrder) || 0,
+      };
+      
+      console.log("Parsed hero slide update data:", slideData);
+      
+      const validatedData = insertHeroSlideSchema.parse(slideData);
+      const slide = await storage.updateHeroSlide(slideId, validatedData);
+      if (!slide) {
+        return res.status(404).json({ message: "Hero slide not found" });
+      }
+      res.json(slide);
+    } catch (error: any) {
+      console.error("Error updating hero slide:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid hero slide data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating hero slide", error: error.message });
+    }
+  });
+
+  app.delete("/api/hero-slides/:id", async (req, res) => {
+    try {
+      const slideId = parseInt(req.params.id);
+      const deleted = await storage.deleteHeroSlide(slideId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Hero slide not found" });
+      }
+      res.json({ message: "Hero slide deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting hero slide", error: error.message });
     }
   });
 

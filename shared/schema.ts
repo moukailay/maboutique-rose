@@ -113,6 +113,18 @@ export const testimonials = pgTable("testimonials", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const heroSlides = pgTable("hero_slides", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  subtitle: text("subtitle"),
+  image: text("image").notNull(),
+  buttonText: text("button_text"),
+  buttonLink: text("button_link"),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
@@ -219,6 +231,11 @@ export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
   createdAt: true,
 });
 
+export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -249,3 +266,6 @@ export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type HeroSlide = typeof heroSlides.$inferSelect;
+export type InsertHeroSlide = z.infer<typeof insertHeroSlideSchema>;

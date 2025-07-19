@@ -28,7 +28,8 @@ import {
   FolderOpen,
   Menu,
   X,
-  Star
+  Star,
+  Image
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -111,6 +112,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       label: 'Témoignages', 
       href: '/admin/testimonials',
       active: location === '/admin/testimonials'
+    },
+    { 
+      icon: Image, 
+      label: 'Carrousel', 
+      href: '/admin/hero-slides',
+      active: location === '/admin/hero-slides'
     },
     { 
       icon: BarChart3, 

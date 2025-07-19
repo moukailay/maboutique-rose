@@ -34,6 +34,9 @@ export const translations = {
     'nav.profile': 'Profil',
 
     // Home page
+    'welcome_to': 'Bienvenue chez',
+    'hero_subtitle': 'Votre source de produits naturels authentiques et responsables',
+    'discover_products': 'Découvrir nos produits',
     'home.hero.title': 'Bienvenue chez ROSE-D\'ÉDEN',
     'home.hero.subtitle': 'Votre source de produits naturels authentiques et responsables.',
     'home.hero.cta': 'Découvrir nos produits',
@@ -151,6 +154,9 @@ export const translations = {
     'nav.profile': 'Profile',
 
     // Home page
+    'welcome_to': 'Welcome to',
+    'hero_subtitle': 'Your source for authentic and responsible natural products',
+    'discover_products': 'Discover our products',
     'home.hero.title': 'Welcome to ROSE-D\'ÉDEN',
     'home.hero.subtitle': 'Your source for authentic and responsible natural products.',
     'home.hero.cta': 'Discover our products',

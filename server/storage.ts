@@ -9,6 +9,7 @@ import {
   newsletters,
   chatMessages,
   testimonials,
+  heroSlides,
   type User,
   type InsertUser,
   type Product,
@@ -29,6 +30,8 @@ import {
   type InsertChatMessage,
   type Testimonial,
   type InsertTestimonial,
+  type HeroSlide,
+  type InsertHeroSlide,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, like, ilike, desc } from "drizzle-orm";
@@ -106,6 +109,13 @@ export interface IStorage {
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
   updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined>;
   deleteTestimonial(id: number): Promise<boolean>;
+
+  // Hero Slides
+  getHeroSlides(): Promise<HeroSlide[]>;
+  getHeroSlide(id: number): Promise<HeroSlide | undefined>;
+  createHeroSlide(slide: InsertHeroSlide): Promise<HeroSlide>;
+  updateHeroSlide(id: number, slide: InsertHeroSlide): Promise<HeroSlide | undefined>;
+  deleteHeroSlide(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -680,6 +690,44 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(testimonials)
       .where(eq(testimonials.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Hero Slides methods
+  async getHeroSlides(): Promise<HeroSlide[]> {
+    return await db
+      .select()
+      .from(heroSlides)
+      .orderBy(heroSlides.sortOrder, heroSlides.createdAt);
+  }
+
+  async getHeroSlide(id: number): Promise<HeroSlide | undefined> {
+    const [slide] = await db
+      .select()
+      .from(heroSlides)
+      .where(eq(heroSlides.id, id));
+    return slide || undefined;
+  }
+
+  async createHeroSlide(slide: InsertHeroSlide): Promise<HeroSlide> {
+    const [newSlide] = await db
+      .insert(heroSlides)
+      .values(slide)
+      .returning();
+    return newSlide;
+  }
+
+  async updateHeroSlide(id: number, slide: InsertHeroSlide): Promise<HeroSlide | undefined> {
+    const [updatedSlide] = await db
+      .update(heroSlides)
+      .set(slide)
+      .where(eq(heroSlides.id, id))
+      .returning();
+    return updatedSlide || undefined;
+  }
+
+  async deleteHeroSlide(id: number): Promise<boolean> {
+    const result = await db.delete(heroSlides).where(eq(heroSlides.id, id));
     return (result.rowCount || 0) > 0;
   }
 }
