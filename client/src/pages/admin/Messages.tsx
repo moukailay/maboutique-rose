@@ -395,6 +395,11 @@ export default function AdminMessages() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 text-xs">
+                  DEBUG: loadingChatMessages={loadingChatMessages.toString()}, chatMessages.length={chatMessages.length}
+                  <br />
+                  Messages: {JSON.stringify(chatMessages.slice(0, 2), null, 2)}
+                </div>
                 {loadingChatMessages ? (
                   <div className="flex items-center justify-center h-32">
                     <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
