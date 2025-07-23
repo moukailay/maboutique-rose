@@ -1,5 +1,25 @@
 import { X, Star } from "lucide-react";
 
+// Function to convert YouTube URL to embed URL
+const getYouTubeEmbedUrl = (url: string): string => {
+  if (!url) return url;
+  
+  // Check if it's already an embed URL
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+  
+  // Extract video ID from various YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  
+  return url; // Return original if not a YouTube URL
+};
+
 interface Testimonial {
   id: number;
   name: string;
@@ -147,6 +167,22 @@ export function TestimonialModal({ testimonial, isOpen, onClose }: TestimonialMo
               }
             </p>
           </div>
+
+          {/* Video section */}
+          {testimonial.videoUrl && (
+            <div className="mb-6">
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  src={getYouTubeEmbedUrl(testimonial.videoUrl)}
+                  className="w-full h-64 rounded-lg"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  title={`Vidéo témoignage de ${testimonial.name}`}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Product info */}
           {testimonial.product?.name && (

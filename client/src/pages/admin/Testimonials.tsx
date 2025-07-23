@@ -124,13 +124,18 @@ const TestimonialForm = ({
 
       <div>
         <Label htmlFor="videoUrl">URL de la vidéo (optionnel)</Label>
-        <Input
-          id="videoUrl"
-          type="url"
-          value={formData.videoUrl}
-          onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-          placeholder="https://youtube.com/embed/..."
-        />
+        <div className="space-y-2">
+          <Input
+            id="videoUrl"
+            type="url"
+            value={formData.videoUrl}
+            onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+            placeholder="https://youtube.com/watch?v=... ou https://youtu.be/..."
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Collez n'importe quelle URL YouTube, elle sera automatiquement convertie au bon format
+          </p>
+        </div>
       </div>
 
       <div>

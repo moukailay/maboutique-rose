@@ -9,6 +9,26 @@ import path from "path";
 import fs from "fs";
 import express from "express";
 
+// Function to convert YouTube URL to embed URL
+function convertToYouTubeEmbed(url: string): string {
+  if (!url) return url;
+  
+  // Check if it's already an embed URL
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+  
+  // Extract video ID from various YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  
+  return url; // Return original if not a YouTube URL
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize database data
   await storage.initializeData();
@@ -743,7 +763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
         content: req.body.content || '',
         image: req.file ? `/uploads/${req.file.filename}` : (req.body.image && req.body.image.trim() !== '' ? req.body.image : null),
-        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? req.body.videoUrl : null,
+        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? convertToYouTubeEmbed(req.body.videoUrl.trim()) : null,
         rating: parseInt(req.body.rating) || 5,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
@@ -775,7 +795,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
         content: req.body.content || '',
         image: req.file ? `/uploads/${req.file.filename}` : (req.body.image && req.body.image.trim() !== '' ? req.body.image : null),
-        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? req.body.videoUrl : null,
+        videoUrl: req.body.videoUrl && req.body.videoUrl.trim() !== '' ? convertToYouTubeEmbed(req.body.videoUrl.trim()) : null,
         rating: parseInt(req.body.rating) || 5,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,

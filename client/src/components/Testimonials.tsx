@@ -23,6 +23,26 @@ interface Testimonial {
   };
 }
 
+// Function to convert YouTube URL to embed URL
+const getYouTubeEmbedUrl = (url: string): string => {
+  if (!url) return url;
+  
+  // Check if it's already an embed URL
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+  
+  // Extract video ID from various YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  
+  return url; // Return original if not a YouTube URL
+};
+
 const TestimonialCard = ({ testimonial, onOpenModal }: { testimonial: Testimonial; onOpenModal: () => void }) => {
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -157,10 +177,11 @@ const TestimonialCard = ({ testimonial, onOpenModal }: { testimonial: Testimonia
                   </div>
                 )}
                 <iframe
-                  src={testimonial.videoUrl}
+                  src={getYouTubeEmbedUrl(testimonial.videoUrl || '')}
                   className="w-full h-48 rounded-lg"
                   frameBorder="0"
                   allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   onLoad={() => setIsVideoLoading(false)}
                 />
               </div>
