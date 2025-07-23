@@ -197,6 +197,8 @@ export default function Testimonials() {
   const { t } = useTranslation();
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const INITIAL_DISPLAY_COUNT = 6; // Nombre de témoignages à afficher initialement
 
   const { data: testimonials = [], isLoading } = useQuery({
     queryKey: ['/api/testimonials'],
@@ -239,6 +241,13 @@ export default function Testimonials() {
 
   const activeTestimonials = testimonials.filter((testimonial: Testimonial) => testimonial.isActive);
   
+  // Filtrer les témoignages à afficher selon l'état showAll
+  const displayedTestimonials = showAll 
+    ? activeTestimonials 
+    : activeTestimonials.slice(0, INITIAL_DISPLAY_COUNT);
+    
+  const hasMoreTestimonials = activeTestimonials.length > INITIAL_DISPLAY_COUNT;
+  
   if (activeTestimonials.length === 0) {
     return null;
   }
@@ -268,7 +277,7 @@ export default function Testimonials() {
 
         {/* Testimonials grid - Format post/avis */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {activeTestimonials
+          {displayedTestimonials
             .sort((a: Testimonial, b: Testimonial) => a.sortOrder - b.sortOrder)
             .map((testimonial: Testimonial) => (
               <TestimonialCard 
@@ -281,6 +290,35 @@ export default function Testimonials() {
               />
           ))}
         </div>
+
+        {/* Bouton Voir plus / Voir moins */}
+        {hasMoreTestimonials && (
+          <div className="text-center mt-12">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+            >
+              <span className="relative flex items-center">
+                {showAll ? (
+                  <>
+                    <svg className="w-5 h-5 mr-2 transform group-hover:-translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    Voir moins de témoignages
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2 transform group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Voir plus de témoignages ({activeTestimonials.length - INITIAL_DISPLAY_COUNT} de plus)
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-rose-600 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modal de témoignage */}
