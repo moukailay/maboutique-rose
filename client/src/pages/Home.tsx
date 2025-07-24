@@ -10,12 +10,10 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { Product } from '@shared/schema';
 
 export default function Home() {
-  const { data: products, isLoading } = useQuery<Product[]>({
-    queryKey: ['/api/products'],
+  const { data: featuredProducts = [], isLoading } = useQuery<Product[]>({
+    queryKey: ['/api/products/featured'],
   });
   const { t } = useTranslation();
-
-  const featuredProducts = products?.slice(0, 4) || [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

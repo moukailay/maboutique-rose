@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
@@ -20,8 +21,11 @@ import {
   Eye, 
   EyeOff, 
   MoreHorizontal,
-  Filter
+  Filter,
+  Star
 } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
 import type { Product } from '@shared/schema';
 
@@ -29,9 +33,32 @@ export default function AdminProducts() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ['/api/products'],
+  });
+
+  const updateFeaturedMutation = useMutation({
+    mutationFn: async ({ id, isFeatured }: { id: number, isFeatured: boolean }) => {
+      return apiRequest('PATCH', `/api/products/${id}/featured`, { isFeatured });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/products/featured'] });
+      toast({
+        title: "Succès",
+        description: "Le statut vedette du produit a été mis à jour",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut vedette du produit",
+        variant: "destructive",
+      });
+    },
   });
 
   const filteredProducts = products?.filter(product => {
@@ -43,9 +70,8 @@ export default function AdminProducts() {
     return matchesSearch && matchesStatus;
   }) || [];
 
-  const handleToggleStatus = (productId: number) => {
-    // In real app, this would call API to toggle product status
-    console.log('Toggle status for product:', productId);
+  const handleToggleFeatured = (productId: number, currentStatus: boolean) => {
+    updateFeaturedMutation.mutate({ id: productId, isFeatured: !currentStatus });
   };
 
   const handleDeleteProduct = (productId: number) => {
@@ -149,6 +175,7 @@ export default function AdminProducts() {
                     <TableHead>Prix</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Statut</TableHead>
+                    <TableHead>Vedette</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -197,6 +224,18 @@ export default function AdminProducts() {
                           </Badge>
                         </TableCell>
                         <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              checked={product.isFeatured || false}
+                              onCheckedChange={() => handleToggleFeatured(product.id, product.isFeatured || false)}
+                              disabled={updateFeaturedMutation.isPending}
+                            />
+                            {product.isFeatured && (
+                              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon">
@@ -208,7 +247,7 @@ export default function AdminProducts() {
                                 <Edit className="mr-2 h-4 w-4" />
                                 Modifier
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleToggleStatus(product.id)}>
+                              <DropdownMenuItem onClick={() => console.log('Toggle status:', product.id)}>
                                 {product.stock > 0 ? (
                                   <>
                                     <EyeOff className="mr-2 h-4 w-4" />

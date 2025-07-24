@@ -56,9 +56,11 @@ export interface IStorage {
   getProducts(): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
   getProductsByCategory(categoryId: number): Promise<Product[]>;
+  getFeaturedProducts(): Promise<Product[]>;
   searchProducts(query: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: InsertProduct): Promise<Product | undefined>;
+  updateProductFeaturedStatus(id: number, isFeatured: boolean): Promise<Product | undefined>;
   deleteProduct(id: number): Promise<boolean>;
 
   // Orders
@@ -505,6 +507,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(products).where(and(eq(products.categoryId, categoryId), eq(products.isActive, true)));
   }
 
+  async getFeaturedProducts(): Promise<Product[]> {
+    return await db.select().from(products).where(and(eq(products.isFeatured, true), eq(products.isActive, true)));
+  }
+
   async searchProducts(query: string): Promise<Product[]> {
     return await db.select().from(products).where(and(ilike(products.name, `%${query}%`), eq(products.isActive, true)));
   }
@@ -533,6 +539,22 @@ export class DatabaseStorage implements IStorage {
       return product || undefined;
     } catch (error) {
       console.error("Database error when updating product:", error);
+      throw error;
+    }
+  }
+
+  async updateProductFeaturedStatus(id: number, isFeatured: boolean): Promise<Product | undefined> {
+    try {
+      console.log("Updating product featured status with ID:", id, "isFeatured:", isFeatured);
+      const [product] = await db
+        .update(products)
+        .set({ isFeatured })
+        .where(eq(products.id, id))
+        .returning();
+      console.log("Product featured status updated successfully:", product);
+      return product || undefined;
+    } catch (error) {
+      console.error("Database error when updating product featured status:", error);
       throw error;
     }
   }

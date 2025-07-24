@@ -40,6 +40,7 @@ export const products = pgTable("products", {
   categoryId: integer("category_id").references(() => categories.id),
   stock: integer("stock").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  isFeatured: boolean("is_featured").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

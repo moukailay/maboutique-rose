@@ -272,6 +272,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Featured products endpoint
+  app.get("/api/products/featured", async (req, res) => {
+    try {
+      const featuredProducts = await storage.getFeaturedProducts();
+      console.log('Featured products found:', featuredProducts.length);
+      res.json(featuredProducts);
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      res.status(500).json({ message: "Error fetching featured products" });
+    }
+  });
+
   app.get("/api/products/:id", async (req, res) => {
     try {
       const product = await storage.getProduct(Number(req.params.id));
@@ -345,6 +357,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting product:", error);
       res.status(500).json({ message: "Error deleting product", error: error.message });
+    }
+  });
+
+  // Update product featured status
+  app.patch("/api/products/:id/featured", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { isFeatured } = req.body;
+      console.log("Updating product featured status with ID:", id, "to:", isFeatured);
+      
+      const product = await storage.updateProductFeaturedStatus(id, isFeatured);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product featured status:", error);
+      res.status(500).json({ message: "Error updating product featured status", error: error.message });
     }
   });
 
