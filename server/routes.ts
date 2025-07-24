@@ -479,6 +479,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe payment route
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { customerInfo, items, total } = req.body;
+      
+      // Créer la commande d'abord
+      const orderItems = items.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: typeof item.price === 'string' ? item.price : item.price.toString()
+      }));
+
+      const orderData = {
+        userId: null, // Commande sans compte utilisateur
+        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customerEmail: customerInfo.email,
+        phone: customerInfo.phone || '',
+        total: total.toString(),
+        status: 'pending',
+        shippingAddress: JSON.stringify({
+          address: customerInfo.address,
+          city: customerInfo.city,
+          postalCode: customerInfo.postalCode,
+          country: customerInfo.country || 'Canada'
+        }),
+        paymentMethod: 'card'
+      };
+      
+      const order = await storage.createOrder(orderData);
+      
+      // Créer les items de la commande
+      for (const item of orderItems) {
+        await storage.createOrderItem({
+          orderId: order.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        });
+      }
+
+      // Créer le payment intent Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(total * 100), // Convert to cents
+        currency: "eur",
+        metadata: {
+          orderId: order.id.toString(),
+          customerEmail: customerInfo.email
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        order: order
+      });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ 
+        message: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
+
   // Orders
   app.post("/api/orders", async (req, res) => {
     try {
