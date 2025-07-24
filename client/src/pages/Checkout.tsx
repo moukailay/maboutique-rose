@@ -1,92 +1,69 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
-import { CreditCard, MapPin, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { useCart } from '@/lib/cart';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import { useAuthState } from '@/hooks/useAuth';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { useEffect, useState } from 'react';
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useCartStore } from "@/stores/cartStore";
+import { useLocation } from "wouter";
+import { ArrowLeft, Lock, CreditCard } from "lucide-react";
+import { useTranslation } from "../hooks/useTranslation";
 
-export default function Checkout() {
-  const { items, getTotalPrice, clearCart } = useCart();
+// Charger Stripe avec la clé publique
+if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+}
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+interface CheckoutFormProps {
+  clientSecret: string;
+  orderData: any;
+}
+
+const CheckoutForm = ({ clientSecret, orderData }: CheckoutFormProps) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const { toast } = useToast();
-  const { user } = useAuthState();
   const { t } = useTranslation();
-  
+  const { clearCart } = useCartStore();
+  const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState<string>('');
-  const [formData, setFormData] = useState({
-    // Shipping
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: 'France',
-    
-    // Payment
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardName: '',
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      // Create order data
-      const orderData = {
-        userId: user?.id || null,
-        customerName: `${formData.firstName} ${formData.lastName}`,
-        customerEmail: formData.email,
-        phone: formData.phone,
-        shippingAddress: {
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          country: formData.country
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/order-confirmation?order_id=${orderData.id}`,
         },
-        items: items.map(item => ({
-          productId: item.id,
-          quantity: item.quantity,
-          price: parseFloat(item.price)
-        })),
-        totalAmount: getTotalPrice(),
-        status: 'pending'
-      };
-
-      // Save order to database
-      const response = await apiRequest('/api/orders', { method: 'POST', data: orderData });
-      const createdOrder = await response.json();
-
-      setOrderId(createdOrder.id);
-      setOrderComplete(true);
-      clearCart();
-      
-      toast({
-        title: "Commande confirmée !",
-        description: `Votre commande #${createdOrder.id} a été passée avec succès.`,
       });
 
+      if (error) {
+        toast({
+          title: "Erreur de paiement",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        // Le paiement a réussi
+        clearCart();
+        toast({
+          title: "Paiement réussi !",
+          description: "Votre commande a été confirmée.",
+        });
+        setLocation(`/order-confirmation?order_id=${orderData.id}`);
+      }
     } catch (error) {
-      console.error('Error creating order:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de votre commande.",
+        description: "Une erreur inattendue s'est produite.",
         variant: "destructive",
       });
     } finally {
@@ -94,278 +71,328 @@ export default function Checkout() {
     }
   };
 
-  if (items.length === 0 && !orderComplete) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-16">
-            <h1 className="text-3xl font-bold text-text-dark mb-4">
-              Votre panier est vide
-            </h1>
-            <p className="text-lg text-text-medium mb-8">
-              Ajoutez des produits à votre panier pour procéder au paiement.
-            </p>
-            <Link href="/products">
-              <Button className="bg-rose-primary hover:bg-rose-light">
-                Découvrir nos produits
-              </Button>
-            </Link>
-          </div>
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+        <div className="flex items-center mb-4">
+          <Lock className="w-5 h-5 text-green-500 mr-2" />
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Paiement sécurisé par Stripe
+          </span>
         </div>
+        
+        <PaymentElement 
+          options={{
+            layout: "tabs",
+            paymentMethodOrder: ["card", "paypal"]
+          }}
+        />
       </div>
-    );
-  }
 
-  if (orderComplete) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-16">
-            <CheckCircle className="h-24 w-24 text-rose-primary mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-text-dark mb-4">
-              Commande confirmée !
-            </h1>
-            <p className="text-lg text-text-medium mb-8">
-              Votre commande #{orderId} a été passée avec succès. Vous recevrez un email de confirmation dans quelques minutes.
-            </p>
-            <div className="space-y-4">
-              <Link href="/products">
-                <Button className="bg-rose-primary hover:bg-rose-light mr-4">
-                  Continuer mes achats
-                </Button>
-              </Link>
-              <Link href="/">
-                <Button variant="outline">
-                  Retour à l'accueil
-                </Button>
-              </Link>
-            </div>
+      <button
+        type="submit"
+        disabled={!stripe || !elements || isProcessing}
+        className="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white py-4 px-6 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+      >
+        {isProcessing ? (
+          <div className="flex items-center">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+            Traitement en cours...
           </div>
-        </div>
-      </div>
-    );
+        ) : (
+          <div className="flex items-center">
+            <CreditCard className="w-5 h-5 mr-2" />
+            Payer {orderData.total}€
+          </div>
+        )}
+      </button>
+
+      <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+        En procédant au paiement, vous acceptez nos conditions de vente.
+        Vos données sont protégées par chiffrement SSL.
+      </p>
+    </form>
+  );
+};
+
+export default function Checkout() {
+  const { t } = useTranslation();
+  const { items, getTotal, clearCart } = useCartStore();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [clientSecret, setClientSecret] = useState("");
+  const [orderData, setOrderData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [customerInfo, setCustomerInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "Canada"
+  });
+
+  // Rediriger si le panier est vide
+  useEffect(() => {
+    if (items.length === 0) {
+      setLocation("/cart");
+      return;
+    }
+  }, [items, setLocation]);
+
+  // Créer l'intention de paiement
+  const createPaymentIntent = async () => {
+    try {
+      setIsLoading(true);
+
+      // Créer la commande avec les informations client
+      const orderItems = items.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      const orderPayload = {
+        customerInfo,
+        items: orderItems,
+        total: getTotal(),
+        status: 'pending'
+      };
+
+      const response = await apiRequest("POST", "/api/create-payment-intent", orderPayload);
+      const data = await response.json();
+
+      if (data.clientSecret && data.order) {
+        setClientSecret(data.clientSecret);
+        setOrderData(data.order);
+      } else {
+        throw new Error("Erreur lors de la création du paiement");
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'intention de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCustomerInfoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validation simple
+    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'postalCode'];
+    const missingFields = requiredFields.filter(field => !customerInfo[field as keyof typeof customerInfo]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createPaymentIntent();
+  };
+
+  if (items.length === 0) {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-text-dark mb-2">
-            Finaliser votre commande
-          </h1>
-          <p className="text-lg text-text-medium">
-            Vérifiez vos informations et procédez au paiement sécurisé
-          </p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* Header */}
+        <div className="flex items-center mb-8">
+          <button
+            onClick={() => setLocation("/cart")}
+            className="flex items-center text-gray-600 dark:text-gray-300 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Retour au panier
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Shipping & Payment Forms */}
-            <div className="space-y-6">
-              {/* Shipping Information */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    Informations de livraison
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">Prénom *</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Nom *</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone">Téléphone *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="address">Adresse *</Label>
-                    <Input
-                      id="address"
-                      value={formData.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="city">Ville *</Label>
-                      <Input
-                        id="city"
-                        value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="postalCode">Code postal *</Label>
-                      <Input
-                        id="postalCode"
-                        value={formData.postalCode}
-                        onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Payment Information */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Informations de paiement
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="cardName">Nom sur la carte *</Label>
-                    <Input
-                      id="cardName"
-                      value={formData.cardName}
-                      onChange={(e) => handleInputChange('cardName', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cardNumber">Numéro de carte *</Label>
-                    <Input
-                      id="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={formData.cardNumber}
-                      onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="expiryDate">Date d'expiration *</Label>
-                      <Input
-                        id="expiryDate"
-                        placeholder="MM/YY"
-                        value={formData.expiryDate}
-                        onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cvv">CVV *</Label>
-                      <Input
-                        id="cvv"
-                        placeholder="123"
-                        value={formData.cvv}
-                        onChange={(e) => handleInputChange('cvv', e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Order Summary */}
-            <div>
-              <Card className="shadow-lg sticky top-8">
-                <CardHeader>
-                  <CardTitle>Récapitulatif de commande</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    {items.map((item) => (
-                      <div key={item.id} className="flex justify-between items-center">
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div>
-                            <p className="font-medium text-sm">{item.name}</p>
-                            <p className="text-xs text-text-medium">Quantité: {item.quantity}</p>
-                          </div>
-                        </div>
-                        <p className="font-medium">
-                          {(parseFloat(item.price) * item.quantity).toFixed(2)} €
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Informations de commande */}
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                Récapitulatif de commande
+              </h2>
+              
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center">
+                      {item.images && item.images[0] && (
+                        <img
+                          src={item.images[0]}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded-lg mr-4"
+                        />
+                      )}
+                      <div>
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Quantité: {item.quantity}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Sous-total</span>
-                      <span>{getTotalPrice().toFixed(2)} €</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Livraison</span>
-                      <span className="text-rose-primary">Gratuite</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span className="text-rose-primary">{getTotalPrice().toFixed(2)} €</span>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {(item.price * item.quantity).toFixed(2)}€
+                      </p>
                     </div>
                   </div>
-                  
-                  <Button
-                    type="submit"
-                    disabled={isProcessing}
-                    className="w-full bg-rose-primary hover:bg-rose-light"
-                  >
-                    {isProcessing ? 'Traitement...' : 'Finaliser la commande'}
-                  </Button>
-                  
-                  <div className="text-center">
-                    <p className="text-xs text-text-medium">
-                      Paiement sécurisé • Livraison gratuite • Satisfaction garantie
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center">
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">
+                    Total:
+                  </span>
+                  <span className="text-xl font-bold text-rose-600 dark:text-rose-400">
+                    {getTotal().toFixed(2)}€
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </form>
+
+          {/* Formulaire de paiement */}
+          <div className="space-y-6">
+            {!clientSecret ? (
+              // Formulaire d'informations client
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                  Informations de livraison
+                </h2>
+                
+                <form onSubmit={handleCustomerInfoSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Prénom *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customerInfo.firstName}
+                        onChange={(e) => setCustomerInfo({...customerInfo, firstName: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Nom *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customerInfo.lastName}
+                        onChange={(e) => setCustomerInfo({...customerInfo, lastName: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={customerInfo.email}
+                      onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Téléphone
+                    </label>
+                    <input
+                      type="tel"
+                      value={customerInfo.phone}
+                      onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Adresse *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={customerInfo.address}
+                      onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Ville *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customerInfo.city}
+                        onChange={(e) => setCustomerInfo({...customerInfo, city: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Code postal *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customerInfo.postalCode}
+                        onChange={(e) => setCustomerInfo({...customerInfo, postalCode: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white py-3 px-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? "Préparation..." : "Continuer vers le paiement"}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              // Formulaire de paiement Stripe
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                  Paiement sécurisé
+                </h2>
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <CheckoutForm clientSecret={clientSecret} orderData={orderData} />
+                </Elements>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

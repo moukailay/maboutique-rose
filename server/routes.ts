@@ -8,6 +8,15 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import express from "express";
+import Stripe from "stripe";
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 // Function to convert YouTube URL to embed URL
 function convertToYouTubeEmbed(url: string): string {
@@ -963,6 +972,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Hero slide deleted successfully" });
     } catch (error: any) {
       res.status(500).json({ message: "Error deleting hero slide", error: error.message });
+    }
+  });
+
+  // Stripe payment routes
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { customerInfo, items, total, status } = req.body;
+
+      // Create order in database first
+      const orderData = {
+        customerFirstName: customerInfo.firstName,
+        customerLastName: customerInfo.lastName,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone || null,
+        customerAddress: customerInfo.address,
+        customerCity: customerInfo.city,
+        customerPostalCode: customerInfo.postalCode,
+        customerCountry: customerInfo.country || 'Canada',
+        total: total,
+        status: 'pending'
+      };
+
+      const order = await storage.createOrder(orderData);
+
+      // Create order items
+      for (const item of items) {
+        await storage.createOrderItem({
+          orderId: order.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        });
+      }
+
+      // Create Stripe PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(total * 100), // Convert to cents
+        currency: "cad", // Canadian dollars
+        metadata: {
+          orderId: order.id.toString()
+        }
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        order: order
+      });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ 
+        message: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
+
+  // Update order status when payment is confirmed
+  app.post("/api/orders/:id/confirm-payment", async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.id);
+      const order = await storage.updateOrderStatus(orderId, 'paid');
+      
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json(order);
+    } catch (error: any) {
+      console.error("Error confirming payment:", error);
+      res.status(500).json({ 
+        message: "Error confirming payment: " + error.message 
+      });
     }
   });
 

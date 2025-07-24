@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useCart } from '@/lib/cart';
+import { useCartStore } from '../stores/cartStore';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import LanguageSelector from '@/components/LanguageSelector';
 import ThemeSelector from '@/components/ThemeSelector';
@@ -17,7 +17,11 @@ export default function Header() {
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useLocation();
-  const { toggleCart, getTotalItems } = useCart();
+  const { getItemCount } = useCartStore();
+  
+  const handleCartClick = () => {
+    setLocation('/cart');
+  };
   const { t } = useTranslation();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -96,13 +100,13 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleCart}
+              onClick={handleCartClick}
               className="text-text-dark dark:text-text-light hover:text-rose-primary relative"
             >
               <ShoppingCart className="h-5 w-5" />
-              {getTotalItems() > 0 && (
+              {getItemCount() > 0 && (
                 <span className="absolute -top-2 -right-2 bg-rose-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {getTotalItems()}
+                  {getItemCount()}
                 </span>
               )}
             </Button>

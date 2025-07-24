@@ -18,6 +18,7 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import OrderConfirmation from "@/pages/OrderConfirmation";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import NotFound from "@/pages/not-found";
@@ -65,6 +66,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/order-confirmation" component={OrderConfirmation} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route component={NotFound} />
