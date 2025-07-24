@@ -49,6 +49,15 @@ export const translations = {
     'home.about.quality': 'Origine et qualité garanties',
     'home.about.social': 'Responsabilité sociale',
     'home.about.cta': 'En savoir plus',
+    'home.categories.title': 'Explorez Toutes Nos Catégories',
+    'home.categories.subtitle': 'Découvrez notre gamme complète de produits naturels organisés par catégories pour faciliter votre recherche.',
+    'home.categories.cta': 'Voir Toutes les Catégories',
+    'home.categories.feature1': 'Produits Naturels',
+    'home.categories.feature1_desc': '100% bio et naturel',
+    'home.categories.feature2': 'Qualité Premium',
+    'home.categories.feature2_desc': 'Sélection rigoureuse',
+    'home.categories.feature3': 'Prix Équitables',
+    'home.categories.feature3_desc': 'Meilleur rapport qualité-prix',
 
     // Products
     'products.title': 'Nos Produits Naturels',
@@ -349,6 +358,15 @@ export const translations = {
     'home.about.quality': 'Guaranteed origin and quality',
     'home.about.social': 'Social responsibility',
     'home.about.cta': 'Learn more',
+    'home.categories.title': 'Explore All Our Categories',
+    'home.categories.subtitle': 'Discover our complete range of natural products organized by categories to make your search easier.',
+    'home.categories.cta': 'View All Categories',
+    'home.categories.feature1': 'Natural Products',
+    'home.categories.feature1_desc': '100% organic and natural',
+    'home.categories.feature2': 'Premium Quality',
+    'home.categories.feature2_desc': 'Rigorous selection',
+    'home.categories.feature3': 'Fair Prices',
+    'home.categories.feature3_desc': 'Best value for money',
 
     // Products
     'products.title': 'Our Natural Products',

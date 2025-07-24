@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { ArrowRight, Leaf, Tag, Handshake } from 'lucide-react';
+import { ArrowRight, Leaf, Tag, Handshake, Grid, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductCard from '@/components/ProductCard';
@@ -62,6 +62,89 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950 dark:via-pink-950 dark:to-purple-950 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-rose-300 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-pink-300 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-purple-300 rounded-full blur-2xl"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <div className="mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-gray-800 rounded-full shadow-lg mb-6 group-hover:shadow-xl transition-all duration-300">
+              <Grid className="w-10 h-10 text-rose-600 dark:text-rose-400" />
+            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('home.categories.title') || 'Explorez Toutes Nos Catégories'}
+            </h2>
+            
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+              {t('home.categories.subtitle') || 'Découvrez notre gamme complète de produits naturels organisés par catégories pour faciliter votre recherche.'}
+            </p>
+          </div>
+          
+          {/* Main CTA Button */}
+          <Link href="/categories">
+            <Button 
+              size="lg" 
+              className="group bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white px-12 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border-0"
+            >
+              <Grid className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
+              {t('home.categories.cta') || 'Voir Toutes les Catégories'}
+              <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform duration-300" />
+            </Button>
+          </Link>
+          
+          {/* Feature highlights */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center justify-center md:justify-start space-x-3">
+              <div className="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
+                <Leaf className="w-6 h-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {t('home.categories.feature1') || 'Produits Naturels'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  {t('home.categories.feature1_desc') || '100% bio et naturel'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center md:justify-start space-x-3">
+              <div className="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
+                <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {t('home.categories.feature2') || 'Qualité Premium'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  {t('home.categories.feature2_desc') || 'Sélection rigoureuse'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center md:justify-start space-x-3">
+              <div className="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
+                <Tag className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {t('home.categories.feature3') || 'Prix Équitables'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  {t('home.categories.feature3_desc') || 'Meilleur rapport qualité-prix'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
