@@ -63,7 +63,7 @@ export default function AdminProducts() {
 
   const filteredProducts = products?.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+                         (product.description?.toLowerCase().includes(searchQuery.toLowerCase()) || false);
     const matchesStatus = statusFilter === 'all' || 
                          (statusFilter === 'active' && product.stock > 0) ||
                          (statusFilter === 'inactive' && product.stock === 0);
