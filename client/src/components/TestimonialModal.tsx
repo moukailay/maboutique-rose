@@ -84,9 +84,16 @@ export function TestimonialModal({ testimonial, isOpen, onClose }: TestimonialMo
         <div className="md:w-1/2 flex-shrink-0">
           {testimonial.image ? (
             <img
-              src={testimonial.image}
+              src={testimonial.image.startsWith('/uploads/') 
+                ? `/api/uploads/${testimonial.image.split('/uploads/')[1]}` 
+                : testimonial.image}
               alt={`Témoignage de ${testimonial.name}`}
               className="w-full h-64 md:h-full object-cover"
+              onError={(e) => {
+                console.error('Image failed to load in modal:', testimonial.image);
+                // Fallback to gradient background
+                e.currentTarget.style.display = 'none';
+              }}
             />
           ) : (
             <div className="w-full h-64 md:h-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center">

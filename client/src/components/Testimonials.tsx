@@ -73,9 +73,16 @@ const TestimonialCard = ({ testimonial, onOpenModal }: { testimonial: Testimonia
       {testimonial.image && (
         <div className="relative">
           <img
-            src={testimonial.image}
+            src={testimonial.image.startsWith('/uploads/') 
+              ? `/api/uploads/${testimonial.image.split('/uploads/')[1]}` 
+              : testimonial.image}
             alt={`Témoignage de ${testimonial.name}`}
             className="w-full h-64 object-cover"
+            onError={(e) => {
+              console.error('Image failed to load:', testimonial.image);
+              // Fallback to placeholder
+              e.currentTarget.src = '/api/placeholder/300/300';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>

@@ -48,6 +48,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
+  // API route to serve uploaded images with correct MIME types
+  app.get('/api/uploads/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(uploadsDir, filename);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+    
+    // Set correct Content-Type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    switch (ext) {
+      case '.jpg':
+      case '.jpeg':
+        res.setHeader('Content-Type', 'image/jpeg');
+        break;
+      case '.png':
+        res.setHeader('Content-Type', 'image/png');
+        break;
+      case '.gif':
+        res.setHeader('Content-Type', 'image/gif');
+        break;
+      case '.webp':
+        res.setHeader('Content-Type', 'image/webp');
+        break;
+      default:
+        res.setHeader('Content-Type', 'application/octet-stream');
+    }
+    
+    // Send the file
+    res.sendFile(filePath);
+  });
+
   const storage_multer = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, uploadsDir);
@@ -70,9 +104,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
-
-  // Serve uploaded files
-  app.use('/uploads', express.static(uploadsDir));
   
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
