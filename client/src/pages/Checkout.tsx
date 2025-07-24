@@ -147,12 +147,15 @@ export default function Checkout() {
     try {
       setIsLoading(true);
 
-      // Créer la commande avec les informations client
-      const orderItems = items.map(item => ({
-        productId: item.id,
-        quantity: item.quantity,
-        price: item.price
-      }));
+      // Créer la commande avec les informations client  
+      const orderItems = items.map(item => {
+        const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+        return {
+          productId: item.id,
+          quantity: item.quantity,
+          price: price.toString()
+        };
+      });
 
       const orderPayload = {
         customerInfo,
@@ -161,8 +164,17 @@ export default function Checkout() {
         status: 'pending'
       };
 
+      console.log("Sending payment intent request:", orderPayload);
       const response = await apiRequest("POST", "/api/create-payment-intent", orderPayload);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Payment intent error:", errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
+      console.log("Payment intent response:", data);
 
       if (data.clientSecret && data.order) {
         setClientSecret(data.clientSecret);

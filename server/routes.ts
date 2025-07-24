@@ -511,6 +511,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Créer les items de la commande
       for (const item of orderItems) {
+        // Vérifier que le produit existe
+        const product = await storage.getProduct(item.productId);
+        if (!product) {
+          console.warn(`Product with ID ${item.productId} not found, skipping order item`);
+          continue;
+        }
+        
         await storage.createOrderItem({
           orderId: order.id,
           productId: item.productId,
