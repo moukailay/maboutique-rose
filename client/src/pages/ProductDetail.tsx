@@ -90,7 +90,7 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images || [product.image];
+  const images = product.images || (product.image ? [product.image] : ['/api/placeholder/300/300']);
   const averageRating = reviews?.length 
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
     : 0;

@@ -154,9 +154,9 @@ export default function OrderConfirmation() {
               {order.items?.map((item: any, index: number) => (
                 <div key={index} className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                   <div className="flex items-center">
-                    {item.product?.images && item.product.images[0] && (
+                    {(item.product?.image || item.product?.images?.[0]) && (
                       <img
-                        src={item.product.images[0]}
+                        src={item.product?.image || item.product?.images?.[0]}
                         alt={item.product.name}
                         className="w-16 h-16 object-cover rounded-lg mr-4"
                       />
