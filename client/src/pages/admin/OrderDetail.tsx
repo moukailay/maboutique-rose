@@ -1,40 +1,35 @@
 import { useState } from 'react';
-import { useLocation, useParams } from 'wouter';
+import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  ArrowLeft, 
-  Package, 
-  User, 
-  MapPin, 
-  CreditCard, 
-  Clock,
-  CheckCircle,
-  XCircle,
-  Truck,
-  Edit
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+  ArrowLeft, 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Package, 
+  Truck, 
+  CheckCircle, 
+  Clock,
+  XCircle,
+  Printer,
+  Edit
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
 
-interface Order {
+interface OrderDetail {
   id: number;
   customerName: string;
   customerEmail: string;
   phone?: string;
   total: string;
-  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'paid' | 'shipped' | 'in-transit' | 'delivered' | 'cancelled';
   shippingAddress?: string;
   paymentMethod?: string;
   createdAt: string;
@@ -46,45 +41,49 @@ interface OrderItem {
   productId: number;
   quantity: number;
   price: string;
-  product?: {
-    id: number;
+  product: {
     name: string;
     image: string;
   };
 }
 
 export default function OrderDetail() {
-  const { id } = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [statusToUpdate, setStatusToUpdate] = useState<string>('');
+  
+  // Get order ID from URL
+  const pathParts = window.location.pathname.split('/');
+  const orderId = parseInt(pathParts[pathParts.length - 1]);
 
   // Fetch order details
-  const { data: order, isLoading, error } = useQuery({
-    queryKey: ['/api/orders', id],
+  const { data: order, isLoading, error } = useQuery<OrderDetail>({
+    queryKey: ['/api/orders', orderId],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/orders/${id}`);
+      const response = await fetch(`/api/orders/${orderId}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch order');
       return response.json();
-    },
-    enabled: !!id
+    }
   });
 
   // Update order status mutation
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
-      const response = await apiRequest('PUT', `/api/orders/${id}/status`, { status });
+      const response = await apiRequest('PUT', `/api/orders/${orderId}/status`, { status });
+      if (!response.ok) throw new Error('Failed to update status');
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/orders', orderId] });
       queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/orders', id] });
       toast({
         title: "Statut mis à jour",
         description: "Le statut de la commande a été modifié avec succès.",
       });
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le statut de la commande.",
@@ -98,45 +97,73 @@ export default function OrderDetail() {
       case 'pending':
         return { 
           text: 'En attente', 
-          color: 'bg-yellow-100 text-yellow-800',
+          color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
           icon: Clock
         };
       case 'paid':
         return { 
           text: 'Payée', 
-          color: 'bg-blue-100 text-blue-800',
+          color: 'bg-blue-100 text-blue-800 border-blue-200',
           icon: CheckCircle
         };
       case 'shipped':
         return { 
           text: 'Expédiée', 
-          color: 'bg-purple-100 text-purple-800',
+          color: 'bg-purple-100 text-purple-800 border-purple-200',
+          icon: Truck
+        };
+      case 'in-transit':
+        return { 
+          text: 'En route', 
+          color: 'bg-orange-100 text-orange-800 border-orange-200',
           icon: Truck
         };
       case 'delivered':
         return { 
           text: 'Livrée', 
-          color: 'bg-green-100 text-green-800',
+          color: 'bg-green-100 text-green-800 border-green-200',
           icon: Package
         };
       case 'cancelled':
         return { 
           text: 'Annulée', 
-          color: 'bg-red-100 text-red-800',
+          color: 'bg-red-100 text-red-800 border-red-200',
           icon: XCircle
         };
       default:
         return { 
           text: status, 
-          color: 'bg-gray-100 text-gray-800',
+          color: 'bg-gray-100 text-gray-800 border-gray-200',
           icon: Clock
         };
     }
   };
 
-  const handleUpdateStatus = () => {
-    if (statusToUpdate) {
-      updateStatusMutation.mutate(statusToUpdate);
+  const handleStatusChange = (newStatus: string) => {
+    updateStatusMutation.mutate(newStatus);
+  };
+
+  const handlePrintInvoice = () => {
+    const printWindow = window.open(`/admin/orders/${orderId}/invoice`, '_blank');
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print();
+      });
+    }
+  };
+
+  const getNextStatusOptions = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return [{ value: 'paid', label: 'Marquer comme payée', icon: CheckCircle }];
+      case 'paid':
+        return [{ value: 'shipped', label: 'Marquer comme expédiée', icon: Truck }];
+      case 'shipped':
+        return [{ value: 'in-transit', label: 'Marquer en route', icon: Truck }];
+      case 'in-transit':
+        return [{ value: 'delivered', label: 'Marquer comme livrée', icon: Package }];
+      default:
+        return [];
     }
   };
 
@@ -157,7 +184,7 @@ export default function OrderDetail() {
       <AdminLayout>
         <div className="space-y-6">
           <div className="text-center py-8">
-            <p className="text-text-medium">Commande introuvable</p>
+            <p className="text-text-medium">Commande non trouvée</p>
             <Button onClick={() => setLocation('/admin/orders')} variant="outline" className="mt-4">
               Retour aux commandes
             </Button>
@@ -169,7 +196,8 @@ export default function OrderDetail() {
 
   const statusConfig = getStatusConfig(order.status);
   const StatusIcon = statusConfig.icon;
-  const shippingData = order.shippingAddress ? JSON.parse(order.shippingAddress) : null;
+  const nextStatusOptions = getNextStatusOptions(order.status);
+  const shippingAddress = order.shippingAddress ? JSON.parse(order.shippingAddress) : null;
 
   return (
     <AdminLayout>
@@ -187,67 +215,74 @@ export default function OrderDetail() {
             <div>
               <h1 className="text-3xl font-bold text-text-dark">Commande #{order.id}</h1>
               <p className="text-text-medium">
-                Créée le {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                Créée le {new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Badge className={statusConfig.color}>
-              <StatusIcon className="mr-1 h-3 w-3" />
+          
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handlePrintInvoice}>
+              <Printer className="mr-2 h-4 w-4" />
+              Imprimer facture
+            </Button>
+            <Badge className={`${statusConfig.color} px-3 py-1 text-sm font-medium`}>
+              <StatusIcon className="mr-1 h-4 w-4" />
               {statusConfig.text}
             </Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Order Items */}
-          <div className="lg:col-span-2">
+          {/* Order Details */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Items */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Articles commandés
-                </CardTitle>
+                <CardTitle>Articles commandés</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        {item.product?.image && (
-                          <img
-                            src={item.product.image}
-                            alt={item.product.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        )}
-                        <div>
-                          <h3 className="font-medium text-text-dark">
-                            {item.product?.name || `Produit #${item.productId}`}
-                          </h3>
-                          <p className="text-sm text-text-medium">
-                            Quantité: {item.quantity}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-text-dark">
-                          {parseFloat(item.price).toFixed(2)} CAD
-                        </p>
-                        <p className="text-sm text-text-medium">
-                          Total: {(parseFloat(item.price) * item.quantity).toFixed(2)} CAD
+                    <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                      <img
+                        src={item.product.image.startsWith('/api/') ? item.product.image : `/api/uploads/${item.product.image.split('/').pop()}`}
+                        alt={item.product.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&auto=format';
+                        }}
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-medium text-text-dark">{item.product.name}</h3>
+                        <p className="text-sm text-text-medium">Quantité: {item.quantity}</p>
+                        <p className="text-sm font-medium text-text-dark">
+                          {parseFloat(item.price).toFixed(2)} CAD × {item.quantity} = {(parseFloat(item.price) * item.quantity).toFixed(2)} CAD
                         </p>
                       </div>
                     </div>
                   ))}
                 </div>
+                
+                <Separator className="my-4" />
+                
+                <div className="flex justify-between items-center text-lg font-bold">
+                  <span>Total:</span>
+                  <span>{parseFloat(order.total).toFixed(2)} CAD</span>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Order Summary & Customer Info */}
+          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Customer Information */}
+            {/* Customer Info */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -255,19 +290,26 @@ export default function OrderDetail() {
                   Informations client
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="font-medium text-text-dark">{order.customerName}</p>
-                  <p className="text-sm text-text-medium">{order.customerEmail}</p>
-                  {order.phone && (
-                    <p className="text-sm text-text-medium">{order.phone}</p>
-                  )}
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-text-medium" />
+                  <span className="text-text-dark">{order.customerName}</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-text-medium" />
+                  <span className="text-text-dark">{order.customerEmail}</span>
+                </div>
+                {order.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-text-medium" />
+                    <span className="text-text-dark">{order.phone}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Shipping Address */}
-            {shippingData && (
+            {shippingAddress && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -276,68 +318,42 @@ export default function OrderDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-sm text-text-medium">
-                    <p>{shippingData.address}</p>
-                    <p>{shippingData.city}, {shippingData.postalCode}</p>
-                    <p>{shippingData.country}</p>
+                  <div className="text-text-dark space-y-1">
+                    <p>{shippingAddress.address}</p>
+                    <p>{shippingAddress.city}, {shippingAddress.postalCode}</p>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Payment Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Paiement
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-text-medium">Méthode:</span>
-                    <span className="text-text-dark">{order.paymentMethod || 'Carte'}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between font-medium text-lg">
-                    <span>Total:</span>
-                    <span className="text-rose-primary">{parseFloat(order.total).toFixed(2)} CAD</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Status Update */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Edit className="h-5 w-5" />
-                  Mettre à jour le statut
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Select value={statusToUpdate} onValueChange={setStatusToUpdate}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir un nouveau statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">En attente</SelectItem>
-                    <SelectItem value="paid">Payée</SelectItem>
-                    <SelectItem value="shipped">Expédiée</SelectItem>
-                    <SelectItem value="delivered">Livrée</SelectItem>
-                    <SelectItem value="cancelled">Annulée</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  onClick={handleUpdateStatus}
-                  disabled={!statusToUpdate || updateStatusMutation.isPending}
-                  className="w-full bg-rose-primary hover:bg-rose-light"
-                >
-                  {updateStatusMutation.isPending ? 'Mise à jour...' : 'Mettre à jour'}
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Status Actions */}
+            {nextStatusOptions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Edit className="h-5 w-5" />
+                    Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {nextStatusOptions.map((option) => {
+                    const OptionIcon = option.icon;
+                    return (
+                      <Button
+                        key={option.value}
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => handleStatusChange(option.value)}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <OptionIcon className="mr-2 h-4 w-4" />
+                        {option.label}
+                      </Button>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>

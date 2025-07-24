@@ -34,7 +34,7 @@ interface Order {
   customerEmail: string;
   phone?: string;
   total: string;
-  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'paid' | 'shipped' | 'in-transit' | 'delivered' | 'cancelled';
   shippingAddress?: string;
   paymentMethod?: string;
   createdAt: string;
@@ -60,7 +60,7 @@ export default function AdminOrders() {
   const queryClient = useQueryClient();
 
   // Fetch orders from API
-  const { data: orders = [], isLoading, error } = useQuery({
+  const { data: orders = [], isLoading, error } = useQuery<Order[]>({
     queryKey: ['/api/orders']
   });
 
@@ -68,6 +68,7 @@ export default function AdminOrders() {
   const updateStatusMutation = useMutation({
     mutationFn: async ({ orderId, status }: { orderId: number; status: string }) => {
       const response = await apiRequest('PUT', `/api/orders/${orderId}/status`, { status });
+      if (!response.ok) throw new Error('Failed to update status');
       return response.json();
     },
     onSuccess: () => {
@@ -114,6 +115,12 @@ export default function AdminOrders() {
           color: 'bg-purple-100 text-purple-800',
           icon: Truck
         };
+      case 'in-transit':
+        return { 
+          text: 'En route', 
+          color: 'bg-orange-100 text-orange-800',
+          icon: Truck
+        };
       case 'delivered':
         return { 
           text: 'Livrée', 
@@ -144,10 +151,13 @@ export default function AdminOrders() {
   };
 
   const handlePrintInvoice = (orderId: number) => {
-    toast({
-      title: "Fonction à venir",
-      description: "L'impression de facture sera bientôt disponible.",
-    });
+    // Open print window with invoice details
+    const printWindow = window.open(`/admin/orders/${orderId}/invoice`, '_blank');
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print();
+      });
+    }
   };
 
   const getStatusCounts = () => {
@@ -156,6 +166,7 @@ export default function AdminOrders() {
       pending: orders.filter(o => o.status === 'pending').length,
       paid: orders.filter(o => o.status === 'paid').length,
       shipped: orders.filter(o => o.status === 'shipped').length,
+      inTransit: orders.filter(o => o.status === 'in-transit').length,
       delivered: orders.filter(o => o.status === 'delivered').length,
       cancelled: orders.filter(o => o.status === 'cancelled').length
     };
@@ -205,7 +216,7 @@ export default function AdminOrders() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-text-dark">{statusCounts.all}</div>
@@ -228,6 +239,12 @@ export default function AdminOrders() {
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-purple-600">{statusCounts.shipped}</div>
               <div className="text-sm text-text-medium">Expédiées</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-orange-600">{statusCounts.inTransit}</div>
+              <div className="text-sm text-text-medium">En route</div>
             </CardContent>
           </Card>
           <Card>
@@ -268,6 +285,7 @@ export default function AdminOrders() {
                   { key: 'pending', label: 'En attente' },
                   { key: 'paid', label: 'Payées' },
                   { key: 'shipped', label: 'Expédiées' },
+                  { key: 'in-transit', label: 'En route' },
                   { key: 'delivered', label: 'Livrées' },
                   { key: 'cancelled', label: 'Annulées' }
                 ].map(status => (
@@ -370,6 +388,12 @@ export default function AdminOrders() {
                                 </DropdownMenuItem>
                               )}
                               {order.status === 'shipped' && (
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'in-transit')}>
+                                  <Truck className="mr-2 h-4 w-4" />
+                                  Marquer en route
+                                </DropdownMenuItem>
+                              )}
+                              {order.status === 'in-transit' && (
                                 <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'delivered')}>
                                   <Package className="mr-2 h-4 w-4" />
                                   Marquer comme livrée
