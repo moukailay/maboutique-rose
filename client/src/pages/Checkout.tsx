@@ -165,7 +165,13 @@ export default function Checkout() {
       };
 
       console.log("Sending payment intent request:", orderPayload);
-      const response = await apiRequest("POST", "/api/create-payment-intent", orderPayload);
+      const response = await fetch("/api/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+      });
       
       if (!response.ok) {
         const errorText = await response.text();
