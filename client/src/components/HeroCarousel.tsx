@@ -115,10 +115,16 @@ export default function HeroCarousel() {
                   }`}
                 >
                   <img
-                    src={imageUrl}
+                    src={imageUrl.startsWith('/uploads/') 
+                      ? `/api/uploads/${imageUrl.split('/uploads/')[1]}` 
+                      : imageUrl}
                     alt={`${slide.title} - Image ${imageIndex + 1}`}
                     className="w-full h-full object-cover lg:object-contain 2xl:object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      console.error('Hero slide image failed to load:', imageUrl);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               ))}
