@@ -73,13 +73,13 @@ export default function Cart() {
                       {item.name}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-2">
-                      {item.description && item.description.length > 100 
+                      {item.description && typeof item.description === 'string' && item.description.length > 100 
                         ? `${item.description.substring(0, 100)}...` 
-                        : item.description}
+                        : item.description || ''}
                     </p>
                     <div className="flex items-center justify-between">
                       <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">
-                        {item.price.toFixed(2)}€
+                        {typeof item.price === 'string' ? parseFloat(item.price).toFixed(2) : item.price.toFixed(2)}€
                       </p>
                       
                       <div className="flex items-center space-x-3">
@@ -124,7 +124,10 @@ export default function Cart() {
                       Sous-total ({item.quantity} {item.quantity > 1 ? 'articles' : 'article'})
                     </span>
                     <span className="text-xl font-bold text-gray-900 dark:text-white">
-                      {(item.price * item.quantity).toFixed(2)}€
+                      {(() => {
+                        const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+                        return (price * item.quantity).toFixed(2);
+                      })()}€
                     </span>
                   </div>
                 </div>

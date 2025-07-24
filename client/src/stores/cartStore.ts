@@ -4,10 +4,10 @@ import { persist } from 'zustand/middleware';
 interface CartItem {
   id: number;
   name: string;
-  price: number;
+  price: string | number;
   quantity: number;
-  images?: string[];
-  description?: string;
+  images?: string[] | null;
+  description?: string | null;
   category?: string;
 }
 
@@ -68,7 +68,10 @@ export const useCartStore = create<CartStore>()(
       },
       
       getTotal: () => {
-        return get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        return get().items.reduce((total, item) => {
+          const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+          return total + (price * item.quantity);
+        }, 0);
       },
       
       getItemCount: () => {

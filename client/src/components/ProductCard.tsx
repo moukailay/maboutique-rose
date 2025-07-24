@@ -19,8 +19,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       id: product.id,
       name: product.name,
       price: product.price,
-      images: product.images,
-      description: product.description
+      images: product.images || undefined,
+      description: product.description || undefined
     });
     toast({
       title: "Produit ajouté",
@@ -48,7 +48,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
         <div className="flex items-center justify-between mt-auto">
           <span className="text-xl font-bold text-rose-600 dark:text-rose-400">
-            {typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price || '0').toFixed(2)}€
+            {(() => {
+              const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+              return isNaN(price) ? '0.00' : price.toFixed(2);
+            })()}€
           </span>
           <Button
             onClick={handleAddToCart}
