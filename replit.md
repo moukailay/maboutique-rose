@@ -1,8 +1,8 @@
-# Replit.md - E-commerce Natural Products Site
+# ROSE-D'ÉDEN - E-commerce Natural Products Site
 
 ## Overview
 
-This is a modern e-commerce web application specialized in natural products called "ROSE-D'ÉDEN", built with a React frontend and Express.js backend. The application features a complete authentication system for both customers and administrators, with a clean, responsive design focused on natural aesthetics and user experience. The app uses JWT-based authentication with dropdown login in the header and separate customer/admin login pages.
+This is ROSE-D'ÉDEN, a modern e-commerce web application specialized in natural products, built with a React frontend and Express.js backend. The application features a complete authentication system for both customers and administrators, with a clean, responsive design focused on natural aesthetics and user experience. The app uses JWT-based authentication with dropdown login in the header and separate customer/admin login pages.
 
 ## User Preferences
 
