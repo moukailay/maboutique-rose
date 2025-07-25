@@ -64,16 +64,45 @@ export default function PrivacyPolicy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>4. Cookies</CardTitle>
+              <CardTitle>4. Cookies et technologies similaires</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                Nous utilisons des cookies pour améliorer votre expérience sur notre site. Les cookies 
-                nous aident à mémoriser vos préférences et à comprendre comment vous utilisez notre site.
+                Rose-d'Éden utilise différents types de cookies pour améliorer votre expérience de navigation :
               </p>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold">Cookies essentiels</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Nécessaires au fonctionnement du site (panier d'achat, authentification, sécurité). 
+                    Ces cookies ne peuvent pas être désactivés.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Cookies d'analyse</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Nous aident à comprendre comment vous utilisez notre site pour l'améliorer 
+                    (pages visitées, temps passé, erreurs rencontrées).
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Cookies marketing</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Permettent de vous proposer des publicités personnalisées sur nos produits naturels 
+                    selon vos centres d'intérêt.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Cookies fonctionnels</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Améliorent l'expérience utilisateur avec des fonctions comme le chat en direct 
+                    et la mémorisation de vos préférences linguistiques.
+                  </p>
+                </div>
+              </div>
               <p>
-                Vous pouvez choisir de désactiver les cookies dans votre navigateur, mais cela pourrait 
-                affecter le fonctionnement de certaines fonctionnalités de notre site.
+                Vous pouvez gérer vos préférences de cookies via la bannière qui apparaît lors de 
+                votre première visite ou en modifiant les paramètres de votre navigateur.
               </p>
             </CardContent>
           </Card>

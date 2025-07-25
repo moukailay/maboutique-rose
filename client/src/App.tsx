@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
 import ChatWidget from "@/components/ChatWidget";
+import CookieConsent from "@/components/CookieConsent";
 import Home from "@/pages/Home";
 import Products from "@/pages/Products";
 import Categories from "@/pages/Categories";
@@ -99,6 +100,7 @@ function App() {
                 <Footer />
                 <CartSidebar />
                 <ChatWidget />
+                <CookieConsent />
               </div>
               <Toaster />
             </TooltipProvider>
