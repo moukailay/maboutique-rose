@@ -31,6 +31,7 @@ import AdminProducts from "@/pages/admin/Products";
 import AddProduct from "@/pages/admin/AddProduct";
 import EditProduct from "@/pages/admin/EditProduct";
 import AdminOrders from "@/pages/admin/Orders";
+import AllOrders from "@/pages/admin/AllOrders";
 import OrderDetail from "@/pages/admin/OrderDetail";
 import OrderInvoice from "@/pages/admin/OrderInvoice";
 import AdminCustomers from "@/pages/admin/Customers";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/admin/products/add" component={AddProduct} />
       <Route path="/admin/products/:id/edit" component={EditProduct} />
       <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/orders/all" component={AllOrders} />
       <Route path="/admin/orders/:id/invoice" component={OrderInvoice} />
       <Route path="/admin/orders/:id" component={OrderDetail} />
       <Route path="/admin/customers" component={AdminCustomers} />

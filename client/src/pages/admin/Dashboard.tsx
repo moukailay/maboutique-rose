@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
 
 interface DashboardStats {
   todayRevenue: number;
@@ -232,8 +234,13 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Orders */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Commandes récentes</CardTitle>
+              <Link href="/admin/orders/all">
+                <Button variant="outline" size="sm">
+                  Voir toutes les commandes
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

@@ -92,7 +92,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: ShoppingCart, 
       label: 'Commandes', 
       href: '/admin/orders',
-      active: location.startsWith('/admin/orders')
+      active: location.startsWith('/admin/orders'),
+      subItems: [
+        { icon: List, label: 'Gestion des commandes', href: '/admin/orders' },
+        { icon: FolderOpen, label: 'Toutes les commandes', href: '/admin/orders/all' }
+      ]
     },
     { 
       icon: Users, 
