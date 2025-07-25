@@ -211,9 +211,9 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
             <p>&copy; 2025 ROSE-D'ÉDEN. Tous droits réservés.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-rose-400 transition-colors">Politique de confidentialité</a>
-              <a href="#" className="hover:text-rose-400 transition-colors">Conditions générales</a>
-              <a href="#" className="hover:text-rose-400 transition-colors">Mentions légales</a>
+              <Link href="/privacy-policy" className="hover:text-rose-400 transition-colors">Politique de confidentialité</Link>
+              <Link href="/terms-of-service" className="hover:text-rose-400 transition-colors">Conditions générales</Link>
+              <Link href="/legal-notice" className="hover:text-rose-400 transition-colors">Mentions légales</Link>
             </div>
           </div>
         </div>

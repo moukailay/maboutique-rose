@@ -21,6 +21,9 @@ import Checkout from "@/pages/Checkout";
 import OrderConfirmation from "@/pages/OrderConfirmation";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
+import LegalNotice from "@/pages/LegalNotice";
 import NotFound from "@/pages/not-found";
 
 // Admin pages
@@ -73,6 +76,9 @@ function Router() {
       <Route path="/order-confirmation" component={OrderConfirmation} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/legal-notice" component={LegalNotice} />
       <Route component={NotFound} />
     </Switch>
   );
