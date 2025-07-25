@@ -43,15 +43,37 @@ export default function AdminProducts() {
   const updateFeaturedMutation = useMutation({
     mutationFn: async ({ id, isFeatured }: { id: number, isFeatured: boolean }) => {
       console.log('Updating featured status:', { id, isFeatured });
-      const response = await apiRequest('PATCH', `/api/products/${id}/featured`, { isFeatured });
-      console.log('Featured status update response:', response);
-      return response;
+      const response = await fetch(`/api/products/${id}/featured`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isFeatured }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update featured status');
+      }
+      
+      const result = await response.json();
+      console.log('Featured status update response:', result);
+      return result;
     },
     onSuccess: async (data, variables) => {
       console.log('Featured status updated successfully:', data);
-      // Force complete cache refresh
-      await queryClient.refetchQueries({ queryKey: ['/api/products'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/products/featured'] });
+      
+      // Update the cache directly with optimistic update
+      queryClient.setQueryData(['/api/products'], (oldData: Product[] | undefined) => {
+        if (!oldData) return oldData;
+        return oldData.map(product => 
+          product.id === variables.id 
+            ? { ...product, isFeatured: variables.isFeatured }
+            : product
+        );
+      });
+      
+      // Also refresh the featured products cache
+      queryClient.invalidateQueries({ queryKey: ['/api/products/featured'] });
       
       toast({
         title: "Succès",
