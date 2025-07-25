@@ -42,17 +42,23 @@ export default function AdminProducts() {
 
   const updateFeaturedMutation = useMutation({
     mutationFn: async ({ id, isFeatured }: { id: number, isFeatured: boolean }) => {
-      return apiRequest('PATCH', `/api/products/${id}/featured`, { isFeatured });
+      console.log('Updating featured status:', { id, isFeatured });
+      const response = await apiRequest('PATCH', `/api/products/${id}/featured`, { isFeatured });
+      console.log('Featured status update response:', response);
+      return response;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    onSuccess: (data, variables) => {
+      console.log('Featured status updated successfully:', data);
+      // Force a complete refresh of the products query
+      queryClient.refetchQueries({ queryKey: ['/api/products'] });
       queryClient.invalidateQueries({ queryKey: ['/api/products/featured'] });
       toast({
         title: "Succès",
-        description: "Le statut vedette du produit a été mis à jour",
+        description: `Le produit ${variables.isFeatured ? 'est maintenant' : 'n\'est plus'} en vedette`,
       });
     },
-    onError: () => {
+    onError: (error, variables) => {
+      console.error('Failed to update featured status:', error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le statut vedette du produit",
@@ -70,9 +76,7 @@ export default function AdminProducts() {
     return matchesSearch && matchesStatus;
   }) || [];
 
-  const handleToggleFeatured = (productId: number, currentStatus: boolean) => {
-    updateFeaturedMutation.mutate({ id: productId, isFeatured: !currentStatus });
-  };
+
 
   const handleDeleteProduct = (productId: number) => {
     // In real app, this would call API to delete product
@@ -227,7 +231,10 @@ export default function AdminProducts() {
                           <div className="flex items-center space-x-2">
                             <Switch
                               checked={product.isFeatured || false}
-                              onCheckedChange={() => handleToggleFeatured(product.id, product.isFeatured || false)}
+                              onCheckedChange={(checked) => {
+                                console.log('Switch toggled:', { productId: product.id, from: product.isFeatured, to: checked });
+                                updateFeaturedMutation.mutate({ id: product.id, isFeatured: checked });
+                              }}
                               disabled={updateFeaturedMutation.isPending}
                             />
                             {product.isFeatured && (
