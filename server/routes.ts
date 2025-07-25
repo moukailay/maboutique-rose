@@ -366,11 +366,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = Number(req.params.id);
       const { isFeatured } = req.body;
       console.log("Updating product featured status with ID:", id, "to:", isFeatured);
+      console.log("Updating product featured status with ID:", id, "isFeatured:", isFeatured);
       
       const product = await storage.updateProductFeaturedStatus(id, isFeatured);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
+      console.log("Product featured status updated successfully:", product);
       res.json(product);
     } catch (error) {
       console.error("Error updating product featured status:", error);

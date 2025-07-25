@@ -47,11 +47,12 @@ export default function AdminProducts() {
       console.log('Featured status update response:', response);
       return response;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: async (data, variables) => {
       console.log('Featured status updated successfully:', data);
-      // Force a complete refresh of the products query
-      queryClient.refetchQueries({ queryKey: ['/api/products'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/products/featured'] });
+      // Force complete cache refresh
+      await queryClient.refetchQueries({ queryKey: ['/api/products'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/products/featured'] });
+      
       toast({
         title: "Succès",
         description: `Le produit ${variables.isFeatured ? 'est maintenant' : 'n\'est plus'} en vedette`,
