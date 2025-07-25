@@ -41,7 +41,8 @@ interface OrderItem {
   productId: number;
   quantity: number;
   price: string;
-  product: {
+  product?: {
+    id?: number;
     name: string;
     images: string[];
   };
@@ -251,8 +252,14 @@ export default function OrderDetail() {
                   {order.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
                       <img
-                        src={item.product.images?.[0]?.startsWith('/api/') ? item.product.images[0] : `/api/uploads/${item.product.images?.[0]?.split('/').pop() || 'default.jpg'}`}
-                        alt={item.product.name}
+                        src={
+                          item.product?.images?.[0] 
+                            ? (item.product.images[0].startsWith('/api/') 
+                                ? item.product.images[0] 
+                                : `/api/uploads/${item.product.images[0].split('/').pop()}`)
+                            : 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&auto=format'
+                        }
+                        alt={item.product?.name || 'Produit'}
                         className="w-16 h-16 object-cover rounded-lg"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -260,7 +267,7 @@ export default function OrderDetail() {
                         }}
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium text-text-dark">{item.product.name}</h3>
+                        <h3 className="font-medium text-text-dark">{item.product?.name || 'Produit indisponible'}</h3>
                         <p className="text-sm text-text-medium">Quantité: {item.quantity}</p>
                         <p className="text-sm font-medium text-text-dark">
                           {parseFloat(item.price).toFixed(2)} CAD × {item.quantity} = {(parseFloat(item.price) * item.quantity).toFixed(2)} CAD
