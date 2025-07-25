@@ -27,7 +27,7 @@ import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/admin/Login";
 import AdminSuccess from "@/pages/admin/AdminSuccess";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminProducts from "@/pages/admin/AdminProducts";
+import AdminProducts from "@/pages/admin/Products";
 import AddProduct from "@/pages/admin/AddProduct";
 import EditProduct from "@/pages/admin/EditProduct";
 import AdminOrders from "@/pages/admin/Orders";

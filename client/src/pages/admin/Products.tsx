@@ -98,7 +98,7 @@ export default function AdminProducts() {
             </p>
           </div>
           <Button 
-            onClick={() => setLocation('/admin/products/new')}
+            onClick={() => setLocation('/admin/products/add')}
             className="bg-rose-primary hover:bg-rose-light"
           >
             <Plus className="mr-2 h-4 w-4" />
