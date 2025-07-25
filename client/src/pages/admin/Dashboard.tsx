@@ -66,11 +66,12 @@ export default function AdminDashboard() {
     totalOrders: orders.length
   };
 
-  const recentOrders = orders.slice(0, 5).map(order => ({
+  const recentOrders = orders.slice(0, 8).map(order => ({
     id: `#${order.id}`,
     customer: order.customerName,
     amount: parseFloat(order.total),
-    status: order.status
+    status: order.status,
+    date: new Date(order.createdAt).toLocaleDateString('fr-CA')
   }));
 
   const topProducts = [
@@ -159,15 +160,15 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Nouveaux clients</CardTitle>
-              <Users className="h-4 w-4 text-rose-primary" />
+              <CardTitle className="text-sm font-medium">Chiffre d'affaires</CardTitle>
+              <DollarSign className="h-4 w-4 text-rose-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-text-dark">
-                {dashboardStats.newCustomers}
+                {orders.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2)} CAD
               </div>
               <p className="text-xs text-text-medium">
-                Cette semaine
+                Total des ventes
               </p>
             </CardContent>
           </Card>
@@ -237,10 +238,11 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between">
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div>
                       <p className="font-medium text-text-dark">{order.id}</p>
                       <p className="text-sm text-text-medium">{order.customer}</p>
+                      <p className="text-xs text-text-light">{order.date}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-text-dark">{order.amount.toFixed(2)} CAD</p>
