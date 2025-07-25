@@ -43,7 +43,7 @@ interface OrderItem {
   price: string;
   product: {
     name: string;
-    image: string;
+    images: string[];
   };
 }
 
@@ -251,7 +251,7 @@ export default function OrderDetail() {
                   {order.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
                       <img
-                        src={item.product.image.startsWith('/api/') ? item.product.image : `/api/uploads/${item.product.image.split('/').pop()}`}
+                        src={item.product.images?.[0]?.startsWith('/api/') ? item.product.images[0] : `/api/uploads/${item.product.images?.[0]?.split('/').pop() || 'default.jpg'}`}
                         alt={item.product.name}
                         className="w-16 h-16 object-cover rounded-lg"
                         onError={(e) => {

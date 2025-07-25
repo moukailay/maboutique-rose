@@ -48,7 +48,7 @@ interface OrderItem {
   price: string;
   product?: {
     name: string;
-    image: string;
+    images: string[];
   };
 }
 
