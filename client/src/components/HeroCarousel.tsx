@@ -122,7 +122,8 @@ export default function HeroCarousel() {
                     className="w-full h-full object-cover lg:object-contain 2xl:object-cover"
                     loading="lazy"
                     onError={(e) => {
-                      console.error('Hero slide image failed to load:', imageUrl);
+                      // Hide broken image silently
+                      (e.target as HTMLImageElement).style.display = 'none';
                       e.currentTarget.style.display = 'none';
                     }}
                   />
