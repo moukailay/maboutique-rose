@@ -76,11 +76,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: Package, 
       label: 'Produits', 
       href: '/admin/products',
-      active: location.startsWith('/admin/products'),
-      subItems: [
-        { icon: List, label: 'Tous les produits', href: '/admin/products' },
-        { icon: Plus, label: 'Ajouter un produit', href: '/admin/products/new' }
-      ]
+      active: location.startsWith('/admin/products')
     },
     { 
       icon: FolderOpen, 
@@ -92,11 +88,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: ShoppingCart, 
       label: 'Commandes', 
       href: '/admin/orders',
-      active: location.startsWith('/admin/orders'),
-      subItems: [
-        { icon: List, label: 'Gestion des commandes', href: '/admin/orders' },
-        { icon: FolderOpen, label: 'Toutes les commandes', href: '/admin/orders/all' }
-      ]
+      active: location.startsWith('/admin/orders')
     },
     { 
       icon: Users, 
@@ -122,18 +114,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       label: 'Carrousel', 
       href: '/admin/hero-slides',
       active: location === '/admin/hero-slides'
-    },
-    { 
-      icon: BarChart3, 
-      label: 'Statistiques', 
-      href: '/admin/stats',
-      active: location === '/admin/stats'
-    },
-    { 
-      icon: Settings, 
-      label: 'Paramètres', 
-      href: '/admin/settings',
-      active: location === '/admin/settings'
     },
   ];
 
@@ -189,26 +169,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </Badge>
                   )}
                 </Button>
-                
-                {item.subItems && item.active && (
-                  <div className="ml-4 mt-2 space-y-1">
-                    {item.subItems.map((subItem) => (
-                      <Button
-                        key={subItem.href}
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start text-gray-600 hover:bg-gray-100"
-                        onClick={() => {
-                          setLocation(subItem.href);
-                          setIsMobileMenuOpen(false);
-                        }}
-                      >
-                        <subItem.icon className="mr-2 h-3 w-3" />
-                        <span className="truncate">{subItem.label}</span>
-                      </Button>
-                    ))}
-                  </div>
-                )}
+
               </div>
             ))}
           </nav>
