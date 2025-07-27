@@ -74,8 +74,7 @@ export default function ProductForm() {
       };
 
       // In real app, this would call API to save product
-      console.log('Saving product:', productData);
-      
+
       toast({
         title: isEdit ? "Produit modifié" : "Produit créé",
         description: `Le produit a été ${isEdit ? 'modifié' : 'créé'} avec succès${publish ? ' et publié' : ''}.`,

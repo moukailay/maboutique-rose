@@ -60,18 +60,18 @@ export default function AdminReviews() {
 
   const handleApprove = (reviewId: number) => {
     // In real app, this would call API to approve review
-    console.log('Approve review:', reviewId);
+
   };
 
   const handleReject = (reviewId: number) => {
     // In real app, this would call API to reject review
-    console.log('Reject review:', reviewId);
+
   };
 
   const handleDelete = (reviewId: number) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
       // In real app, this would call API to delete review
-      console.log('Delete review:', reviewId);
+
     }
   };
 

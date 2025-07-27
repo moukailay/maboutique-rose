@@ -17,19 +17,17 @@ export default function AdminSuccess() {
     }
 
     // ─── 2. Vérification du token auprès du backend ─────────────────────────
-    console.log("Vérification du token:", token);
+
     fetch("/api/auth/verify", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => {
-        console.log("Response status:", response.status);
 
         if (!response.ok) {
           throw new Error(`Token invalide (status: ${response.status})`);
         }
 
         // ─── 3. Token valide : uniformiser le stockage ──────────────────
-        console.log("Token valide, redirection vers dashboard");
 
         /*
          * On duplique le jeton sous plusieurs clés pour satisfaire

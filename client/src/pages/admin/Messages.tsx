@@ -101,7 +101,7 @@ export default function AdminMessages() {
       }
       
       const data = await response.json();
-      console.log('Chat messages loaded successfully:', data.length, 'messages');
+
       return data;
     }
   });

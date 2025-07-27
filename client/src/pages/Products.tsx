@@ -16,11 +16,7 @@ export default function Products() {
   const urlParams = new URLSearchParams(window.location.search);
   const searchQuery = urlParams.get('search') || '';
   const categoryFilter = urlParams.get('category') || '';
-  
-  console.log('Current location:', location);
-  console.log('Window location search:', window.location.search);
-  console.log('Category filter from URL:', categoryFilter);
-  
+
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const { t } = useTranslation();
 
@@ -32,15 +28,14 @@ export default function Products() {
       if (categoryFilter) params.append('category', categoryFilter);
       
       const url = `/api/products${params.toString() ? '?' + params.toString() : ''}`;
-      console.log('Fetching products from:', url);
-      
+
       const response = await fetch(url, {
         credentials: 'include'
       });
       
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
-      console.log('Received products:', data.length, 'for category:', categoryFilter || 'all');
+
       return data;
     },
     staleTime: 0,

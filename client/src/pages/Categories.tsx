@@ -92,7 +92,7 @@ export default function Categories() {
   };
 
   const handleCategoryClick = (categoryId: number) => {
-    console.log('Navigating to category:', categoryId);
+
     // Force navigation with window.location to ensure URL parameters are preserved
     window.location.href = `/products?category=${categoryId}`;
   };

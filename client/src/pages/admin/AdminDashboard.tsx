@@ -28,22 +28,18 @@ export default function AdminDashboard() {
     const checkToken = () => {
       const token = localStorage.getItem('authToken');
       const adminToken = localStorage.getItem('adminToken');
-      
-      console.log('Dashboard - authToken:', token);
-      console.log('Dashboard - adminToken:', adminToken);
-      
+
       // Nettoyage des anciennes clés et migration
       if (adminToken) {
         if (!token) {
           localStorage.setItem('authToken', adminToken);
-          console.log('Migration du token effectuée');
+
         }
         localStorage.removeItem('adminToken');
       }
       
       const finalToken = token || adminToken;
-      console.log('Dashboard - finalToken:', finalToken);
-      
+
       return finalToken;
     };
     
@@ -55,7 +51,7 @@ export default function AdminDashboard() {
       setTimeout(() => {
         const retryToken = checkToken();
         if (!retryToken) {
-          console.log('Pas de token après retry, redirection vers login');
+
           setLocation('/admin/login');
           return;
         }
@@ -69,28 +65,26 @@ export default function AdminDashboard() {
 
   const verifyToken = (finalToken: string) => {
     // Vérifier la validité du token
-    console.log('Vérification du token...');
-    
+
     fetch('/api/auth/verify', {
       headers: {
         'Authorization': `Bearer ${finalToken}`
       }
     })
     .then(response => {
-      console.log('Réponse de vérification du token:', response.status);
+
       if (!response.ok) {
-        console.log('Token invalide, redirection vers login');
+
         localStorage.removeItem('authToken');
         setLocation('/admin/login');
       } else {
-        console.log('Token valide, dashboard peut s\'afficher');
-        console.log('Dashboard prêt à s\'afficher avec le token valide');
+
       }
     })
     .catch(error => {
-      console.log('Erreur de vérification du token:', error);
+
       // Ne pas supprimer le token en cas d'erreur réseau
-      console.log('Erreur réseau, on garde le token');
+
     });
   };
 

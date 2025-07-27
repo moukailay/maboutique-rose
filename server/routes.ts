@@ -34,7 +34,7 @@ function filterValidImages(images: string[]): string[] {
     if (!imageUrl || imageUrl.trim() === '') return false;
     const exists = fileExists(imageUrl);
     if (!exists) {
-      console.log(`Image file not found, excluding: ${imageUrl}`);
+
     }
     return exists;
   });
@@ -222,25 +222,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/verify", async (req, res) => {
     try {
       const token = req.headers.authorization?.replace('Bearer ', '');
-      
-      console.log('Token verification attempt:', { token: token ? 'presente' : 'absente', length: token?.length });
-      
+
       if (!token || !token.startsWith('fake-jwt-token-')) {
-        console.log('Token invalid or missing');
+
         return res.status(401).json({ message: "Invalid token" });
       }
       
       const userId = parseInt(token.replace('fake-jwt-token-', ''));
-      console.log('Extracting user ID from token:', userId);
-      
+
       const user = await storage.getUser(userId);
       
       if (!user) {
-        console.log('User not found for ID:', userId);
+
         return res.status(401).json({ message: "User not found" });
       }
-      
-      console.log('User verification successful:', user.email);
+
       res.json({
         id: user.id,
         firstName: user.firstName,
@@ -259,34 +255,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category, search } = req.query;
       let products;
-      
-      console.log('Products API called with params:', { category, search });
-      
+
       if (search) {
-        console.log('Searching for products with query:', search);
+
         products = await storage.searchProducts(search as string);
       } else if (category) {
-        console.log('Filtering by category:', category);
+
         // Check if category is a slug or ID
         const categoryData = isNaN(Number(category)) 
           ? await storage.getCategoryBySlug(category as string)
           : await storage.getCategory(Number(category));
-        
-        console.log('Category data found:', categoryData);
-        
+
         if (categoryData) {
           products = await storage.getProductsByCategory(categoryData.id);
-          console.log('Products found for category:', products.length);
+
         } else {
-          console.log('Category not found, returning all products');
+
           products = await storage.getProducts();
         }
       } else {
-        console.log('No filters, returning all products');
+
         products = await storage.getProducts();
       }
-      
-      console.log('Final products count:', products.length);
+
       res.json(products);
     } catch (error) {
       console.error('Error in products API:', error);
@@ -298,7 +289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/products/featured", async (req, res) => {
     try {
       const featuredProducts = await storage.getFeaturedProducts();
-      console.log('Featured products found:', featuredProducts.length);
+
       res.json(featuredProducts);
     } catch (error) {
       console.error('Error fetching featured products:', error);
@@ -320,14 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/products", async (req, res) => {
     try {
-      console.log("Creating product with data:", {
-        name: req.body.name,
-        price: req.body.price,
-        categoryId: req.body.categoryId,
-        stock: req.body.stock,
-        imageLength: req.body.image?.length || 0
-      });
-      
+
       const productData = insertProductSchema.parse(req.body);
       const product = await storage.createProduct(productData);
       res.status(201).json(product);
@@ -343,14 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/products/:id", async (req, res) => {
     try {
       const id = Number(req.params.id);
-      console.log("Updating product with ID:", id, "data:", {
-        name: req.body.name,
-        price: req.body.price,
-        categoryId: req.body.categoryId,
-        stock: req.body.stock,
-        imageLength: req.body.image?.length || 0
-      });
-      
+
       const productData = insertProductSchema.parse(req.body);
       const product = await storage.updateProduct(id, productData);
       if (!product) {
@@ -369,8 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/products/:id", async (req, res) => {
     try {
       const id = Number(req.params.id);
-      console.log("Deleting product with ID:", id);
-      
+
       const deleted = await storage.deleteProduct(id);
       if (!deleted) {
         return res.status(404).json({ message: "Product not found" });
@@ -387,14 +363,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = Number(req.params.id);
       const { isFeatured } = req.body;
-      console.log("Updating product featured status with ID:", id, "to:", isFeatured);
-      console.log("Updating product featured status with ID:", id, "isFeatured:", isFeatured);
-      
+
       const product = await storage.updateProductFeaturedStatus(id, isFeatured);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
-      console.log("Product featured status updated successfully:", product);
+
       res.json(product);
     } catch (error) {
       console.error("Error updating product featured status:", error);
@@ -406,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/categories", async (req, res) => {
     try {
       const categories = await storage.getCategories();
-      console.log("Categories fetched:", categories.length);
+
       res.json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -462,8 +436,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/categories/:id", async (req, res) => {
     try {
       const id = Number(req.params.id);
-      console.log("Updating category with data:", req.body);
-      
+
       // Auto-generate slug if not provided
       const requestData = { ...req.body };
       if (!requestData.slug && requestData.name) {
@@ -481,8 +454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const categoryData = insertCategorySchema.parse(requestData);
-      console.log("Parsed category data:", categoryData);
-      
+
       const category = await storage.updateCategory(id, categoryData);
       if (!category) {
         return res.status(404).json({ message: "Category not found" });
@@ -836,25 +808,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Vérification du token comme dans /api/auth/verify
       const token = req.headers.authorization?.replace('Bearer ', '');
-      
-      console.log('Token verification attempt:', { token: token ? 'presente' : 'absente', length: token?.length });
-      
+
       if (!token || !token.startsWith('fake-jwt-token-')) {
-        console.log('Token invalid or missing');
+
         return res.status(401).json({ error: 'Invalid token' });
       }
       
       const userId = parseInt(token.replace('fake-jwt-token-', ''));
-      console.log('Extracting user ID from token:', userId);
-      
+
       const user = await storage.getUser(userId);
       if (!user) {
-        console.log('User not found:', userId);
+
         return res.status(401).json({ error: 'User not found' });
       }
-      
-      console.log('User verification successful:', user.email);
-      
+
       if (user.role !== 'admin') {
         return res.status(401).json({ error: 'Admin access required' });
       }
@@ -918,9 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/testimonials", upload.single('image'), async (req, res) => {
     try {
-      console.log("Received testimonial data:", req.body);
-      console.log("Received file:", req.file);
-      
+
       const testimonialData = {
         name: req.body.name || '',
         title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
@@ -931,9 +896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };
-      
-      console.log("Parsed testimonial data:", testimonialData);
-      
+
       const validatedData = insertTestimonialSchema.parse(testimonialData);
       const testimonial = await storage.createTestimonial(validatedData);
       res.status(201).json(testimonial);
@@ -949,10 +912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/testimonials/:id", upload.single('image'), async (req, res) => {
     try {
       const testimonialId = parseInt(req.params.id);
-      console.log("Updating testimonial ID:", testimonialId);
-      console.log("Received update data:", req.body);
-      console.log("Received file:", req.file);
-      
+
       const testimonialData = {
         name: req.body.name || '',
         title: req.body.title && req.body.title.trim() !== '' ? req.body.title : null,
@@ -963,9 +923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };
-      
-      console.log("Parsed update data:", testimonialData);
-      
+
       const validatedData = insertTestimonialSchema.parse(testimonialData);
       const testimonial = await storage.updateTestimonial(testimonialId, validatedData);
       if (!testimonial) {
@@ -1024,9 +982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/hero-slides", upload.array('images', 10), async (req, res) => {
     try {
-      console.log("Received hero slide data:", req.body);
-      console.log("Received files:", req.files);
-      
+
       // Traiter les fichiers d'images
       const images = [];
       if (req.files && Array.isArray(req.files)) {
@@ -1053,9 +1009,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };
-      
-      console.log("Parsed hero slide data:", slideData);
-      
+
       const validatedData = insertHeroSlideSchema.parse(slideData);
       const slide = await storage.createHeroSlide(validatedData);
       res.status(201).json(slide);
@@ -1071,10 +1025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/hero-slides/:id", upload.array('images', 10), async (req, res) => {
     try {
       const slideId = parseInt(req.params.id);
-      console.log("Updating hero slide ID:", slideId);
-      console.log("Received update data:", req.body);
-      console.log("Received files:", req.files);
-      
+
       // Traiter les nouvelles images
       const newImages = [];
       if (req.files && Array.isArray(req.files)) {
@@ -1105,9 +1056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
         sortOrder: parseInt(req.body.sortOrder) || 0,
       };
-      
-      console.log("Parsed hero slide update data:", slideData);
-      
+
       const validatedData = insertHeroSlideSchema.parse(slideData);
       const slide = await storage.updateHeroSlide(slideId, validatedData);
       if (!slide) {

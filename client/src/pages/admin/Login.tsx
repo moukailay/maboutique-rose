@@ -1,21 +1,26 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
-import { Shield, Eye, EyeOff } from 'lucide-react';
-
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
+import { Shield, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('admin@rose-d-eden.fr');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { login } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -23,19 +28,18 @@ export default function AdminLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       // Utiliser le hook useAuth avec isAdmin = true
       await login(email, password, true);
-      
+
       // Rediriger vers la page de succès qui gérera la vérification et la redirection
       setTimeout(() => {
-        window.location.href = '/admin/success';
+        window.location.href = "/admin/success";
       }, 100);
-      
     } catch (err: any) {
-      setError(err.message || 'Erreur de connexion');
+      setError(err.message || "Erreur de connexion");
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +93,7 @@ export default function AdminLogin() {
                   <div className="relative mt-1">
                     <Input
                       id="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -112,30 +116,24 @@ export default function AdminLogin() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full"
-              >
+              <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Connexion...
                   </div>
                 ) : (
-                  'Se connecter'
+                  "Se connecter"
                 )}
               </Button>
             </form>
-
-
           </CardContent>
         </Card>
 
         <div className="text-center">
           <Button
             variant="outline"
-            onClick={() => setLocation('/')}
+            onClick={() => setLocation("/")}
             className="text-sm"
           >
             ← Retour au site

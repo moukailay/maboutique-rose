@@ -189,8 +189,7 @@ export default function EditProduct() {
         stock: parseInt(data.stock),
         isActive: true,
       };
-      
-      console.log("Updating product with data:", productData);
+
       const response = await apiRequest(`/api/products/${id}`, { method: 'PUT', data: productData });
       const result = await response.json();
       return result;

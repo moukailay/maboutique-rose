@@ -164,7 +164,6 @@ export default function Checkout() {
         status: 'pending'
       };
 
-      console.log("Sending payment intent request:", orderPayload);
       const response = await fetch("/api/create-payment-intent", {
         method: "POST",
         headers: {
@@ -180,7 +179,6 @@ export default function Checkout() {
       }
       
       const data = await response.json();
-      console.log("Payment intent response:", data);
 
       if (data.clientSecret && data.order) {
         setClientSecret(data.clientSecret);
@@ -203,16 +201,13 @@ export default function Checkout() {
 
   const handleCustomerInfoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log("Customer info submitted:", customerInfo);
-    console.log("Cart items:", items);
-    
+
     // Validation simple
     const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'postalCode'];
     const missingFields = requiredFields.filter(field => !customerInfo[field as keyof typeof customerInfo]);
     
     if (missingFields.length > 0) {
-      console.log("Missing fields:", missingFields);
+
       toast({
         title: "Informations manquantes",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -221,7 +216,6 @@ export default function Checkout() {
       return;
     }
 
-    console.log("Starting payment intent creation...");
     createPaymentIntent();
   };
 

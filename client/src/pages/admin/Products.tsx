@@ -42,7 +42,7 @@ export default function AdminProducts() {
 
   const updateFeaturedMutation = useMutation({
     mutationFn: async ({ id, isFeatured }: { id: number, isFeatured: boolean }) => {
-      console.log('Updating featured status:', { id, isFeatured });
+
       const response = await fetch(`/api/products/${id}/featured`, {
         method: 'PATCH',
         headers: {
@@ -56,12 +56,11 @@ export default function AdminProducts() {
       }
       
       const result = await response.json();
-      console.log('Featured status update response:', result);
+
       return result;
     },
     onSuccess: async (data, variables) => {
-      console.log('Featured status updated successfully:', data);
-      
+
       // Update the cache directly with optimistic update
       queryClient.setQueryData(['/api/products'], (oldData: Product[] | undefined) => {
         if (!oldData) return oldData;
@@ -99,11 +98,9 @@ export default function AdminProducts() {
     return matchesSearch && matchesStatus;
   }) || [];
 
-
-
   const handleDeleteProduct = (productId: number) => {
     // In real app, this would call API to delete product
-    console.log('Delete product:', productId);
+
   };
 
   const getStockStatus = (stock: number) => {
@@ -255,7 +252,7 @@ export default function AdminProducts() {
                             <Switch
                               checked={product.isFeatured || false}
                               onCheckedChange={(checked) => {
-                                console.log('Switch toggled:', { productId: product.id, from: product.isFeatured, to: checked });
+
                                 updateFeaturedMutation.mutate({ id: product.id, isFeatured: checked });
                               }}
                               disabled={updateFeaturedMutation.isPending}
@@ -277,7 +274,7 @@ export default function AdminProducts() {
                                 <Edit className="mr-2 h-4 w-4" />
                                 Modifier
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => console.log('Toggle status:', product.id)}>
+                              <DropdownMenuItem onClick={() => {}}>
                                 {product.stock > 0 ? (
                                   <>
                                     <EyeOff className="mr-2 h-4 w-4" />

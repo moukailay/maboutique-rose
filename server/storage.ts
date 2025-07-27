@@ -517,9 +517,9 @@ export class DatabaseStorage implements IStorage {
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     try {
-      console.log("Creating product with data:", insertProduct);
+
       const [product] = await db.insert(products).values(insertProduct).returning();
-      console.log("Product created successfully:", product);
+
       return product;
     } catch (error) {
       console.error("Database error when creating product:", error);
@@ -529,13 +529,13 @@ export class DatabaseStorage implements IStorage {
 
   async updateProduct(id: number, updateData: InsertProduct): Promise<Product | undefined> {
     try {
-      console.log("Updating product with ID:", id, "data:", updateData);
+
       const [product] = await db
         .update(products)
         .set(updateData)
         .where(eq(products.id, id))
         .returning();
-      console.log("Product updated successfully:", product);
+
       return product || undefined;
     } catch (error) {
       console.error("Database error when updating product:", error);
@@ -545,13 +545,13 @@ export class DatabaseStorage implements IStorage {
 
   async updateProductFeaturedStatus(id: number, isFeatured: boolean): Promise<Product | undefined> {
     try {
-      console.log("Updating product featured status with ID:", id, "isFeatured:", isFeatured);
+
       const [product] = await db
         .update(products)
         .set({ isFeatured })
         .where(eq(products.id, id))
         .returning();
-      console.log("Product featured status updated successfully:", product);
+
       return product || undefined;
     } catch (error) {
       console.error("Database error when updating product featured status:", error);
@@ -561,12 +561,12 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: number): Promise<boolean> {
     try {
-      console.log("Deleting product with ID:", id);
+
       const result = await db
         .delete(products)
         .where(eq(products.id, id))
         .returning();
-      console.log("Product deleted successfully:", result.length > 0);
+
       return result.length > 0;
     } catch (error) {
       console.error("Database error when deleting product:", error);
@@ -616,8 +616,7 @@ export class DatabaseStorage implements IStorage {
       .from(orderItems)
       .leftJoin(products, eq(orderItems.productId, products.id))
       .where(eq(orderItems.orderId, orderId));
-    
-    console.log('Order items fetched for order', orderId, ':', items);
+
     return items;
   }
 

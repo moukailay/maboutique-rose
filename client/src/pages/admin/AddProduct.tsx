@@ -170,8 +170,7 @@ export default function AddProduct() {
         stock: parseInt(data.stock),
         isActive: true,
       };
-      
-      console.log("Sending product data:", productData);
+
       const response = await apiRequest('/api/products', { method: 'POST', data: productData });
       const result = await response.json();
       return result;
