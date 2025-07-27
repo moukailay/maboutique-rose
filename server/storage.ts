@@ -107,8 +107,8 @@ export interface IStorage {
   updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined>;
 
   // Testimonials
-  getTestimonials(): Promise<(Testimonial & { product?: Product })[]>;
-  getAllTestimonials(): Promise<(Testimonial & { product?: Product })[]>;
+  getTestimonials(): Promise<(Testimonial & { product?: Product | null })[]>;
+  getAllTestimonials(): Promise<(Testimonial & { product?: Product | null })[]>;
   getTestimonial(id: number): Promise<Testimonial | undefined>;
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
   updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined>;
@@ -490,7 +490,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCategory(id: number): Promise<boolean> {
     const result = await db.delete(categories).where(eq(categories.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Product methods
@@ -708,7 +708,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Testimonials
-  async getTestimonials(): Promise<(Testimonial & { product?: Product })[]> {
+  async getTestimonials(): Promise<(Testimonial & { product?: Product | null })[]> {
     return await db
       .select({
         id: testimonials.id,
@@ -725,7 +725,15 @@ export class DatabaseStorage implements IStorage {
         product: {
           id: products.id,
           name: products.name,
+          createdAt: products.createdAt,
+          description: products.description,
+          image: products.image,
+          price: products.price,
           images: products.images,
+          categoryId: products.categoryId,
+          stock: products.stock,
+          isActive: products.isActive,
+          isFeatured: products.isFeatured,
         },
       })
       .from(testimonials)
@@ -734,7 +742,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(testimonials.sortOrder, testimonials.createdAt);
   }
 
-  async getAllTestimonials(): Promise<(Testimonial & { product?: Product })[]> {
+  async getAllTestimonials(): Promise<(Testimonial & { product?: Product | null })[]> {
     return await db
       .select({
         id: testimonials.id,
@@ -751,7 +759,15 @@ export class DatabaseStorage implements IStorage {
         product: {
           id: products.id,
           name: products.name,
+          createdAt: products.createdAt,
+          description: products.description,
+          image: products.image,
+          price: products.price,
           images: products.images,
+          categoryId: products.categoryId,
+          stock: products.stock,
+          isActive: products.isActive,
+          isFeatured: products.isFeatured,
         },
       })
       .from(testimonials)
