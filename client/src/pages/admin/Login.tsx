@@ -80,7 +80,7 @@ export default function AdminLogin() {
                     required
                     autoComplete="email"
                     className="mt-1"
-                    placeholder="admin@rose-d-eden.fr"
+                    placeholder="roseden.boutique@gmail.com"
                   />
                 </div>
 
@@ -128,15 +128,7 @@ export default function AdminLogin() {
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-                Identifiants par défaut:
-              </h4>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                Email: admin@rose-d-eden.fr<br />
-                Mot de passe: admin123
-              </p>
-            </div>
+
           </CardContent>
         </Card>
 

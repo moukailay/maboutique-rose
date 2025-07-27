@@ -252,13 +252,13 @@ export class DatabaseStorage implements IStorage {
     // Products will be created via admin interface later
 
     // Create admin user if it doesn't exist
-    const adminUser = await this.getUserByEmail("admin@rose-d-eden.fr");
+    const adminUser = await this.getUserByEmail("roseden.boutique@gmail.com");
     if (!adminUser) {
       await this.createUserWithAuth({
         firstName: "Admin",
         lastName: "User",
-        email: "admin@rose-d-eden.fr",
-        password: "admin123",
+        email: "roseden.boutique@gmail.com",
+        password: "JssRose5641@",
         role: "admin",
       });
     }
