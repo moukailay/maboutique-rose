@@ -18,6 +18,28 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
+// Function to check if file exists
+function fileExists(filePath: string): boolean {
+  try {
+    const fullPath = path.join(process.cwd(), filePath.replace(/^\/uploads\//, './uploads/'));
+    return fs.existsSync(fullPath);
+  } catch (error) {
+    return false;
+  }
+}
+
+// Function to filter valid images (that actually exist on disk)
+function filterValidImages(images: string[]): string[] {
+  return images.filter(imageUrl => {
+    if (!imageUrl || imageUrl.trim() === '') return false;
+    const exists = fileExists(imageUrl);
+    if (!exists) {
+      console.log(`Image file not found, excluding: ${imageUrl}`);
+    }
+    return exists;
+  });
+}
+
 // Function to convert YouTube URL to embed URL
 function convertToYouTubeEmbed(url: string): string {
   if (!url) return url;
@@ -976,7 +998,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/hero-slides", async (req, res) => {
     try {
       const slides = await storage.getHeroSlides();
-      res.json(slides);
+      // Nettoyer les images invalides lors de la récupération
+      const cleanedSlides = slides.map(slide => ({
+        ...slide,
+        images: filterValidImages(slide.images || [])
+      }));
+      res.json(cleanedSlides);
     } catch (error: any) {
       res.status(500).json({ message: "Error fetching hero slides", error: error.message });
     }
@@ -1008,11 +1035,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Ajouter les images existantes si elles existent
+      // Ajouter les images existantes si elles existent ET qu'elles sont valides
       if (req.body.existingImages) {
         try {
           const existingImages = JSON.parse(req.body.existingImages);
-          images.push(...existingImages);
+          const validExistingImages = filterValidImages(existingImages);
+          images.push(...validExistingImages);
         } catch (e) {
           console.error("Error parsing existing images:", e);
         }
@@ -1055,12 +1083,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Récupérer les images existantes
+      // Récupérer les images existantes ET les valider
       const existingImages = [];
       if (req.body.existingImages) {
         try {
           const parsed = JSON.parse(req.body.existingImages);
-          existingImages.push(...parsed);
+          const validExistingImages = filterValidImages(parsed);
+          existingImages.push(...validExistingImages);
         } catch (e) {
           console.error("Error parsing existing images:", e);
         }
