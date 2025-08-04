@@ -891,13 +891,13 @@ export class MemStorage implements IStorage {
       role: "admin",
     });
 
-    // Create sample products with working images
+    // Create sample products with existing uploaded images
     const sampleProducts = [
       {
         name: "Tisane Détox Bio",
         description: "Une tisane détoxifiante naturelle aux plantes biologiques",
         price: "24.99",
-        image: "/api/placeholder/400/300?color=e8f5e8&textColor=2d5a27",
+        image: "/api/uploads/image-1752430253727-829362421.png",
         categoryId: 1,
         stock: 50,
         isActive: true,
@@ -907,7 +907,7 @@ export class MemStorage implements IStorage {
         name: "Huile Rose-d'Éden Signature",
         description: "Huile essentielle signature de la marque Rose-d'Éden",
         price: "39.99", 
-        image: "/api/placeholder/400/300?color=f4e8f1&textColor=8b2f65",
+        image: "/api/uploads/image-1752431577788-827143469.png",
         categoryId: 3,
         stock: 30,
         isActive: true,
@@ -917,7 +917,7 @@ export class MemStorage implements IStorage {
         name: "Produit Femme Bio",
         description: "Produit naturel spécialement conçu pour les femmes",
         price: "32.50",
-        image: "/api/placeholder/400/300?color=f9e8f4&textColor=a6467a",
+        image: "/api/uploads/image-1752724817817-146777460.jpeg",
         categoryId: 2,
         stock: 25,
         isActive: true,
@@ -927,7 +927,7 @@ export class MemStorage implements IStorage {
         name: "Produit Amincissant Naturel",
         description: "Aide à la perte de poids de manière naturelle",
         price: "45.99",
-        image: "/api/placeholder/400/300?color=e8f2ff&textColor=2d4a8b",
+        image: "/api/uploads/image-1752947309774-301584921.webp",
         categoryId: 5,
         stock: 15,
         isActive: true,
