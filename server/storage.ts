@@ -891,25 +891,45 @@ export class MemStorage implements IStorage {
       role: "admin",
     });
 
-    // Create sample products
+    // Create sample products with working images
     const sampleProducts = [
       {
         name: "Tisane Détox Bio",
-        description: "Une tisane détoxifiante naturelle",
+        description: "Une tisane détoxifiante naturelle aux plantes biologiques",
         price: "24.99",
-        image: "/api/placeholder/400/300",
+        image: "/api/placeholder/400/300?color=e8f5e8&textColor=2d5a27",
         categoryId: 1,
         stock: 50,
         isActive: true,
         isFeatured: true,
       },
       {
-        name: "Huile Rose-d'Éden",
-        description: "Huile essentielle signature",
+        name: "Huile Rose-d'Éden Signature",
+        description: "Huile essentielle signature de la marque Rose-d'Éden",
         price: "39.99", 
-        image: "/api/placeholder/400/300",
+        image: "/api/placeholder/400/300?color=f4e8f1&textColor=8b2f65",
         categoryId: 3,
         stock: 30,
+        isActive: true,
+        isFeatured: true,
+      },
+      {
+        name: "Produit Femme Bio",
+        description: "Produit naturel spécialement conçu pour les femmes",
+        price: "32.50",
+        image: "/api/placeholder/400/300?color=f9e8f4&textColor=a6467a",
+        categoryId: 2,
+        stock: 25,
+        isActive: true,
+        isFeatured: false,
+      },
+      {
+        name: "Produit Amincissant Naturel",
+        description: "Aide à la perte de poids de manière naturelle",
+        price: "45.99",
+        image: "/api/placeholder/400/300?color=e8f2ff&textColor=2d4a8b",
+        categoryId: 5,
+        stock: 15,
         isActive: true,
         isFeatured: true,
       }
@@ -1034,7 +1054,17 @@ export class MemStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
-    const newProduct = { ...product, id: this.getNextId(), createdAt: new Date() };
+    const newProduct = { 
+      ...product, 
+      id: this.getNextId(), 
+      createdAt: new Date(),
+      description: product.description || null,
+      images: product.images || null,
+      categoryId: product.categoryId || null,
+      stock: product.stock || 0,
+      isActive: product.isActive ?? true,
+      isFeatured: product.isFeatured ?? false
+    };
     this.products.push(newProduct);
     return newProduct;
   }

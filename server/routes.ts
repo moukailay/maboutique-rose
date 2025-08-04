@@ -10,13 +10,16 @@ import fs from "fs";
 import express from "express";
 import Stripe from "stripe";
 
-// Initialize Stripe
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Initialize Stripe (only if key is provided)
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-06-30.basil" as any,
+  });
+} else {
+  console.warn("⚠️  Stripe n'est pas configuré (STRIPE_SECRET_KEY manquant)");
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-06-30.basil" as any,
-});
+
 
 // Function to check if file exists
 function fileExists(filePath: string): boolean {
@@ -102,6 +105,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Send the file
     res.sendFile(filePath);
+  });
+
+  // API endpoint for placeholder images
+  app.get('/api/placeholder/:width/:height', (req, res) => {
+    const { width, height } = req.params;
+    const color = req.query.color || 'f0f0f0';
+    const textColor = req.query.textColor || '666666';
+    
+    // Create a simple SVG placeholder
+    const svg = `
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#${color}"/>
+        <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-size="16" fill="#${textColor}">
+          ${width}×${height}
+        </text>
+      </svg>
+    `;
+    
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(svg);
   });
 
   const storage_multer = multer.diskStorage({
@@ -1092,15 +1116,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create order in database first
       const orderData = {
-        customerFirstName: customerInfo.firstName,
-        customerLastName: customerInfo.lastName,
+        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
         customerEmail: customerInfo.email,
-        customerPhone: customerInfo.phone || null,
-        customerAddress: customerInfo.address,
-        customerCity: customerInfo.city,
-        customerPostalCode: customerInfo.postalCode,
-        customerCountry: customerInfo.country || 'Canada',
-        total: total,
+        phone: customerInfo.phone || null,
+        shippingAddress: `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.postalCode}, ${customerInfo.country || 'Canada'}`,
+        total: total.toString(),
         status: 'pending'
       };
 
@@ -1116,7 +1136,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create Stripe PaymentIntent
+      // Create Stripe PaymentIntent (only if Stripe is configured)
+      if (!stripe) {
+        return res.status(500).json({ message: "Stripe n'est pas configuré" });
+      }
+      
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(total * 100), // Convert to cents
         currency: "cad", // Canadian dollars
