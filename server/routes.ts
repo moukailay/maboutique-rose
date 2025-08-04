@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storagePromise, type IStorage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertReviewSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertTestimonialSchema, insertHeroSlideSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -15,7 +15,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-06-30.basil" as any,
 });
 
 // Function to check if file exists
@@ -61,8 +61,8 @@ function convertToYouTubeEmbed(url: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize database data
-  await storage.initializeData();
+  // Initialize storage 
+  const storage: IStorage = await storagePromise;
 
   // Configure multer for file uploads
   const uploadsDir = path.join(process.cwd(), 'uploads');

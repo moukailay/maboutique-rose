@@ -846,4 +846,433 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// MemStorage for fallback when database is unavailable
+export class MemStorage implements IStorage {
+  private users: User[] = [];
+  private categories: Category[] = [];
+  private products: Product[] = [];
+  private orders: Order[] = [];
+  private orderItems: OrderItem[] = [];
+  private reviews: Review[] = [];
+  private contacts: Contact[] = [];
+  private newsletters: Newsletter[] = [];
+  private chatMessages: ChatMessage[] = [];
+  private testimonials: Testimonial[] = [];
+  private heroSlides: HeroSlide[] = [];
+  private nextId = 1;
+
+  private getNextId(): number {
+    return this.nextId++;
+  }
+
+  async initializeData() {
+    // Initialize with sample data
+    console.log("Initializing in-memory storage with sample data...");
+    
+    // Create categories
+    const categoriesData = [
+      { name: "TISANES", description: "Tisanes biologiques et infusions naturelles", slug: "tisanes", parentId: null, sortOrder: 1 },
+      { name: "FEMMES", description: "Produits dédiés aux femmes", slug: "femmes", parentId: null, sortOrder: 2 },
+      { name: "ROSE-D'ÉDEN", description: "Produits signature Rose-d'Éden", slug: "rose-d-eden", parentId: null, sortOrder: 3 },
+      { name: "HOMMES", description: "Produits dédiés aux hommes", slug: "hommes", parentId: null, sortOrder: 4 },
+      { name: "PRODUITS AMINCISSANTS", description: "Produits pour la perte de poids et la minceur", slug: "produits-amincissants", parentId: null, sortOrder: 5 },
+    ];
+
+    for (const cat of categoriesData) {
+      await this.createCategory(cat);
+    }
+
+    // Create admin user
+    await this.createUserWithAuth({
+      firstName: "Admin",
+      lastName: "User", 
+      email: "roseden.boutique@gmail.com",
+      password: "JssRose5641@",
+      role: "admin",
+    });
+
+    // Create sample products
+    const sampleProducts = [
+      {
+        name: "Tisane Détox Bio",
+        description: "Une tisane détoxifiante naturelle",
+        price: "24.99",
+        image: "/api/placeholder/400/300",
+        categoryId: 1,
+        stock: 50,
+        isActive: true,
+        isFeatured: true,
+      },
+      {
+        name: "Huile Rose-d'Éden",
+        description: "Huile essentielle signature",
+        price: "39.99", 
+        image: "/api/placeholder/400/300",
+        categoryId: 3,
+        stock: 30,
+        isActive: true,
+        isFeatured: true,
+      }
+    ];
+
+    for (const product of sampleProducts) {
+      await this.createProduct(product);
+    }
+  }
+
+  // Users
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.find(u => u.id === id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.users.find(u => u.username === username);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(u => u.email === email);
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const newUser = { 
+      ...user, 
+      id: this.getNextId(), 
+      createdAt: new Date(),
+      firstName: user.firstName || null,
+      lastName: user.lastName || null,
+      phone: user.phone || null,
+      address: user.address || null,
+      city: user.city || null,
+      postalCode: user.postalCode || null,
+      country: user.country || null,
+      role: user.role || 'user'
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
+
+  async createUserWithAuth(userData: { firstName: string; lastName: string; email: string; password: string; role?: 'user' | 'admin' }): Promise<User> {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    return this.createUser({
+      username: userData.email,
+      email: userData.email,
+      password: hashedPassword,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      role: userData.role || 'user',
+    });
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return this.users;
+  }
+
+  // Categories
+  async getCategories(): Promise<Category[]> {
+    return this.categories.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }
+
+  async getCategory(id: number): Promise<Category | undefined> {
+    return this.categories.find(c => c.id === id);
+  }
+
+  async getCategoryBySlug(slug: string): Promise<Category | undefined> {
+    return this.categories.find(c => c.slug === slug);
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const newCategory = { 
+      ...category, 
+      id: this.getNextId(), 
+      createdAt: new Date(),
+      description: category.description || null,
+      image: category.image || null,
+      parentId: category.parentId || null,
+      sortOrder: category.sortOrder || null
+    };
+    this.categories.push(newCategory);
+    return newCategory;
+  }
+
+  async updateCategory(id: number, category: InsertCategory): Promise<Category | undefined> {
+    const index = this.categories.findIndex(c => c.id === id);
+    if (index === -1) return undefined;
+    this.categories[index] = { ...this.categories[index], ...category };
+    return this.categories[index];
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const index = this.categories.findIndex(c => c.id === id);
+    if (index === -1) return false;
+    this.categories.splice(index, 1);
+    return true;
+  }
+
+  // Products
+  async getProducts(): Promise<Product[]> {
+    return this.products;
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    return this.products.find(p => p.id === id);
+  }
+
+  async getProductsByCategory(categoryId: number): Promise<Product[]> {
+    return this.products.filter(p => p.categoryId === categoryId);
+  }
+
+  async getFeaturedProducts(): Promise<Product[]> {
+    return this.products.filter(p => p.isFeatured);
+  }
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const lowerQuery = query.toLowerCase();
+    return this.products.filter(p => 
+      p.name.toLowerCase().includes(lowerQuery) || 
+      (p.description && p.description.toLowerCase().includes(lowerQuery))
+    );
+  }
+
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const newProduct = { ...product, id: this.getNextId(), createdAt: new Date() };
+    this.products.push(newProduct);
+    return newProduct;
+  }
+
+  async updateProduct(id: number, product: InsertProduct): Promise<Product | undefined> {
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) return undefined;
+    this.products[index] = { ...this.products[index], ...product };
+    return this.products[index];
+  }
+
+  async updateProductFeaturedStatus(id: number, isFeatured: boolean): Promise<Product | undefined> {
+    const product = this.products.find(p => p.id === id);
+    if (!product) return undefined;
+    product.isFeatured = isFeatured;
+    return product;
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) return false;
+    this.products.splice(index, 1);
+    return true;
+  }
+
+  // Orders
+  async getOrders(): Promise<Order[]> {
+    return this.orders.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async getOrder(id: number): Promise<Order | undefined> {
+    return this.orders.find(o => o.id === id);
+  }
+
+  async getOrdersByUser(userId: number): Promise<Order[]> {
+    return this.orders.filter(o => o.userId === userId);
+  }
+
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const newOrder = { ...order, id: this.getNextId(), createdAt: new Date() };
+    this.orders.push(newOrder);
+    return newOrder;
+  }
+
+  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
+    const order = this.orders.find(o => o.id === id);
+    if (!order) return undefined;
+    order.status = status;
+    return order;
+  }
+
+  // Order Items
+  async getOrderItems(orderId: number): Promise<OrderItem[]> {
+    return this.orderItems.filter(oi => oi.orderId === orderId);
+  }
+
+  async createOrderItem(orderItem: InsertOrderItem): Promise<OrderItem> {
+    const newOrderItem = { ...orderItem, id: this.getNextId() };
+    this.orderItems.push(newOrderItem);
+    return newOrderItem;
+  }
+
+  // Reviews
+  async getReviews(productId: number): Promise<Review[]> {
+    return this.reviews.filter(r => r.productId === productId && r.isApproved);
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return this.reviews.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const newReview = { ...review, id: this.getNextId(), createdAt: new Date() };
+    this.reviews.push(newReview);
+    return newReview;
+  }
+
+  async updateReviewApproval(id: number, isApproved: boolean): Promise<Review | undefined> {
+    const review = this.reviews.find(r => r.id === id);
+    if (!review) return undefined;
+    review.isApproved = isApproved;
+    return review;
+  }
+
+  // Contacts
+  async createContact(contact: InsertContact): Promise<Contact> {
+    const newContact = { ...contact, id: this.getNextId(), createdAt: new Date(), isRead: false };
+    this.contacts.push(newContact);
+    return newContact;
+  }
+
+  async getAllContacts(): Promise<Contact[]> {
+    return this.contacts.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async markContactAsRead(id: number): Promise<Contact | undefined> {
+    const contact = this.contacts.find(c => c.id === id);
+    if (!contact) return undefined;
+    contact.isRead = true;
+    return contact;
+  }
+
+  // Newsletter
+  async createNewsletter(newsletter: InsertNewsletter): Promise<Newsletter> {
+    const newNewsletter = { ...newsletter, id: this.getNextId(), createdAt: new Date() };
+    this.newsletters.push(newNewsletter);
+    return newNewsletter;
+  }
+
+  // Chat Messages
+  async getChatMessages(): Promise<ChatMessage[]> {
+    return this.chatMessages.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async createChatMessage(chatMessage: InsertChatMessage): Promise<ChatMessage> {
+    const newChatMessage = { 
+      ...chatMessage, 
+      id: this.getNextId(), 
+      createdAt: new Date(),
+      isRead: chatMessage.isRead || false,
+      userAgent: chatMessage.userAgent || null,
+      url: chatMessage.url || null,
+      ipAddress: chatMessage.ipAddress || null,
+      adminResponse: chatMessage.adminResponse || null,
+      respondedAt: chatMessage.respondedAt || null,
+      respondedBy: chatMessage.respondedBy || null
+    };
+    this.chatMessages.push(newChatMessage);
+    return newChatMessage;
+  }
+
+  async markChatMessageAsRead(id: number): Promise<ChatMessage | undefined> {
+    const message = this.chatMessages.find(m => m.id === id);
+    if (!message) return undefined;
+    message.isRead = true;
+    return message;
+  }
+
+  async respondToChatMessage(id: number, response: string, adminId: number): Promise<ChatMessage | undefined> {
+    const message = this.chatMessages.find(m => m.id === id);
+    if (!message) return undefined;
+    message.adminResponse = response;
+    message.respondedBy = adminId;
+    message.respondedAt = new Date();
+    return message;
+  }
+
+  // Testimonials
+  async getTestimonials(): Promise<(Testimonial & { product?: Product | null })[]> {
+    return this.testimonials
+      .filter(t => t.isActive)
+      .map(t => ({
+        ...t,
+        product: t.productId ? this.products.find(p => p.id === t.productId) || null : null
+      }))
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }
+
+  async getAllTestimonials(): Promise<(Testimonial & { product?: Product | null })[]> {
+    return this.testimonials
+      .map(t => ({
+        ...t,
+        product: t.productId ? this.products.find(p => p.id === t.productId) || null : null
+      }))
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }
+
+  async getTestimonial(id: number): Promise<Testimonial | undefined> {
+    return this.testimonials.find(t => t.id === id);
+  }
+
+  async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
+    const newTestimonial = { ...testimonial, id: this.getNextId(), createdAt: new Date() };
+    this.testimonials.push(newTestimonial);
+    return newTestimonial;
+  }
+
+  async updateTestimonial(id: number, testimonial: InsertTestimonial): Promise<Testimonial | undefined> {
+    const index = this.testimonials.findIndex(t => t.id === id);
+    if (index === -1) return undefined;
+    this.testimonials[index] = { ...this.testimonials[index], ...testimonial };
+    return this.testimonials[index];
+  }
+
+  async deleteTestimonial(id: number): Promise<boolean> {
+    const index = this.testimonials.findIndex(t => t.id === id);
+    if (index === -1) return false;
+    this.testimonials.splice(index, 1);
+    return true;
+  }
+
+  // Hero Slides
+  async getHeroSlides(): Promise<HeroSlide[]> {
+    return this.heroSlides.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }
+
+  async getHeroSlide(id: number): Promise<HeroSlide | undefined> {
+    return this.heroSlides.find(s => s.id === id);
+  }
+
+  async createHeroSlide(slide: InsertHeroSlide): Promise<HeroSlide> {
+    const newSlide = { ...slide, id: this.getNextId(), createdAt: new Date() };
+    this.heroSlides.push(newSlide);
+    return newSlide;
+  }
+
+  async updateHeroSlide(id: number, slide: InsertHeroSlide): Promise<HeroSlide | undefined> {
+    const index = this.heroSlides.findIndex(s => s.id === id);
+    if (index === -1) return undefined;
+    this.heroSlides[index] = { ...this.heroSlides[index], ...slide };
+    return this.heroSlides[index];
+  }
+
+  async deleteHeroSlide(id: number): Promise<boolean> {
+    const index = this.heroSlides.findIndex(s => s.id === id);
+    if (index === -1) return false;
+    this.heroSlides.splice(index, 1);
+    return true;
+  }
+}
+
+// Create storage with automatic fallback
+async function createStorage(): Promise<IStorage> {
+  // Try database first
+  try {
+    const dbStorage = new DatabaseStorage();
+    // Test database connection
+    await dbStorage.getCategories();
+    console.log("✅ Using database storage");
+    return dbStorage;
+  } catch (error) {
+    console.warn("⚠️  Database unavailable, falling back to in-memory storage:", error.message);
+    const memStorage = new MemStorage();
+    await memStorage.initializeData();
+    return memStorage;
+  }
+}
+
+// Export storage initialization promise
+export const storagePromise = createStorage();
+export let storage: IStorage;
